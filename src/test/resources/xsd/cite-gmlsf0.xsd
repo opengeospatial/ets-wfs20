@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema targetNamespace="http://cite.opengeospatial.org/gmlsf/2.0"
+  xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:sf="http://cite.opengeospatial.org/gmlsf/2.0" elementFormDefault="qualified" version="2.0">
+
+  <xsd:annotation>
+    <xsd:appinfo xmlns:gmlsf="http://www.opengis.net/gmlsf/2.0"
+      source="http://schemas.opengis.net/gmlsfProfile/2.0/gmlsfLevels.xsd">
+      <gmlsf:ComplianceLevel>0</gmlsf:ComplianceLevel>
+    </xsd:appinfo>
+    <xsd:documentation xml:lang="en">This GML application schema conforms to Level SF-0 as defined
+      in "Geography Markup Language (GML) simple features profile", Version 2.0.1 (OGC 10-100r3).
+    </xsd:documentation>
+  </xsd:annotation>
+
+  <xsd:import namespace="http://www.opengis.net/gml/3.2"
+    schemaLocation="http://schemas.opengis.net/gml/3.2.1/gml.xsd"/>
+
+  <xsd:element name="SimpleFeatureCollection" type="sf:SimpleFeatureCollectionType"
+    substitutionGroup="gml:AbstractGML">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en">General feature collection used as the root element in an
+        instance document.</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:complexType name="SimpleFeatureCollectionType">
+    <xsd:complexContent>
+      <xsd:extension base="gml:AbstractFeatureType">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+          <xsd:element name="featureMember">
+            <xsd:complexType>
+              <xsd:complexContent>
+                <xsd:extension base="gml:AbstractFeatureMemberType">
+                  <xsd:sequence>
+                    <xsd:element ref="gml:AbstractFeature"/>
+                  </xsd:sequence>
+                </xsd:extension>
+              </xsd:complexContent>
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:element name="PrimitiveGeoFeature" type="sf:PrimitiveGeoFeatureType"
+    substitutionGroup="gml:AbstractFeature">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en">Feature type with selected simple non-spatial properties and
+        spatial properties having primitive geometry values.</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:complexType name="PrimitiveGeoFeatureType">
+    <xsd:complexContent>
+      <xsd:extension base="gml:AbstractFeatureType">
+        <xsd:sequence>
+          <xsd:element name="surfaceProperty" minOccurs="0" type="gml:SurfacePropertyType"/>
+          <xsd:element name="pointProperty" minOccurs="0" type="gml:PointPropertyType"/>
+          <xsd:element name="curveProperty" minOccurs="0" type="gml:CurvePropertyType"/>
+          <xsd:element name="intProperty" type="xsd:integer"/>
+          <xsd:element name="uriProperty" type="xsd:anyURI" minOccurs="0"/>
+          <xsd:element name="measurand" type="gml:MeasureType"/>
+          <xsd:element name="dateTimeProperty" type="xsd:dateTime" minOccurs="0"/>
+          <xsd:element name="dateProperty" type="xsd:date" minOccurs="0"/>
+          <xsd:element name="decimalProperty">
+            <xsd:simpleType>
+              <xsd:restriction base="xsd:decimal">
+                <xsd:totalDigits value="4"/>
+                <xsd:fractionDigits value="2"/>
+              </xsd:restriction>
+            </xsd:simpleType>
+          </xsd:element>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:element name="AggregateGeoFeature" type="sf:AggregateGeoFeatureType"
+    substitutionGroup="gml:AbstractFeature">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en">Feature type with selected simple non-spatial properties and
+        spatial properties having aggregate geometry values.</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:complexType name="AggregateGeoFeatureType">
+    <xsd:complexContent>
+      <xsd:extension base="gml:AbstractFeatureType">
+        <xsd:sequence>
+          <xsd:element name="multiPointProperty" minOccurs="0" type="gml:MultiPointPropertyType"/>
+          <xsd:element name="multiCurveProperty" minOccurs="0" type="gml:MultiCurvePropertyType"/>
+          <xsd:element name="multiSurfaceProperty" minOccurs="0" type="gml:MultiSurfacePropertyType"/>
+          <xsd:element name="multiGeomProperty" minOccurs="0" type="gml:MultiGeometryPropertyType"/>
+          <xsd:element name="doubleProperty" type="xsd:double"/>
+          <xsd:element name="intRangeProperty" minOccurs="0">
+            <xsd:simpleType>
+              <xsd:restriction base="xsd:integer">
+                <xsd:minInclusive value="0"/>
+                <xsd:maxInclusive value="99"/>
+              </xsd:restriction>
+            </xsd:simpleType>
+          </xsd:element>
+          <xsd:element name="strProperty" type="xsd:string"/>
+          <xsd:element name="featureCode">
+            <xsd:complexType>
+              <xsd:simpleContent>
+                <xsd:restriction base="gml:CodeType">
+                  <xsd:attribute name="codeSpace" type="xsd:anyURI"
+                    default="https://www.dgiwg.org/FAD/fdd/registers.jsp?register=DFDD"/>
+                </xsd:restriction>
+              </xsd:simpleContent>
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:element name="EntitéGénérique" type="sf:EntitéGénériqueType"
+    substitutionGroup="gml:AbstractFeature">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en">Simple feature with a generic geometry property that includes
+        characters outside of the range U+0000..U+007F (Basic Latin). Acceptable geometry
+        representations include any of the following: gml:Point, gml:LineString, gml:Curve,
+        gml:Polygon, gml:Surface, gml:MultiPoint, gml:MultiCurve, and gml:MultiSurface.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:complexType name="EntitéGénériqueType">
+    <xsd:complexContent>
+      <xsd:extension base="gml:AbstractFeatureType">
+        <xsd:sequence>
+          <xsd:element name="attribut.Géométrie" type="gml:GeometryPropertyType"/>
+          <xsd:element name="boolProperty" type="xsd:boolean"/>
+          <xsd:element name="str4Property">
+            <xsd:simpleType>
+              <xsd:restriction base="xsd:string">
+                <xsd:length value="4"/>
+              </xsd:restriction>
+            </xsd:simpleType>
+          </xsd:element>
+          <xsd:element name="featureRef" type="gml:ReferenceType" minOccurs="0">
+            <xsd:annotation>
+              <xsd:appinfo>
+                <gml:targetElement>gml:AbstractFeature</gml:targetElement>
+              </xsd:appinfo>
+            </xsd:annotation>
+          </xsd:element>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+</xsd:schema>

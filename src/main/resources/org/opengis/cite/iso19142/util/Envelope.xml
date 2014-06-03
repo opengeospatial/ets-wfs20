@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gml:Envelope xmlns:gml="http://www.opengis.net/gml/3.2"
+  srsName="urn:ogc:def:crs:EPSG::4326">
+  <gml:lowerCorner>-90 -180</gml:lowerCorner>
+  <gml:upperCorner>90 180</gml:upperCorner>
+</gml:Envelope>

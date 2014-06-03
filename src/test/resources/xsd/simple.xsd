@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema targetNamespace="http://example.org/ns1"
+	xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:tns="http://example.org/ns1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	elementFormDefault="qualified">
+
+	<xsd:import namespace="http://www.opengis.net/gml/3.2"
+		schemaLocation="http://schemas.opengis.net/gml/3.2.1/gml.xsd" />
+
+	<xsd:element name="SimpleFeature" type="tns:SimpleFeatureType"
+		substitutionGroup="gml:AbstractFeature">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Feature type with
+				selected simple non-spatial properties and
+				spatial properties having
+				primitive geometry values.
+			</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="SimpleFeatureType">
+		<xsd:complexContent>
+			<xsd:extension base="gml:AbstractFeatureType">
+				<xsd:sequence>
+					<xsd:element ref="gml:locationName" minOccurs="0"
+						maxOccurs="unbounded" />
+					<xsd:element ref="gml:locationReference" minOccurs="0" />
+					<xsd:element name="surfaceProperty" minOccurs="0"
+						type="gml:SurfacePropertyType" />
+					<xsd:element name="pointProperty" minOccurs="0"
+						type="gml:PointPropertyType" />
+					<xsd:element name="curveProperty" minOccurs="0"
+						type="tns:LineStringPropertyType" />
+					<xsd:element name="intProperty" type="xsd:integer" />
+					<xsd:element name="uriProperty" type="xsd:anyURI"
+						minOccurs="0" />
+					<xsd:element name="measurand" type="xsd:double" />
+					<xsd:element name="dateTimeProperty" type="xsd:dateTime"
+						minOccurs="0" />
+					<xsd:element name="dateProperty" type="xsd:date"
+						minOccurs="0" />
+					<xsd:element name="decimalProperty">
+						<xsd:simpleType>
+							<xsd:restriction base="xsd:decimal">
+								<xsd:totalDigits value="4" />
+								<xsd:fractionDigits value="2" />
+							</xsd:restriction>
+						</xsd:simpleType>
+					</xsd:element>
+					<xsd:element name="relatedFeature" type="gml:ReferenceType"
+						minOccurs="0">
+						<xsd:annotation>
+							<xsd:appinfo xsi:type="tns:SimpleFeature" />
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:element name="lineStringProperty" type="tns:LineStringPropertyType" />
+	<xsd:complexType name="LineStringPropertyType">
+		<xsd:sequence>
+			<xsd:element ref="gml:LineString" />
+		</xsd:sequence>
+		<!--<xsd:attributeGroup ref="gml:OwnershipAttributeGroup" /> -->
+	</xsd:complexType>
+
+	<xsd:element name="ComplexFeature" type="tns:ComplexFeatureType"
+		substitutionGroup="gml:AbstractFeature">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Feature having complex
+				property values.
+			</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ComplexFeatureType">
+		<xsd:complexContent>
+			<xsd:extension base="gml:AbstractFeatureType">
+				<xsd:sequence>
+					<xsd:element name="multiGeomProperty" type="gml:MultiGeometryPropertyType" />
+					<xsd:element name="observation" type="gml:MeasureType" />
+					<xsd:element ref="tns:hexBinaryProperty" />
+					<xsd:element name="typeCode" type="gml:CodeType" />
+					<xsd:element ref="tns:b64BinaryProperty" minOccurs="0" />
+					<xsd:element name="validTime" type="xsd:dateTime" />
+					<xsd:element name="locationCode" type="tns:LocationCodeType"
+						minOccurs="0" />
+					<xsd:element name="simpleFeature" minOccurs="0"
+						maxOccurs="unbounded" type="tns:SimpleFeatureAssociationType" />
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="SimpleFeatureAssociationType">
+		<xsd:complexContent>
+			<xsd:restriction base="gml:AssociationRoleType">
+				<xsd:sequence minOccurs="0">
+					<xsd:element ref="tns:SimpleFeature" />
+				</xsd:sequence>
+				<xsd:attributeGroup ref="gml:OwnershipAttributeGroup" />
+				<xsd:attributeGroup ref="gml:AssociationAttributeGroup" />
+			</xsd:restriction>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:element name="hexBinaryProperty" type="tns:HexBinaryPropertyType"
+		nillable="true" />
+	<xsd:complexType name="HexBinaryPropertyType">
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:hexBinary">
+				<xsd:attribute name="url" type="xsd:anyURI" use="optional" />
+				<xsd:attribute name="mimeType" type="xsd:string" use="required" />
+				<xsd:attribute name="role" type="xsd:string" use="optional" />
+				<xsd:attribute name="length" type="xsd:positiveInteger"
+					use="optional" />
+				<xsd:attribute name="nilReason" type="gml:NilReasonType" />
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+
+	<xsd:element name="b64BinaryProperty">
+		<xsd:complexType>
+			<xsd:simpleContent>
+				<xsd:extension base="xsd:base64Binary">
+					<xsd:attribute name="url" type="xsd:anyURI" use="optional" />
+					<xsd:attribute name="mimeType" type="xsd:string" use="required" />
+					<xsd:attribute name="role" type="xsd:string" use="optional" />
+					<xsd:attribute name="length" type="xsd:positiveInteger"
+						use="optional" />
+				</xsd:extension>
+			</xsd:simpleContent>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:simpleType name="LocationCodeType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="CA-AB" />
+			<xsd:enumeration value="CA-BC" />
+			<xsd:enumeration value="CA-SK" />
+			<xsd:enumeration value="CA-MB" />
+			<xsd:enumeration value="CA-ON" />
+		</xsd:restriction>
+	</xsd:simpleType>
+
+
+</xsd:schema>

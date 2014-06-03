@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wfs:GetPropertyValue service="WFS" version="2.0.0"
+  xmlns:wfs="http://www.opengis.net/wfs/2.0"
+  xmlns:ns1="http://cite.opengeospatial.org/gmlsf"
+  xmlns:gml="http://www.opengis.net/gml/3.2"
+  count="100"
+  valueReference="@gml:id">
+  <wfs:Query typeNames="ns1:AggregateGeoFeature"/>
+</wfs:GetPropertyValue>

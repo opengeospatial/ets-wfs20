@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Add this entry to TE_BASE/config.xml (//organization/standard) -->
+<organization>
+  <name>OGC</name>
+  <standard>
+    <name>Web Feature Service (WFS)</name>
+    <version>
+      <name>2.0</name>
+      <suite>
+        <namespace-uri>http://www.opengis.net/cite/iso19142</namespace-uri>
+        <prefix>tns</prefix>
+        <local-name>ets-${ets-code}-${version}</local-name>
+        <title>WFS 2.0 (ISO 19142:2010) Conformance Test Suite</title>
+        <description>Checks WFS 2.0 implementations for conformance to ISO 19142:2010.</description>
+      </suite>
+      <revision>
+        <name>${project.version}</name>
+        <status>Beta</status>
+        <sources>
+          <source>${ets-code}/${spec-version}/ctl</source>
+        </sources>
+        <webdir>${ets-code}/${spec-version}/site</webdir>
+      </revision>
+    </version>
+  </standard>
+</organization>

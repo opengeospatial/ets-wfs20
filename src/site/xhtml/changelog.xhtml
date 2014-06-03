@@ -1,0 +1,113 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+  <head>
+    <title>Release Notes</title>
+  </head>
+  <body>
+    <h1>Release Notes</h1>
+
+    <h2>2.0-r16 (2014-MM-DD)</h2>
+    <p>This release incorporates the following changes:</p>
+    <ul>
+      <li style="list-style:square">Modify POM for GitHub.</li>
+      <li style="list-style:square">Add site content.</li>
+      <li style="list-style:square">Change license to Apache License, Version 2.0.</li>
+    </ul>
+
+    <h2>2.0-r15 (2014-04-15)</h2>
+    <p>This release includes the following updates:</p>
+    <ul>
+      <li style="list-style:square">Fix CITE-944: InsertResults/UpdateResults/ReplaceResults.</li>
+      <li style="list-style:square">Fix CITE-925: Infinite loop in selectRandomFeatureType.</li>
+      <li style="list-style:square">Update dependencies.</li>
+    </ul>
+
+    <h2>2.0-r14 (2014-02-04)</h2>
+    <p>This release includes the following fixes:</p>
+    <ul>
+      <li style="list-style:square">Fixed CITE-924: Check if the (embedded) Derby database exists and contains EPSG tables; if not, create them.</li>
+      <li style="list-style:square">Updated dependency: ets-gml-3.2.1-r13.</li>
+    </ul>
+
+    <h2>2.0-r13 (2013-12-04)</h2>
+    <p>This release includes the following changes:</p>
+    <ul>
+      <li style="list-style:square">Resolved CITE-890: updateGMLName test fails.</li>
+      <li style="list-style:square">Updated dependency: ets-gml-3.2.1-r12.</li>
+    </ul>
+
+    <h2>2.0-r12 (2013-11-14)</h2>
+    <p>This release includes the following changes:</p>
+    <ul>
+      <li style="list-style:square">Resolved CITE-893: Removed boundedByIsNil test.</li>
+    </ul>
+
+    <h2>2.0-r11 (2013-10-29)</h2>
+    <p>This release includes the following changes:</p>
+    <ul>
+      <li style="list-style:square">Fixed CITE-883: Stored query tests throw NullPointerException.</li>
+      <li style="list-style:square">Fixed CITE-874: Test run aborts with <code>ArrayIndexOutOfBoundsException</code>.</li>
+      <li style="list-style:square">Allow upload of capabilities document (form interface).</li>
+      <li style="list-style:square">Updated dependencies.</li>
+    </ul>
+
+    <h2>2.0-r10 (2013-09-19)</h2>
+    <p>This is a maintenance release; it includes the following changes:</p>
+    <ul>
+      <li style="list-style:square">Resolved CITE-866: CRS reference not inherited from geometry collection 
+      (fixed in geomatics-geotk-1.1).</li>
+      <li style="list-style:square">Write reporter output to test session directory when invoked via CTL script.</li>
+    </ul>
+
+    <h2>2.0-r9 (2013-08-30)</h2>
+    <p>This is a maintenance release; it includes the following fixes and enhancements:</p>
+    <ul>
+      <li style="list-style:square">CITE-863: Revised ExceptionReport.sch to allow for SOAP fault message.</li>
+      <li style="list-style:square">CITE-812: Added optional 'fid' test run argument.</li>
+      <li style="list-style:square">CITE-861: propertyIsGreaterThanEqualTo_matchAny (invalid string literal for integer).</li>
+      <li style="list-style:square">CITE-860: propertyIsLike (only applies to properties of type xsd:string).</li>
+    </ul>
+
+    <h2>2.0-r8 (2013-08-27)</h2>
+    <p>This is a maintenance release; it includes the following fixes:</p>
+    <ul>
+      <li style="list-style:square">CITE-859: updateFeatureName test is not run.</li>
+      <li style="list-style:square">CITE-847: NullPointerException when handling SOAP error response.</li>
+    </ul>
+
+    <h2>2.0-r7 (2013-07-24)</h2>
+    <p>This is a maintenance release; it includes the following fixes and enhancements:</p>
+    <ul>
+      <li style="list-style:square">CITE-837: GetFeatureById with unknown Id should return status code 403.</li>
+      <li style="list-style:square">Updated dependency: ets-gml-3.2.1-r7.</li>
+      <li style="list-style:square">Write response entity to report (attribute) if test method failed.</li>
+    </ul>
+
+    <h2>2.0-r6 (2013-07-16)</h2>
+    <p>This is a maintenance release; it includes the following enhancements and fixes:</p>
+    <ul>
+      <li style="list-style:square">CITE-836: Precondition checkDataAvailability only tries one message binding.</li>
+      <li style="list-style:square">CITE-832: GetFeatureById response should include feature representation by itself.</li>
+    </ul>
+
+    <h2>2.0-r5 (2013-07-15)</h2>
+    <p>This is a maintenance release; it includes the following changes:</p>
+    <ul>
+      <li style="list-style:square">CITE-831: Added constructor functions to XPath expressions (PropertyIsEqualToOperatorTests).</li>
+      <li style="list-style:square">CITE-827: Changed how the content of a SOAP body is extracted from response entity.</li>
+      <li style="list-style:square">CITE-806: The legacy SOAP 1.1 namespace is used by default in SOAP request messages</li>
+      <li style="list-style:square">CITE-785: DateTime parsing problem (RelationalOperatorTests)</li>
+      <li style="list-style:square">Changed stored query identifiers in accord with the <a target="_blank" 
+      href="http://def.seegrid.csiro.au/sissvoc/ogc-def/resource?uri=http://www.opengis.net/def/query/">OGC-NA register</a></li>
+    </ul>
+
+    <h2>2.0-r4 (2013-07-04)</h2>
+    <p>This is a maintenance release. The following issues were resolved:</p>
+    <ul>
+      <li style="list-style:square">CITE-813 (Soap Responses): Added client support for SOAP message responses</li>
+      <li style="list-style:square">CITE-779 (Test Suite hangs): Added prerequisite checks in @BeforeSuite methods</li>
+    </ul>
+
+  </body>
+</html>

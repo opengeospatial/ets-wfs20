@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" prefer="system">
+
+  <system systemId="http://www.w3.org/2009/01/xml.xsd"
+          uri="./xsd/xml.xsd" />
+  <system systemId="http://www.w3.org/2001/xml.xsd"
+          uri="./xsd/xml.xsd" />
+  <system systemId="http://www.w3.org/XML/2008/06/xlink.xsd"
+          uri="./xsd/xlink.xsd" />
+  <system systemId="http://www.w3.org/1999/xlink.xsd"
+          uri="./xsd/xlink.xsd" />
+  <system systemId="http://schemas.opengis.net/gml/3.2.1/gml.xsd"
+          uri="./xsd/gml-3.2.1.xsd" />
+  <system systemId="http://schemas.opengis.net/iso/19139/20070417/gmd/gmd.xsd"
+          uri="./xsd/gmd-2007.xsd" />
+  <system systemId="http://schemas.opengis.net/iso/19139/20070417/gco/gco.xsd"
+          uri="./xsd/gco-2007.xsd" />
+  <system systemId="http://schemas.opengis.net/iso/19139/20070417/gts/gts.xsd"
+          uri="./xsd/gts-2007.xsd" />
+  <system systemId="http://schemas.opengis.net/iso/19139/20070417/gss/gss.xsd"
+          uri="./xsd/gss-2007.xsd" />
+  <system systemId="http://schemas.opengis.net/iso/19139/20070417/gsr/gsr.xsd"
+          uri="./xsd/gsr-2007.xsd" />
+
+  <!-- Map target namespace to schema resource -->
+  <uri name="http://www.example.net/gamma"
+       uri="./xsd/gamma.xsd"/>
+  <uri name="http://example.org/ns1"
+       uri="./xsd/simple.xsd"/>
+</catalog>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wfs:Transaction version="2.0.0" service="WFS"
+  xmlns:wfs="http://www.opengis.net/wfs/2.0" 
+  xmlns:gml="http://www.opengis.net/gml/3.2">
+  <wfs:Update typeName="gml:AbstractFeature">
+    <wfs:Property>
+      <wfs:ValueReference action="replace">gml:boundedBy</wfs:ValueReference>
+      <wfs:Value>
+        <Point xmlns="http://www.opengis.net/kml/2.2">
+          <coordinates>-123.1,49.25</coordinates>
+        </Point>
+      </wfs:Value>
+    </wfs:Property>
+  </wfs:Update>
+</wfs:Transaction>

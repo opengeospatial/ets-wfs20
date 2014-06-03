@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wfs:GetFeature version="2.0.0" service="WFS" count="100"
+  xmlns:wfs="http://www.opengis.net/wfs/2.0">
+  <wfs:Query xmlns:tns="http://cite.opengeospatial.org/gmlsf" 
+  typeNames="tns:PrimitiveGeoFeature tns:AggregateGeoFeature"/>
+</wfs:GetFeature>

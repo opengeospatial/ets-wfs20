@@ -1,0 +1,1664 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="http://www.opengis.net/ows/1.1" xmlns:ows="http://www.opengis.net/ows/1.1"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2001/XMLSchema"
+  elementFormDefault="qualified" version="1.1.0 2010-01-30" xml:lang="en">
+  <annotation>
+    <appinfo>owsAll.xsd 2010-01-30</appinfo>
+    <documentation>This XML Schema Document includes and imports, directly and indirectly, all the
+      XML Schemas defined by the OWS Common Implemetation Specification. OWS is an OGC Standard.
+      Copyright (c) 2006,2010 Open Geospatial Consortium, Inc. All Rights Reserved. To obtain
+      additional rights of use, visit http://www.opengeospatial.org/legal/ . </documentation>
+    <documentation source="http://portal.opengeospatial.org/files/?artifact_id=20040">OGC Web
+      Services Common Specification, Version 1.1.0 with Corrigendum 1 (OGC 06-121r3)</documentation>
+  </annotation>
+
+  <import namespace="http://www.w3.org/1999/xlink"
+    schemaLocation="http://schemas.opengis.net/xlink/1.0.0/xlinks.xsd"/>
+  <import namespace="http://www.w3.org/XML/1998/namespace"
+    schemaLocation="http://www.w3.org/2001/xml.xsd"/>
+
+  <element name="ServiceIdentification">
+    <annotation>
+      <documentation>General metadata for this specific server. This XML Schema of this section
+        shall be the same for all OWS. </documentation>
+    </annotation>
+    <complexType>
+      <complexContent>
+        <extension base="ows:DescriptionType">
+          <sequence>
+            <element name="ServiceType" type="ows:CodeType">
+              <annotation>
+                <documentation>A service type name from a registry of services. For example, the
+                  values of the codeSpace URI and name and code string may be "OGC" and "catalogue."
+                  This type name is normally used for machine-to-machine communication.
+                </documentation>
+              </annotation>
+            </element>
+            <element name="ServiceTypeVersion" type="ows:VersionType" maxOccurs="unbounded">
+              <annotation>
+                <documentation>Unordered list of one or more versions of this service type
+                  implemented by this server. This information is not adequate for version
+                  negotiation, and shall not be used for that purpose. </documentation>
+              </annotation>
+            </element>
+            <element name="Profile" type="anyURI" minOccurs="0" maxOccurs="unbounded">
+              <annotation>
+                <documentation>Unordered list of identifiers of Application Profiles that are
+                  implemented by this server. This element should be included for each specified
+                  application profile implemented by this server. The identifier value should be
+                  specified by each Application Profile. If this element is omitted, no meaning is
+                  implied. </documentation>
+              </annotation>
+            </element>
+            <element ref="ows:Fees" minOccurs="0">
+              <annotation>
+                <documentation>If this element is omitted, no meaning is implied. </documentation>
+              </annotation>
+            </element>
+            <element ref="ows:AccessConstraints" minOccurs="0" maxOccurs="unbounded">
+              <annotation>
+                <documentation>Unordered list of access constraints applied to assure the protection
+                  of privacy or intellectual property, and any other restrictions on retrieving or
+                  using data from or otherwise using this server. The reserved value NONE (case
+                  insensitive) shall be used to mean no access constraints are imposed. When this
+                  element is omitted, no meaning is implied. </documentation>
+              </annotation>
+            </element>
+          </sequence>
+        </extension>
+      </complexContent>
+    </complexType>
+  </element>
+
+  <element name="ServiceProvider">
+    <annotation>
+      <documentation>Metadata about the organization that provides this specific service instance or
+        server. </documentation>
+    </annotation>
+    <complexType>
+      <sequence>
+        <element name="ProviderName" type="string">
+          <annotation>
+            <documentation>A unique identifier for the service provider organization.
+            </documentation>
+          </annotation>
+        </element>
+        <element name="ProviderSite" type="ows:OnlineResourceType" minOccurs="0">
+          <annotation>
+            <documentation>Reference to the most relevant web site of the service provider.
+            </documentation>
+          </annotation>
+        </element>
+        <element name="ServiceContact" type="ows:ResponsiblePartySubsetType">
+          <annotation>
+            <documentation>Information for contacting the service provider. The OnlineResource
+              element within this ServiceContact element should not be used to reference a web site
+              of the service provider. </documentation>
+          </annotation>
+        </element>
+      </sequence>
+    </complexType>
+  </element>
+
+  <element name="OperationsMetadata">
+    <annotation>
+      <documentation>Metadata about the operations and related abilities specified by this service
+        and implemented by this server, including the URLs for operation requests. The basic
+        contents of this section shall be the same for all OWS types, but individual services can
+        add elements and/or change the optionality of optional elements. </documentation>
+    </annotation>
+    <complexType>
+      <sequence>
+        <element ref="ows:Operation" minOccurs="2" maxOccurs="unbounded">
+          <annotation>
+            <documentation>Metadata for unordered list of all the (requests for) operations that
+              this server interface implements. The list of required and optional operations
+              implemented shall be specified in the Implementation Specification for this service.
+            </documentation>
+          </annotation>
+        </element>
+        <element name="Parameter" type="ows:DomainType" minOccurs="0" maxOccurs="unbounded">
+          <annotation>
+            <documentation>Optional unordered list of parameter valid domains that each apply to one
+              or more operations which this server interface implements. The list of required and
+              optional parameter domain limitations shall be specified in the Implementation
+              Specification for this service. </documentation>
+          </annotation>
+        </element>
+        <element name="Constraint" type="ows:DomainType" minOccurs="0" maxOccurs="unbounded">
+          <annotation>
+            <documentation>Optional unordered list of valid domain constraints on non-parameter
+              quantities that each apply to this server. The list of required and optional
+              constraints shall be specified in the Implementation Specification for this service.
+            </documentation>
+          </annotation>
+        </element>
+        <element ref="ows:ExtendedCapabilities" minOccurs="0"/>
+      </sequence>
+    </complexType>
+  </element>
+
+  <element name="ExtendedCapabilities" type="anyType">
+    <annotation>
+      <documentation>Individual software vendors and servers can use this element to provide
+        metadata about any additional server abilities. </documentation>
+    </annotation>
+  </element>
+
+  <element name="Operation">
+    <annotation>
+      <documentation>Metadata for one operation that this server implements. </documentation>
+    </annotation>
+    <complexType>
+      <sequence>
+        <element ref="ows:DCP" maxOccurs="unbounded">
+          <annotation>
+            <documentation>Unordered list of Distributed Computing Platforms (DCPs) supported for
+              this operation. At present, only the HTTP DCP is defined, so this element will appear
+              only once. </documentation>
+          </annotation>
+        </element>
+        <element name="Parameter" type="ows:DomainType" minOccurs="0" maxOccurs="unbounded">
+          <annotation>
+            <documentation>Optional unordered list of parameter domains that each apply to this
+              operation which this server implements. If one of these Parameter elements has the
+              same "name" attribute as a Parameter element in the OperationsMetadata element, this
+              Parameter element shall override the other one for this operation. The list of
+              required and optional parameter domain limitations for this operation shall be
+              specified in the Implementation Specification for this service. </documentation>
+          </annotation>
+        </element>
+        <element name="Constraint" type="ows:DomainType" minOccurs="0" maxOccurs="unbounded">
+          <annotation>
+            <documentation>Optional unordered list of valid domain constraints on non-parameter
+              quantities that each apply to this operation. If one of these Constraint elements has
+              the same "name" attribute as a Constraint element in the OperationsMetadata element,
+              this Constraint element shall override the other one for this operation. The list of
+              required and optional constraints for this operation shall be specified in the
+              Implementation Specification for this service. </documentation>
+          </annotation>
+        </element>
+        <element ref="ows:Metadata" minOccurs="0" maxOccurs="unbounded">
+          <annotation>
+            <documentation>Optional unordered list of additional metadata about this operation and
+              its' implementation. A list of required and optional metadata elements for this
+              operation should be specified in the Implementation Specification for this service.
+              (Informative: This metadata might specify the operation request parameters or provide
+              the XML Schemas for the operation request.) </documentation>
+          </annotation>
+        </element>
+      </sequence>
+      <attribute name="name" type="string" use="required">
+        <annotation>
+          <documentation>Name or identifier of this operation (request) (for example,
+            GetCapabilities). The list of required and optional operations implemented shall be
+            specified in the Implementation Specification for this service. </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>
+
+  <element name="DCP">
+    <annotation>
+      <documentation>Information for one distributed Computing Platform (DCP) supported for this
+        operation. At present, only the HTTP DCP is defined, so this element only includes the HTTP
+        element. </documentation>
+    </annotation>
+    <complexType>
+      <choice>
+        <element ref="ows:HTTP"/>
+      </choice>
+    </complexType>
+  </element>
+
+  <element name="HTTP">
+    <annotation>
+      <documentation>Connect point URLs for the HTTP Distributed Computing Platform (DCP). Normally,
+        only one Get and/or one Post is included in this element. More than one Get and/or Post is
+        allowed to support including alternative URLs for uses such as load balancing or backup.
+      </documentation>
+    </annotation>
+    <complexType>
+      <choice maxOccurs="unbounded">
+        <element name="Get" type="ows:RequestMethodType">
+          <annotation>
+            <documentation>Connect point URL prefix and any constraints for the HTTP "Get" request
+              method for this operation request. </documentation>
+          </annotation>
+        </element>
+        <element name="Post" type="ows:RequestMethodType">
+          <annotation>
+            <documentation>Connect point URL and any constraints for the HTTP "Post" request method
+              for this operation request. </documentation>
+          </annotation>
+        </element>
+      </choice>
+    </complexType>
+  </element>
+
+  <complexType name="RequestMethodType">
+    <annotation>
+      <documentation>Connect point URL and any constraints for this HTTP request method for this
+        operation request. In the OnlineResourceType, the xlink:href attribute in the
+        xlink:simpleLink attribute group shall be used to contain this URL. The other attributes in
+        the xlink:simpleLink attribute group should not be used. </documentation>
+    </annotation>
+    <complexContent>
+      <extension base="ows:OnlineResourceType">
+        <sequence>
+          <element name="Constraint" type="ows:DomainType" minOccurs="0" maxOccurs="unbounded">
+            <annotation>
+              <documentation>Optional unordered list of valid domain constraints on non-parameter
+                quantities that each apply to this request method for this operation. If one of
+                these Constraint elements has the same "name" attribute as a Constraint element in
+                the OperationsMetadata or Operation element, this Constraint element shall override
+                the other one for this operation. The list of required and optional constraints for
+                this request method for this operation shall be specified in the Implementation
+                Specification for this service. </documentation>
+            </annotation>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+
+  <complexType name="CapabilitiesBaseType">
+    <annotation>
+      <documentation>XML encoded GetCapabilities operation response. This document provides clients
+        with service metadata about a specific service instance, usually including metadata about
+        the tightly-coupled data served. If the server does not implement the updateSequence
+        parameter, the server shall always return the complete Capabilities document, without the
+        updateSequence parameter. When the server implements the updateSequence parameter and the
+        GetCapabilities operation request included the updateSequence parameter with the current
+        value, the server shall return this element with only the "version" and "updateSequence"
+        attributes. Otherwise, all optional elements shall be included or not depending on the
+        actual value of the Contents parameter in the GetCapabilities operation request. This base
+        type shall be extended by each specific OWS to include the additional contents needed.
+      </documentation>
+    </annotation>
+    <sequence>
+      <element ref="ows:ServiceIdentification" minOccurs="0"/>
+      <element ref="ows:ServiceProvider" minOccurs="0"/>
+      <element ref="ows:OperationsMetadata" minOccurs="0"/>
+    </sequence>
+    <attribute name="version" type="ows:VersionType" use="required"/>
+    <attribute name="updateSequence" type="ows:UpdateSequenceType" use="optional">
+      <annotation>
+        <documentation>Service metadata document version, having values that are "increased"
+          whenever any change is made in service metadata document. Values are selected by each
+          server, and are always opaque to clients. When not supported by server, server shall not
+          return this attribute. </documentation>
+      </annotation>
+    </attribute>
+  </complexType>
+
+  <element name="GetCapabilities" type="ows:GetCapabilitiesType"/>
+
+  <complexType name="GetCapabilitiesType">
+    <annotation>
+      <documentation>XML encoded GetCapabilities operation request. This operation allows clients to
+        retrieve service metadata about a specific service instance. In this XML encoding, no
+        "request" parameter is included, since the element name specifies the specific operation.
+        This base type shall be extended by each specific OWS to include the additional required
+        "service" attribute, with the correct value for that OWS. </documentation>
+    </annotation>
+    <sequence>
+      <element name="AcceptVersions" type="ows:AcceptVersionsType" minOccurs="0">
+        <annotation>
+          <documentation>When omitted, server shall return latest supported version.
+          </documentation>
+        </annotation>
+      </element>
+      <element name="Sections" type="ows:SectionsType" minOccurs="0">
+        <annotation>
+          <documentation>When omitted or not supported by server, server shall return complete
+            service metadata (Capabilities) document. </documentation>
+        </annotation>
+      </element>
+      <element name="AcceptFormats" type="ows:AcceptFormatsType" minOccurs="0">
+        <annotation>
+          <documentation>When omitted or not supported by server, server shall return service
+            metadata document using the MIME type "text/xml". </documentation>
+        </annotation>
+      </element>
+    </sequence>
+    <attribute name="updateSequence" type="ows:UpdateSequenceType" use="optional">
+      <annotation>
+        <documentation>When omitted or not supported by server, server shall return latest complete
+          service metadata document. </documentation>
+      </annotation>
+    </attribute>
+  </complexType>
+
+  <simpleType name="ServiceType">
+    <annotation>
+      <documentation>Service type identifier, where the string value is the OWS type abbreviation,
+        such as "WMS" or "WFS". </documentation>
+    </annotation>
+    <restriction base="string"/>
+  </simpleType>
+
+  <complexType name="AcceptVersionsType">
+    <annotation>
+      <documentation>Prioritized sequence of one or more specification versions accepted by client,
+        with preferred versions listed first. See Version negotiation subclause for more
+        information. </documentation>
+    </annotation>
+    <sequence>
+      <element name="Version" type="ows:VersionType" maxOccurs="unbounded"/>
+    </sequence>
+  </complexType>
+
+  <complexType name="SectionsType">
+    <annotation>
+      <documentation>Unordered list of zero or more names of requested sections in complete service
+        metadata document. Each Section value shall contain an allowed section name as specified by
+        each OWS specification. See Sections parameter subclause for more information.
+      </documentation>
+    </annotation>
+    <sequence>
+      <element name="Section" type="string" minOccurs="0" maxOccurs="unbounded"/>
+    </sequence>
+  </complexType>
+
+  <simpleType name="UpdateSequenceType">
+    <annotation>
+      <documentation>Service metadata document version, having values that are "increased" whenever
+        any change is made in service metadata document. Values are selected by each server, and are
+        always opaque to clients. See updateSequence parameter use subclause for more information.
+      </documentation>
+    </annotation>
+    <restriction base="string"/>
+  </simpleType>
+
+  <complexType name="AcceptFormatsType">
+    <annotation>
+      <documentation>Prioritized sequence of zero or more GetCapabilities operation response formats
+        desired by client, with preferred formats listed first. Each response format shall be
+        identified by its MIME type. See AcceptFormats parameter use subclause for more information.
+      </documentation>
+    </annotation>
+    <sequence>
+      <element name="OutputFormat" type="ows:MimeType" minOccurs="0" maxOccurs="unbounded"/>
+    </sequence>
+  </complexType>
+
+  <element name="Resource">
+    <annotation>
+      <documentation>XML encoded GetResourceByID operation response. The complexType used by this
+        element shall be specified by each specific OWS. </documentation>
+    </annotation>
+  </element>
+
+  <element name="GetResourceByID" type="ows:GetResourceByIdType"/>
+
+  <complexType name="GetResourceByIdType">
+    <annotation>
+      <documentation>Request to a service to perform the GetResourceByID operation. This operation
+        allows a client to retrieve one or more identified resources, including datasets and
+        resources that describe datasets or parameters. In this XML encoding, no "request" parameter
+        is included, since the element name specifies the specific operation. </documentation>
+    </annotation>
+    <sequence>
+      <element name="ResourceID" type="anyURI" minOccurs="0" maxOccurs="unbounded">
+        <annotation>
+          <documentation>Unordered list of zero or more resource identifiers. These identifiers can
+            be listed in the Contents section of the service metadata (Capabilities) document. For
+            more information on this parameter, see Subclause 9.4.2.1 of the OWS Common
+            specification. </documentation>
+        </annotation>
+      </element>
+      <element ref="ows:OutputFormat" minOccurs="0">
+        <annotation>
+          <documentation>Optional reference to the data format to be used for response to this
+            operation request. This element shall be included when multiple output formats are
+            available for the selected resource(s), and the client desires a format other than the
+            specified default, if any. </documentation>
+        </annotation>
+      </element>
+    </sequence>
+    <attribute name="service" type="ows:ServiceType" use="required"/>
+    <attribute name="version" type="ows:VersionType" use="required"/>
+  </complexType>
+
+  <element name="ExceptionReport">
+    <annotation>
+      <documentation>Report message returned to the client that requested any OWS operation when the
+        server detects an error while processing that operation request. </documentation>
+    </annotation>
+    <complexType>
+      <sequence>
+        <element ref="ows:Exception" maxOccurs="unbounded">
+          <annotation>
+            <documentation>Unordered list of one or more Exception elements that each describes an
+              error. These Exception elements shall be interpreted by clients as being independent
+              of one another (not hierarchical). </documentation>
+          </annotation>
+        </element>
+      </sequence>
+      <attribute name="version" use="required">
+        <annotation>
+          <documentation>Specification version for OWS operation. The string value shall contain one
+            x.y.z "version" value (e.g., "2.1.3"). A version number shall contain three non-negative
+            integers separated by decimal points, in the form "x.y.z". The integers y and z shall
+            not exceed 99. Each version shall be for the Implementation Specification (document) and
+            the associated XML Schemas to which requested operations will conform. An Implementation
+            Specification version normally specifies XML Schemas against which an XML encoded
+            operation response must conform and should be validated. See Version negotiation
+            subclause for more information. </documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="string">
+            <pattern value="\d+\.\d?\d\.\d?\d"/>
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute ref="xml:lang" use="optional">
+        <annotation>
+          <documentation>Identifier of the language used by all included exception text values.
+            These language identifiers shall be as specified in IETF RFC 4646. When this attribute
+            is omitted, the language used is not identified. </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>
+
+  <element name="Exception" type="ows:ExceptionType"/>
+
+  <complexType name="ExceptionType">
+    <annotation>
+      <documentation>An Exception element describes one detected error that a server chooses to
+        convey to the client. </documentation>
+    </annotation>
+    <sequence>
+      <element name="ExceptionText" type="string" minOccurs="0" maxOccurs="unbounded">
+        <annotation>
+          <documentation>Ordered sequence of text strings that describe this specific exception or
+            error. The contents of these strings are left open to definition by each server
+            implementation. A server is strongly encouraged to include at least one ExceptionText
+            value, to provide more information about the detected error than provided by the
+            exceptionCode. When included, multiple ExceptionText values shall provide hierarchical
+            information about one detected error, with the most significant information listed
+            first. </documentation>
+        </annotation>
+      </element>
+    </sequence>
+    <attribute name="exceptionCode" type="string" use="required">
+      <annotation>
+        <documentation>A code representing the type of this exception, which shall be selected from
+          a set of exceptionCode values specified for the specific service operation and server.
+        </documentation>
+      </annotation>
+    </attribute>
+    <attribute name="locator" type="string" use="optional">
+      <annotation>
+        <documentation>When included, this locator shall indicate to the client where an exception
+          was encountered in servicing the client's operation request. This locator should be
+          included whenever meaningful information can be provided by the server. The contents of
+          this locator will depend on the specific exceptionCode and OWS service, and shall be
+          specified in the OWS Implementation Specification. </documentation>
+      </annotation>
+    </attribute>
+  </complexType>
+
+  <complexType name="DomainType">
+    <annotation>
+      <documentation>Valid domain (or allowed set of values) of one quantity, with its name or
+        identifier. </documentation>
+    </annotation>
+    <complexContent>
+      <extension base="ows:UnNamedDomainType">
+        <attribute name="name" type="string" use="required">
+          <annotation>
+            <documentation>Name or identifier of this quantity. </documentation>
+          </annotation>
+        </attribute>
+      </extension>
+    </complexContent>
+  </complexType>
+
+  <complexType name="UnNamedDomainType">
+    <annotation>
+      <documentation>Valid domain (or allowed set of values) of one quantity, with needed metadata
+        but without a quantity name or identifier. </documentation>
+    </annotation>
+    <sequence>
+      <group ref="ows:PossibleValues"/>
+      <element ref="ows:DefaultValue" minOccurs="0">
+        <annotation>
+          <documentation>Optional default value for this quantity, which should be included when
+            this quantity has a default value. </documentation>
+        </annotation>
+      </element>
+      <element ref="ows:Meaning" minOccurs="0">
+        <annotation>
+          <documentation>Meaning metadata should be referenced or included for each quantity.
+          </documentation>
+        </annotation>
+      </element>
+      <element ref="ows:DataType" minOccurs="0">
+        <annotation>
+          <documentation>This data type metadata should be referenced or included for each quantity.
+          </documentation>
+        </annotation>
+      </element>
+      <group ref="ows:ValuesUnit" minOccurs="0">
+        <annotation>
+          <documentation>Unit of measure, which should be included when this set of PossibleValues
+            has units or a more complete reference system. </documentation>
+        </annotation>
+      </group>
+      <element ref="ows:Metadata" minOccurs="0" maxOccurs="unbounded">
+        <annotation>
+          <documentation>Optional unordered list of other metadata about this quantity. A list of
+            required and optional other metadata elements for this quantity should be specified in
+            the Implementation Specification for this service. </documentation>
+        </annotation>
+      </element>
+    </sequence>
+  </complexType>
+
+  <group name="PossibleValues">
+    <annotation>
+      <documentation>Specifies the possible values of this quantity. </documentation>
+    </annotation>
+    <choice>
+      <element ref="ows:AllowedValues"/>
+      <element ref="ows:AnyValue"/>
+      <element ref="ows:NoValues"/>
+      <element ref="ows:ValuesReference"/>
+    </choice>
+  </group>
+
+  <element name="AnyValue">
+    <annotation>
+      <documentation>Specifies that any value is allowed for this parameter.</documentation>
+    </annotation>
+    <complexType/>
+  </element>
+
+  <element name="NoValues">
+    <annotation>
+      <documentation>Specifies that no values are allowed for this parameter or
+        quantity.</documentation>
+    </annotation>
+    <complexType/>
+  </element>
+
+  <element name="ValuesReference">
+    <annotation>
+      <documentation>Reference to externally specified list of all the valid values and/or ranges of
+        values for this quantity. (Informative: This element was simplified from the
+        metaDataProperty element in GML 3.0.) </documentation>
+    </annotation>
+    <complexType>
+      <simpleContent>
+        <extension base="string">
+          <annotation>
+            <documentation>Human-readable name of the list of values provided by the referenced
+              document. Can be empty string when this list has no name. </documentation>
+          </annotation>
+          <attribute ref="ows:reference" use="required"> </attribute>
+        </extension>
+      </simpleContent>
+    </complexType>
+  </element>
+
+  <group name="ValuesUnit">
+    <annotation>
+      <documentation>Indicates that this quantity has units or a reference system, and identifies
+        the unit or reference system used by the AllowedValues or ValuesReference. </documentation>
+    </annotation>
+    <choice>
+      <element ref="ows:UOM">
+        <annotation>
+          <documentation>Identifier of unit of measure of this set of values. Should be included
+            then this set of values has units (and not a more complete reference system).
+          </documentation>
+        </annotation>
+      </element>
+      <element ref="ows:ReferenceSystem">
+        <annotation>
+          <documentation>Identifier of reference system used by this set of values. Should be
+            included then this set of values has a reference system (not just units).
+          </documentation>
+        </annotation>
+      </element>
+    </choice>
+  </group>
+
+  <element name="AllowedValues">
+    <annotation>
+      <documentation>List of all the valid values and/or ranges of values for this quantity. For
+        numeric quantities, signed values should be ordered from negative infinity to positive
+        infinity. </documentation>
+    </annotation>
+    <complexType>
+      <choice maxOccurs="unbounded">
+        <element ref="ows:Value"/>
+        <element ref="ows:Range"/>
+      </choice>
+    </complexType>
+  </element>
+
+  <element name="Value" type="ows:ValueType"/>
+
+  <complexType name="ValueType">
+    <annotation>
+      <documentation>A single value, encoded as a string. This type can be used for one value, for a
+        spacing between allowed values, or for the default value of a parameter. </documentation>
+    </annotation>
+    <simpleContent>
+      <extension base="string"/>
+    </simpleContent>
+  </complexType>
+
+  <element name="DefaultValue" type="ows:ValueType">
+    <annotation>
+      <documentation>The default value for a quantity for which multiple values are allowed.
+      </documentation>
+    </annotation>
+  </element>
+
+  <element name="Range" type="ows:RangeType"/>
+
+  <complexType name="RangeType">
+    <annotation>
+      <documentation>A range of values of a numeric parameter. This range can be continuous or
+        discrete, defined by a fixed spacing between adjacent valid values. If the MinimumValue or
+        MaximumValue is not included, there is no value limit in that direction. Inclusion of the
+        specified minimum and maximum values in the range shall be defined by the rangeClosure.
+      </documentation>
+    </annotation>
+    <sequence>
+      <element ref="ows:MinimumValue" minOccurs="0"/>
+      <element ref="ows:MaximumValue" minOccurs="0"/>
+      <element ref="ows:Spacing" minOccurs="0">
+        <annotation>
+          <documentation>Shall be included when the allowed values are NOT continuous in this range.
+            Shall not be included when the allowed values are continuous in this range.
+          </documentation>
+        </annotation>
+      </element>
+    </sequence>
+    <attribute ref="ows:rangeClosure" use="optional">
+      <annotation>
+        <documentation>Shall be included unless the default value applies. </documentation>
+      </annotation>
+    </attribute>
+  </complexType>
+
+  <element name="MinimumValue" type="ows:ValueType">
+    <annotation>
+      <documentation>Minimum value of this numeric parameter. </documentation>
+    </annotation>
+  </element>
+
+  <element name="MaximumValue" type="ows:ValueType">
+    <annotation>
+      <documentation>Maximum value of this numeric parameter. </documentation>
+    </annotation>
+  </element>
+
+  <element name="Spacing" type="ows:ValueType">
+    <annotation>
+      <documentation>The regular distance or spacing between the allowed values in a range.
+      </documentation>
+    </annotation>
+  </element>
+
+  <attribute name="rangeClosure" default="closed">
+    <annotation>
+      <documentation>Specifies which of the minimum and maximum values are included in the range.
+        Note that plus and minus infinity are considered closed bounds. </documentation>
+    </annotation>
+    <simpleType>
+      <restriction base="NMTOKENS">
+        <enumeration value="closed">
+          <annotation>
+            <documentation>The specified minimum and maximum values are included in this range.
+            </documentation>
+          </annotation>
+        </enumeration>
+        <enumeration value="open">
+          <annotation>
+            <documentation>The specified minimum and maximum values are NOT included in this range.
+            </documentation>
+          </annotation>
+        </enumeration>
+        <enumeration value="open-closed">
+          <annotation>
+            <documentation>The specified minimum value is NOT included in this range, and the
+              specified maximum value IS included in this range. </documentation>
+          </annotation>
+        </enumeration>
+        <enumeration value="closed-open">
+          <annotation>
+            <documentation>The specified minimum value IS included in this range, and the specified
+              maximum value is NOT included in this range. </documentation>
+          </annotation>
+        </enumeration>
+      </restriction>
+    </simpleType>
+  </attribute>
+
+  <complexType name="DomainMetadataType">
+    <annotation>
+      <documentation>References metadata about a quantity, and provides a name for this metadata.
+        (Informative: This element was simplified from the metaDataProperty element in GML 3.0.)
+      </documentation>
+    </annotation>
+    <simpleContent>
+      <extension base="string">
+        <annotation>
+          <documentation>Human-readable name of the metadata described by associated referenced
+            document. </documentation>
+        </annotation>
+        <attribute ref="ows:reference" use="optional"/>
+      </extension>
+    </simpleContent>
+  </complexType>
+
+  <attribute name="reference" type="anyURI">
+    <annotation>
+      <documentation>Reference to data or metadata recorded elsewhere, either external to this XML
+        document or within it. Whenever practical, this attribute should be a URL from which this
+        metadata can be electronically retrieved. Alternately, this attribute can reference a URN
+        for well-known metadata. For example, such a URN could be a URN defined in the "ogc" URN
+        namespace. </documentation>
+    </annotation>
+  </attribute>
+
+  <element name="Meaning" type="ows:DomainMetadataType">
+    <annotation>
+      <documentation>Definition of the meaning or semantics of this set of values. This Meaning can
+        provide more specific, complete, precise, machine accessible, and machine understandable
+        semantics about this quantity, relative to other available semantic information. For
+        example, other semantic information is often provided in "documentation" elements in XML
+        Schemas or "description" elements in GML objects. </documentation>
+    </annotation>
+  </element>
+
+  <element name="DataType" type="ows:DomainMetadataType">
+    <annotation>
+      <documentation>Definition of the data type of this set of values. In this case, the xlink:href
+        attribute can reference a URN for a well-known data type. For example, such a URN could be a
+        data type identification URN defined in the "ogc" URN namespace. </documentation>
+    </annotation>
+  </element>
+
+  <element name="ReferenceSystem" type="ows:DomainMetadataType">
+    <annotation>
+      <documentation>Definition of the reference system used by this set of values, including the
+        unit of measure whenever applicable (as is normal). In this case, the xlink:href attribute
+        can reference a URN for a well-known reference system, such as for a coordinate reference
+        system (CRS). For example, such a URN could be a CRS identification URN defined in the "ogc"
+        URN namespace. </documentation>
+    </annotation>
+  </element>
+
+  <element name="UOM" type="ows:DomainMetadataType">
+    <annotation>
+      <documentation>Definition of the unit of measure of this set of values. In this case, the
+        xlink:href attribute can reference a URN for a well-known unit of measure (uom). For
+        example, such a URN could be a UOM identification URN defined in the "ogc" URN namespace.
+      </documentation>
+    </annotation>
+  </element>
+
+  <complexType name="ContentsBaseType">
+    <annotation>
+      <documentation>Contents of typical Contents section of an OWS service metadata (Capabilities)
+        document. This type shall be extended and/or restricted if needed for specific OWS use to
+        include the specific metadata needed. </documentation>
+    </annotation>
+    <sequence>
+      <element ref="ows:DatasetDescriptionSummary" minOccurs="0" maxOccurs="unbounded">
+        <annotation>
+          <documentation>Unordered set of summary descriptions for the datasets available from this
+            OWS server. This set shall be included unless another source is referenced and all this
+            metadata is available from that source. </documentation>
+        </annotation>
+      </element>
+      <element ref="ows:OtherSource" minOccurs="0" maxOccurs="unbounded">
+        <annotation>
+          <documentation>Unordered set of references to other sources of metadata describing the
+            coverage offerings available from this server. </documentation>
+        </annotation>
+      </element>
+    </sequence>
+  </complexType>
+
+  <element name="OtherSource" type="ows:MetadataType">
+    <annotation>
+      <documentation>Reference to a source of metadata describing coverage offerings available from
+        this server. This parameter can reference a catalogue server from which dataset metadata is
+        available. This ability is expected to be used by servers with thousands or millions of
+        datasets, for which searching a catalogue is more feasible than fetching a long Capabilities
+        XML document. When no DatasetDescriptionSummaries are included, and one or more catalogue
+        servers are referenced, this set of catalogues shall contain current metadata summaries for
+        all the datasets currently available from this OWS server, with the metadata for each such
+        dataset referencing this OWS server. </documentation>
+    </annotation>
+  </element>
+
+  <element name="DatasetDescriptionSummary" type="ows:DatasetDescriptionSummaryBaseType"/>
+
+  <complexType name="DatasetDescriptionSummaryBaseType">
+    <annotation>
+      <documentation>Typical dataset metadata in typical Contents section of an OWS service metadata
+        (Capabilities) document. This type shall be extended and/or restricted if needed for
+        specific OWS use, to include the specific Dataset description metadata needed.
+      </documentation>
+    </annotation>
+    <complexContent>
+      <extension base="ows:DescriptionType">
+        <sequence>
+          <element ref="ows:WGS84BoundingBox" minOccurs="0" maxOccurs="unbounded">
+            <annotation>
+              <documentation>Unordered list of zero or more minimum bounding rectangles surrounding
+                coverage data, using the WGS 84 CRS with decimal degrees and longitude before
+                latitude. If no WGS 84 bounding box is recorded for a coverage, any such bounding
+                boxes recorded for a higher level in a hierarchy of datasets shall apply to this
+                coverage. If WGS 84 bounding box(es) are recorded for a coverage, any such bounding
+                boxes recorded for a higher level in a hierarchy of datasets shall be ignored. For
+                each lowest-level coverage in a hierarchy, at least one applicable WGS84BoundingBox
+                shall be either recorded or inherited, to simplify searching for datasets that might
+                overlap a specified region. If multiple WGS 84 bounding boxes are included, this
+                shall be interpreted as the union of the areas of these bounding boxes.
+              </documentation>
+            </annotation>
+          </element>
+          <element name="Identifier" type="ows:CodeType">
+            <annotation>
+              <documentation>Unambiguous identifier or name of this coverage, unique for this
+                server. </documentation>
+            </annotation>
+          </element>
+          <element ref="ows:BoundingBox" minOccurs="0" maxOccurs="unbounded">
+            <annotation>
+              <documentation>Unordered list of zero or more minimum bounding rectangles surrounding
+                coverage data, in AvailableCRSs. Zero or more BoundingBoxes are allowed in addition
+                to one or more WGS84BoundingBoxes to allow more precise specification of the Dataset
+                area in AvailableCRSs. These Bounding Boxes shall not use any CRS not listed as an
+                AvailableCRS. However, an AvailableCRS can be listed without a corresponding
+                Bounding Box. If no such bounding box is recorded for a coverage, any such bounding
+                boxes recorded for a higher level in a hierarchy of datasets shall apply to this
+                coverage. If such bounding box(es) are recorded for a coverage, any such bounding
+                boxes recorded for a higher level in a hierarchy of datasets shall be ignored. If
+                multiple bounding boxes are included with the same CRS, this shall be interpreted as
+                the union of the areas of these bounding boxes. </documentation>
+            </annotation>
+          </element>
+          <element ref="ows:Metadata" minOccurs="0" maxOccurs="unbounded">
+            <annotation>
+              <documentation>Optional unordered list of additional metadata about this dataset. A
+                list of optional metadata elements for this dataset description could be specified
+                in the Implementation Specification for this service. </documentation>
+            </annotation>
+          </element>
+          <element ref="ows:DatasetDescriptionSummary" minOccurs="0" maxOccurs="unbounded">
+            <annotation>
+              <documentation>Metadata describing zero or more unordered subsidiary datasets
+                available from this server. </documentation>
+            </annotation>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+
+  <simpleType name="MimeType">
+    <annotation>
+      <documentation>XML encoded identifier of a standard MIME type, possibly a parameterized MIME
+        type. </documentation>
+    </annotation>
+    <restriction base="string">
+      <pattern value="(application|audio|image|text|video|message|multipart|model)/.+(;\s*.+=.+)*"/>
+    </restriction>
+  </simpleType>
+
+  <simpleType name="VersionType">
+    <annotation>
+      <documentation>Specification version for OWS operation. The string value shall contain one
+        x.y.z "version" value (e.g., "2.1.3"). A version number shall contain three non-negative
+        integers separated by decimal points, in the form "x.y.z". The integers y and z shall not
+        exceed 99. Each version shall be for the Implementation Specification (document) and the
+        associated XML Schemas to which requested operations will conform. An Implementation
+        Specification version normally specifies XML Schemas against which an XML encoded operation
+        response must conform and should be validated. See Version negotiation subclause for more
+        information. </documentation>
+    </annotation>
+    <restriction base="string">
+      <pattern value="\d+\.\d?\d\.\d?\d"/>
+    </restriction>
+  </simpleType>
+
+  <element name="Metadata" type="ows:MetadataType"/>
+
+  <complexType name="MetadataType">
+    <annotation>
+      <documentation>This element either references or contains more metadata about the element that
+        includes this element. To reference metadata stored remotely, at least the xlinks:href
+        attribute in xlink:simpleLink shall be included. Either at least one of the attributes in
+        xlink:simpleLink or a substitute for the AbstractMetaData element shall be included, but not
+        both. An Implementation Specification can restrict the contents of this element to always be
+        a reference or always contain metadata. (Informative: This element was adapted from the
+        metaDataProperty element in GML 3.0.) </documentation>
+    </annotation>
+    <sequence>
+      <element ref="ows:AbstractMetaData" minOccurs="0"/>
+    </sequence>
+    <attributeGroup ref="xlink:simpleLink">
+      <annotation>
+        <documentation>Reference to metadata recorded elsewhere, either external to this XML
+          document or within it. Whenever practical, the xlink:href attribute with type anyURI
+          should include a URL from which this metadata can be electronically retrieved.
+        </documentation>
+      </annotation>
+    </attributeGroup>
+    <attribute name="about" type="anyURI" use="optional">
+      <annotation>
+        <documentation>Optional reference to the aspect of the element which includes this
+          "metadata" element that this metadata provides more information about. </documentation>
+      </annotation>
+    </attribute>
+  </complexType>
+
+  <element name="AbstractMetaData" abstract="true">
+    <annotation>
+      <documentation>Abstract element containing more metadata about the element that includes the
+        containing "metadata" element. A specific server implementation, or an Implementation
+        Specification, can define concrete elements in the AbstractMetaData substitution group.
+      </documentation>
+    </annotation>
+  </element>
+
+  <element name="BoundingBox" type="ows:BoundingBoxType"/>
+
+  <complexType name="BoundingBoxType">
+    <annotation>
+      <documentation>XML encoded minimum rectangular bounding box (or region) parameter, surrounding
+        all the associated data. </documentation>
+      <documentation>This type is adapted from the EnvelopeType of GML 3.1, with modified contents
+        and documentation for encoding a MINIMUM size box SURROUNDING all associated data.
+      </documentation>
+    </annotation>
+    <sequence>
+      <element name="LowerCorner" type="ows:PositionType">
+        <annotation>
+          <documentation>Position of the bounding box corner at which the value of each coordinate
+            normally is the algebraic minimum within this bounding box. In some cases, this position
+            is normally displayed at the top, such as the top left for some image coordinates. For
+            more information, see Subclauses 10.2.5 and C.13. </documentation>
+        </annotation>
+      </element>
+      <element name="UpperCorner" type="ows:PositionType">
+        <annotation>
+          <documentation>Position of the bounding box corner at which the value of each coordinate
+            normally is the algebraic maximum within this bounding box. In some cases, this position
+            is normally displayed at the bottom, such as the bottom right for some image
+            coordinates. For more information, see Subclauses 10.2.5 and C.13. </documentation>
+        </annotation>
+      </element>
+    </sequence>
+    <attribute name="crs" type="anyURI" use="optional">
+      <annotation>
+        <documentation>Usually references the definition of a CRS, as specified in [OGC Topic 2].
+          Such a CRS definition can be XML encoded using the gml:CoordinateReferenceSystemType in
+          [GML 3.1]. For well known references, it is not required that a CRS definition exist at
+          the location the URI points to. If no anyURI value is included, the applicable CRS must be
+          either: a) Specified outside the bounding box, but inside a data structure that includes
+          this bounding box, as specified for a specific OWS use of this bounding box type. b) Fixed
+          and specified in the Implementation Specification for a specific OWS use of the bounding
+          box type. </documentation>
+      </annotation>
+    </attribute>
+    <attribute name="dimensions" type="positiveInteger" use="optional">
+      <annotation>
+        <documentation>The number of dimensions in this CRS (the length of a coordinate sequence in
+          this use of the PositionType). This number is specified by the CRS definition, but can
+          also be specified here. </documentation>
+      </annotation>
+    </attribute>
+  </complexType>
+
+  <simpleType name="PositionType">
+    <annotation>
+      <documentation>Position instances hold the coordinates of a position in a coordinate reference
+        system (CRS) referenced by the related "crs" attribute or elsewhere. For an angular
+        coordinate axis that is physically continuous for multiple revolutions, but whose recorded
+        values can be discontinuous, special conditions apply when the bounding box is continuous
+        across the value discontinuity: a) If the bounding box is continuous clear around this
+        angular axis, then ordinate values of minus and plus infinity shall be used. b) If the
+        bounding box is continuous across the value discontinuity but is not continuous clear around
+        this angular axis, then some non-normal value can be used if specified for a specific OWS
+        use of the BoundingBoxType. For more information, see Subclauses 10.2.5 and C.13. </documentation>
+      <documentation>This type is adapted from DirectPositionType and doubleList of GML 3.1. The
+        adaptations include omission of all the attributes, since the needed information is included
+        in the BoundingBoxType. </documentation>
+    </annotation>
+    <list itemType="double"/>
+  </simpleType>
+
+  <element name="WGS84BoundingBox" type="ows:WGS84BoundingBoxType"
+    substitutionGroup="ows:BoundingBox"/>
+
+  <complexType name="WGS84BoundingBoxType">
+    <annotation>
+      <documentation>XML encoded minimum rectangular bounding box (or region) parameter, surrounding
+        all the associated data. This box is specialized for use with the 2D WGS 84 coordinate
+        reference system with decimal values of longitude and latitude. </documentation>
+      <documentation>This type is adapted from the general BoundingBoxType, with modified contents
+        and documentation for use with the 2D WGS 84 coordinate reference system. </documentation>
+    </annotation>
+    <complexContent>
+      <restriction base="ows:BoundingBoxType">
+        <sequence>
+          <element name="LowerCorner" type="ows:PositionType2D">
+            <annotation>
+              <documentation>Position of the bounding box corner at which the values of longitude
+                and latitude normally are the algebraic minimums within this bounding box. For more
+                information, see Subclauses 10.4.5 and C.13. </documentation>
+            </annotation>
+          </element>
+          <element name="UpperCorner" type="ows:PositionType2D">
+            <annotation>
+              <documentation>Position of the bounding box corner at which the values of longitude
+                and latitude normally are the algebraic minimums within this bounding box. For more
+                information, see Subclauses 10.4.5 and C.13. </documentation>
+            </annotation>
+          </element>
+        </sequence>
+        <attribute name="crs" type="anyURI" use="optional" fixed="urn:ogc:def:crs:OGC:2:84">
+          <annotation>
+            <documentation>This attribute can be included when considered useful. When included,
+              this attribute shall reference the 2D WGS 84 coordinate reference system with
+              longitude before latitude and decimal values of longitude and latitude.
+            </documentation>
+          </annotation>
+        </attribute>
+        <attribute name="dimensions" type="positiveInteger" use="optional" fixed="2">
+          <annotation>
+            <documentation>The number of dimensions in this CRS (the length of a coordinate sequence
+              in this use of the PositionType). This number is specified by the CRS definition, but
+              can also be specified here. </documentation>
+          </annotation>
+        </attribute>
+      </restriction>
+    </complexContent>
+  </complexType>
+
+  <simpleType name="PositionType2D">
+    <annotation>
+      <documentation>Two-dimensional position instances hold the longitude and latitude coordinates
+        of a position in the 2D WGS 84 coordinate reference system. The longitude value shall be
+        listed first, followed by the latitude value, both in decimal degrees. Latitude values shall
+        range from -90 to +90 degrees, and longitude values shall normally range from -180 to +180
+        degrees. For the longitude axis, special conditions apply when the bounding box is
+        continuous across the +/- 180 degrees meridian longitude value discontinuity: a) If the
+        bounding box is continuous clear around the Earth, then longitude values of minus and plus
+        infinity shall be used. b) If the bounding box is continuous across the value discontinuity
+        but is not continuous clear around the Earth, then some non-normal value can be used if
+        specified for a specific OWS use of the WGS84BoundingBoxType. For more information, see
+        Subclauses 10.4.5 and C.13. </documentation>
+    </annotation>
+    <restriction base="ows:PositionType">
+      <length value="2"/>
+    </restriction>
+  </simpleType>
+
+  <complexType name="LanguageStringType">
+    <annotation>
+      <documentation>Text string with the language of the string identified as recommended in the
+        XML 1.0 W3C Recommendation, section 2.12. </documentation>
+    </annotation>
+    <simpleContent>
+      <extension base="string">
+        <attribute ref="xml:lang" use="optional"/>
+      </extension>
+    </simpleContent>
+  </complexType>
+
+  <element name="Title" type="ows:LanguageStringType">
+    <annotation>
+      <documentation>Title of this resource, normally used for display to a human. </documentation>
+    </annotation>
+  </element>
+
+  <element name="Abstract" type="ows:LanguageStringType">
+    <annotation>
+      <documentation>Brief narrative description of this resource, normally used for display to a
+        human. </documentation>
+    </annotation>
+  </element>
+
+  <element name="Keywords" type="ows:KeywordsType"/>
+
+  <complexType name="KeywordsType">
+    <annotation>
+      <documentation>Unordered list of one or more commonly used or formalised word(s) or phrase(s)
+        used to describe the subject. When needed, the optional "type" can name the type of the
+        associated list of keywords that shall all have the same type. Also when needed, the
+        codeSpace attribute of that "type" can reference the type name authority and/or thesaurus.
+        If the xml:lang attribute is not included in a Keyword element, then no language is
+        specified for that element unless specified by another means. All Keyword elements in the
+        same Keywords element that share the same xml:lang attribute value represent different
+        keywords in that language. </documentation>
+      <documentation>For OWS use, the optional thesaurusName element was omitted as being complex
+        information that could be referenced by the codeSpace attribute of the Type element.
+      </documentation>
+    </annotation>
+    <sequence>
+      <element name="Keyword" type="ows:LanguageStringType" maxOccurs="unbounded"/>
+      <element name="Type" type="ows:CodeType" minOccurs="0"/>
+    </sequence>
+  </complexType>
+
+  <complexType name="CodeType">
+    <annotation>
+      <documentation>Name or code with an (optional) authority. If the codeSpace attribute is
+        present, its value shall reference a dictionary, thesaurus, or authority for the name or
+        code, such as the organisation who assigned the value, or the dictionary from which it is
+        taken. </documentation>
+      <documentation>Type copied from basicTypes.xsd of GML 3 with documentation edited, for
+        possible use outside the ServiceIdentification section of a service metadata document.
+      </documentation>
+    </annotation>
+    <simpleContent>
+      <extension base="string">
+        <attribute name="codeSpace" type="anyURI" use="optional"/>
+      </extension>
+    </simpleContent>
+  </complexType>
+
+  <element name="PointOfContact" type="ows:ResponsiblePartyType">
+    <annotation>
+      <documentation>Identification of, and means of communication with, person(s) responsible for
+        the resource(s). </documentation>
+      <documentation>For OWS use in the ServiceProvider section of a service metadata document, the
+        optional organizationName element was removed, since this type is always used with the
+        ProviderName element which provides that information. The optional individualName element
+        was made mandatory, since either the organizationName or individualName element is
+        mandatory. The mandatory "role" element was changed to optional, since no clear use of this
+        information is known in the ServiceProvider section. </documentation>
+    </annotation>
+  </element>
+
+  <complexType name="ResponsiblePartyType">
+    <annotation>
+      <documentation>Identification of, and means of communication with, person responsible for the
+        server. At least one of IndividualName, OrganisationName, or PositionName shall be included.
+      </documentation>
+    </annotation>
+    <sequence>
+      <element ref="ows:IndividualName" minOccurs="0"/>
+      <element ref="ows:OrganisationName" minOccurs="0"/>
+      <element ref="ows:PositionName" minOccurs="0"/>
+      <element ref="ows:ContactInfo" minOccurs="0"/>
+      <element ref="ows:Role"/>
+    </sequence>
+  </complexType>
+
+  <complexType name="ResponsiblePartySubsetType">
+    <annotation>
+      <documentation>Identification of, and means of communication with, person responsible for the
+        server. </documentation>
+      <documentation>For OWS use in the ServiceProvider section of a service metadata document, the
+        optional organizationName element was removed, since this type is always used with the
+        ProviderName element which provides that information. The mandatory "role" element was
+        changed to optional, since no clear use of this information is known in the ServiceProvider
+        section. </documentation>
+    </annotation>
+    <sequence>
+      <element ref="ows:IndividualName" minOccurs="0"/>
+      <element ref="ows:PositionName" minOccurs="0"/>
+      <element ref="ows:ContactInfo" minOccurs="0"/>
+      <element ref="ows:Role" minOccurs="0"/>
+    </sequence>
+  </complexType>
+
+  <element name="IndividualName" type="string">
+    <annotation>
+      <documentation>Name of the responsible person: surname, given name, title separated by a
+        delimiter. </documentation>
+    </annotation>
+  </element>
+
+  <element name="OrganisationName" type="string">
+    <annotation>
+      <documentation>Name of the responsible organization. </documentation>
+    </annotation>
+  </element>
+
+  <element name="PositionName" type="string">
+    <annotation>
+      <documentation>Role or position of the responsible person. </documentation>
+    </annotation>
+  </element>
+
+  <element name="Role" type="ows:CodeType">
+    <annotation>
+      <documentation>Function performed by the responsible party. Possible values of this Role shall
+        include the values and the meanings listed in Subclause B.5.5 of ISO 19115:2003.
+      </documentation>
+    </annotation>
+  </element>
+
+  <element name="ContactInfo" type="ows:ContactType">
+    <annotation>
+      <documentation>Address of the responsible party. </documentation>
+    </annotation>
+  </element>
+
+  <complexType name="ContactType">
+    <annotation>
+      <documentation>Information required to enable contact with the responsible person and/or
+        organization. </documentation>
+      <documentation>For OWS use in the service metadata document, the optional hoursOfService and
+        contactInstructions elements were retained, as possibly being useful in the ServiceProvider
+        section. </documentation>
+    </annotation>
+    <sequence>
+      <element name="Phone" type="ows:TelephoneType" minOccurs="0">
+        <annotation>
+          <documentation>Telephone numbers at which the organization or individual may be contacted.
+          </documentation>
+        </annotation>
+      </element>
+      <element name="Address" type="ows:AddressType" minOccurs="0">
+        <annotation>
+          <documentation>Physical and email address at which the organization or individual may be
+            contacted. </documentation>
+        </annotation>
+      </element>
+      <element name="OnlineResource" type="ows:OnlineResourceType" minOccurs="0">
+        <annotation>
+          <documentation>On-line information that can be used to contact the individual or
+            organization. OWS specifics: The xlink:href attribute in the xlink:simpleLink attribute
+            group shall be used to reference this resource. Whenever practical, the xlink:href
+            attribute with type anyURI should be a URL from which more contact information can be
+            electronically retrieved. The xlink:title attribute with type "string" can be used to
+            name this set of information. The other attributes in the xlink:simpleLink attribute
+            group should not be used. </documentation>
+        </annotation>
+      </element>
+      <element name="HoursOfService" type="string" minOccurs="0">
+        <annotation>
+          <documentation>Time period (including time zone) when individuals can contact the
+            organization or individual. </documentation>
+        </annotation>
+      </element>
+      <element name="ContactInstructions" type="string" minOccurs="0">
+        <annotation>
+          <documentation>Supplemental instructions on how or when to contact the individual or
+            organization. </documentation>
+        </annotation>
+      </element>
+    </sequence>
+  </complexType>
+
+  <complexType name="OnlineResourceType">
+    <annotation>
+      <documentation>Reference to on-line resource from which data can be obtained. </documentation>
+      <documentation>For OWS use in the service metadata document, the CI_OnlineResource class was
+        XML encoded as the attributeGroup "xlink:simpleLink", as used in GML. </documentation>
+    </annotation>
+    <attributeGroup ref="xlink:simpleLink"/>
+  </complexType>
+
+  <complexType name="TelephoneType">
+    <annotation>
+      <documentation>Telephone numbers for contacting the responsible individual or organization.
+      </documentation>
+    </annotation>
+    <sequence>
+      <element name="Voice" type="string" minOccurs="0" maxOccurs="unbounded">
+        <annotation>
+          <documentation>Telephone number by which individuals can speak to the responsible
+            organization or individual. </documentation>
+        </annotation>
+      </element>
+      <element name="Facsimile" type="string" minOccurs="0" maxOccurs="unbounded">
+        <annotation>
+          <documentation>Telephone number of a facsimile machine for the responsible organization or
+            individual. </documentation>
+        </annotation>
+      </element>
+    </sequence>
+  </complexType>
+
+  <complexType name="AddressType">
+    <annotation>
+      <documentation>Location of the responsible individual or organization. </documentation>
+    </annotation>
+    <sequence>
+      <element name="DeliveryPoint" type="string" minOccurs="0" maxOccurs="unbounded">
+        <annotation>
+          <documentation>Address line for the location. </documentation>
+        </annotation>
+      </element>
+      <element name="City" type="string" minOccurs="0">
+        <annotation>
+          <documentation>City of the location. </documentation>
+        </annotation>
+      </element>
+      <element name="AdministrativeArea" type="string" minOccurs="0">
+        <annotation>
+          <documentation>State or province of the location. </documentation>
+        </annotation>
+      </element>
+      <element name="PostalCode" type="string" minOccurs="0">
+        <annotation>
+          <documentation>ZIP or other postal code. </documentation>
+        </annotation>
+      </element>
+      <element name="Country" type="string" minOccurs="0">
+        <annotation>
+          <documentation>Country of the physical address. </documentation>
+        </annotation>
+      </element>
+      <element name="ElectronicMailAddress" type="string" minOccurs="0" maxOccurs="unbounded">
+        <annotation>
+          <documentation>Address of the electronic mailbox of the responsible organization or
+            individual. </documentation>
+        </annotation>
+      </element>
+    </sequence>
+  </complexType>
+
+  <complexType name="DescriptionType">
+    <annotation>
+      <documentation>Human-readable descriptive information for the object it is included within.
+        This type shall be extended if needed for specific OWS use to include additional metadata
+        for each type of information. This type shall not be restricted for a specific OWS to change
+        the multiplicity (or optionality) of some elements. If the xml:lang attribute is not
+        included in a Title, Abstract or Keyword element, then no language is specified for that
+        element unless specified by another means. All Title, Abstract and Keyword elements in the
+        same Description that share the same xml:lang attribute value represent the description of
+        the parent object in that language. Multiple Title or Abstract elements shall not exist in
+        the same Description with the same xml:lang attribute value unless otherwise specified.
+      </documentation>
+    </annotation>
+    <sequence>
+      <element ref="ows:Title" minOccurs="0" maxOccurs="unbounded"/>
+      <element ref="ows:Abstract" minOccurs="0" maxOccurs="unbounded"/>
+      <element ref="ows:Keywords" minOccurs="0" maxOccurs="unbounded"/>
+    </sequence>
+  </complexType>
+
+  <complexType name="BasicIdentificationType">
+    <annotation>
+      <documentation>Basic metadata identifying and describing a set of data. </documentation>
+    </annotation>
+    <complexContent>
+      <extension base="ows:DescriptionType">
+        <sequence>
+          <element ref="ows:Identifier" minOccurs="0">
+            <annotation>
+              <documentation>Optional unique identifier or name of this dataset. </documentation>
+            </annotation>
+          </element>
+          <element ref="ows:Metadata" minOccurs="0" maxOccurs="unbounded">
+            <annotation>
+              <documentation>Optional unordered list of additional metadata about this data(set). A
+                list of optional metadata elements for this data identification could be specified
+                in the Implementation Specification for this service. </documentation>
+            </annotation>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+
+  <complexType name="IdentificationType">
+    <annotation>
+      <documentation>Extended metadata identifying and describing a set of data. This type shall be
+        extended if needed for each specific OWS to include additional metadata for each type of
+        dataset. If needed, this type should first be restricted for each specific OWS to change the
+        multiplicity (or optionality) of some elements. </documentation>
+    </annotation>
+    <complexContent>
+      <extension base="ows:BasicIdentificationType">
+        <sequence>
+          <element ref="ows:BoundingBox" minOccurs="0" maxOccurs="unbounded">
+            <annotation>
+              <documentation>Unordered list of zero or more bounding boxes whose union describes the
+                extent of this dataset. </documentation>
+            </annotation>
+          </element>
+          <element ref="ows:OutputFormat" minOccurs="0" maxOccurs="unbounded">
+            <annotation>
+              <documentation>Unordered list of zero or more references to data formats supported for
+                server outputs. </documentation>
+            </annotation>
+          </element>
+          <element ref="ows:AvailableCRS" minOccurs="0" maxOccurs="unbounded">
+            <annotation>
+              <documentation>Unordered list of zero or more available coordinate reference systems.
+              </documentation>
+            </annotation>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+
+  <element name="Identifier" type="ows:CodeType">
+    <annotation>
+      <documentation>Unique identifier or name of this dataset. </documentation>
+    </annotation>
+  </element>
+
+  <element name="OutputFormat" type="ows:MimeType">
+    <annotation>
+      <documentation>Reference to a format in which this data can be encoded and transferred. More
+        specific parameter names should be used by specific OWS specifications wherever applicable.
+        More than one such parameter can be included for different purposes. </documentation>
+    </annotation>
+  </element>
+
+  <element name="AvailableCRS" type="anyURI"/>
+  <element name="SupportedCRS" type="anyURI" substitutionGroup="ows:AvailableCRS">
+    <annotation>
+      <documentation>Coordinate reference system in which data from this data(set) or resource is
+        available or supported. More specific parameter names should be used by specific OWS
+        specifications wherever applicable. More than one such parameter can be included for
+        different purposes. </documentation>
+    </annotation>
+  </element>
+
+  <element name="AccessConstraints" type="string">
+    <annotation>
+      <documentation>Access constraint applied to assure the protection of privacy or intellectual
+        property, or any other restrictions on retrieving or using data from or otherwise using this
+        server. The reserved value NONE (case insensitive) shall be used to mean no access
+        constraints are imposed. </documentation>
+    </annotation>
+  </element>
+
+  <element name="Fees" type="string">
+    <annotation>
+      <documentation>Fees and terms for retrieving data from or otherwise using this server,
+        including the monetary units as specified in ISO 4217. The reserved value NONE (case
+        insensitive) shall be used to mean no fees or terms. </documentation>
+    </annotation>
+  </element>
+
+  <element name="Language" type="language">
+    <annotation>
+      <documentation>Identifier of a language used by the data(set) contents. This language
+        identifier shall be as specified in IETF RFC 4646. When this element is omitted, the
+        language used is not identified. </documentation>
+    </annotation>
+  </element>
+
+  <element name="AbstractReferenceBase" type="ows:AbstractReferenceBaseType" abstract="true"/>
+  <complexType name="AbstractReferenceBaseType">
+    <annotation>
+      <documentation> Base for a reference to a remote or local resource. </documentation>
+      <documentation>This type contains only a restricted and annotated set of the attributes from
+        the xlink:simpleLink attributeGroup. </documentation>
+    </annotation>
+    <attribute name="type" type="string" fixed="simple" form="qualified"/>
+    <attribute ref="xlink:href" use="required">
+      <annotation>
+        <documentation>Reference to a remote resource or local payload. A remote resource is
+          typically addressed by a URL. For a local payload (such as a multipart mime message), the
+          xlink:href must start with the prefix cid:. </documentation>
+      </annotation>
+    </attribute>
+    <attribute ref="xlink:role" use="optional">
+      <annotation>
+        <documentation>Reference to a resource that describes the role of this reference. When no
+          value is supplied, no particular role value is to be inferred. </documentation>
+      </annotation>
+    </attribute>
+    <attribute ref="xlink:arcrole" use="optional">
+      <annotation>
+        <documentation>Although allowed, this attribute is not expected to be useful in this
+          application of xlink:simpleLink. </documentation>
+      </annotation>
+    </attribute>
+    <attribute ref="xlink:title" use="optional">
+      <annotation>
+        <documentation>Describes the meaning of the referenced resource in a human-readable fashion.
+        </documentation>
+      </annotation>
+    </attribute>
+    <attribute ref="xlink:show" use="optional">
+      <annotation>
+        <documentation>Although allowed, this attribute is not expected to be useful in this
+          application of xlink:simpleLink. </documentation>
+      </annotation>
+    </attribute>
+    <attribute ref="xlink:actuate" use="optional">
+      <annotation>
+        <documentation>Although allowed, this attribute is not expected to be useful in this
+          application of xlink:simpleLink. </documentation>
+      </annotation>
+    </attribute>
+  </complexType>
+
+  <element name="Reference" type="ows:ReferenceType" substitutionGroup="ows:AbstractReferenceBase"/>
+
+  <complexType name="ReferenceType">
+    <annotation>
+      <documentation>Complete reference to a remote or local resource, allowing including metadata
+        about that resource. </documentation>
+    </annotation>
+    <complexContent>
+      <extension base="ows:AbstractReferenceBaseType">
+        <sequence>
+          <element ref="ows:Identifier" minOccurs="0">
+            <annotation>
+              <documentation>Optional unique identifier of the referenced resource. </documentation>
+            </annotation>
+          </element>
+          <element ref="ows:Abstract" minOccurs="0" maxOccurs="unbounded"/>
+          <element name="Format" type="ows:MimeType" minOccurs="0">
+            <annotation>
+              <documentation>The format of the referenced resource. This element is omitted when the
+                mime type is indicated in the http header of the reference. </documentation>
+            </annotation>
+          </element>
+          <element ref="ows:Metadata" minOccurs="0" maxOccurs="unbounded">
+            <annotation>
+              <documentation>Optional unordered list of additional metadata about this resource. A
+                list of optional metadata elements for this ReferenceType could be specified in the
+                Implementation Specification for each use of this type in a specific OWS.
+              </documentation>
+            </annotation>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+
+  <element name="ReferenceGroup" type="ows:ReferenceGroupType"/>
+
+  <complexType name="ReferenceGroupType">
+    <annotation>
+      <documentation>Logical group of one or more references to remote and/or local resources,
+        allowing including metadata about that group. A Group can be used instead of a Manifest that
+        can only contain one group. </documentation>
+    </annotation>
+    <complexContent>
+      <extension base="ows:BasicIdentificationType">
+        <sequence>
+          <element ref="ows:AbstractReferenceBase" maxOccurs="unbounded"/>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+
+  <element name="Manifest" type="ows:ManifestType"/>
+
+  <complexType name="ManifestType">
+    <annotation>
+      <documentation>Unordered list of one or more groups of references to remote and/or local
+        resources. </documentation>
+    </annotation>
+    <complexContent>
+      <extension base="ows:BasicIdentificationType">
+        <sequence>
+          <element ref="ows:ReferenceGroup" maxOccurs="unbounded"/>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <element name="OperationResponse" type="ows:ManifestType">
+    <annotation>
+      <documentation>Response from an OWS operation, allowing including multiple output data items
+        with each item either included or referenced. This OperationResponse element, or an element
+        using the ManifestType with a more specific element name, shall be used whenever applicable
+        for responses from OWS operations. </documentation>
+      <documentation>This element is specified for use where the ManifestType contents are needed
+        for an operation response, but the Manifest element name is not fully applicable. This
+        element or the ManifestType shall be used instead of using the ows:ReferenceType proposed in
+        OGC 04-105. </documentation>
+    </annotation>
+  </element>
+
+  <element name="InputData" type="ows:ManifestType">
+    <annotation>
+      <documentation>Input data in a XML-encoded OWS operation request, allowing including multiple
+        data items with each data item either included or referenced. This InputData element, or an
+        element using the ManifestType with a more-specific element name (TBR), shall be used
+        whenever applicable within XML-encoded OWS operation requests. </documentation>
+    </annotation>
+  </element>
+
+  <element name="ServiceReference" type="ows:ServiceReferenceType" substitutionGroup="ows:Reference"/>
+
+  <complexType name="ServiceReferenceType">
+    <annotation>
+      <documentation>Complete reference to a remote resource that needs to be retrieved from an OWS
+        using an XML-encoded operation request. This element shall be used, within an InputData or
+        Manifest element that is used for input data, when that input data needs to be retrieved
+        from another web service using a XML-encoded OWS operation request. This element shall not
+        be used for local payload input data or for requesting the resource from a web server using
+        HTTP Get. </documentation>
+    </annotation>
+    <complexContent>
+      <extension base="ows:ReferenceType">
+        <choice>
+          <element name="RequestMessage" type="anyType">
+            <annotation>
+              <documentation>The XML-encoded operation request message to be sent to request this
+                input data from another web server using HTTP Post. </documentation>
+            </annotation>
+          </element>
+          <element name="RequestMessageReference" type="anyURI">
+            <annotation>
+              <documentation>Reference to the XML-encoded operation request message to be sent to
+                request this input data from another web server using HTTP Post. The referenced
+                message shall be attached to the same message (using the cid scheme), or be
+                accessible using a URL. </documentation>
+            </annotation>
+          </element>
+        </choice>
+      </extension>
+    </complexContent>
+  </complexType>
+</schema>

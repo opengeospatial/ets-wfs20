@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wfs:GetFeature version="2.0.0" service="WFS" count="100"
+  xmlns:wfs="http://www.opengis.net/wfs/2.0">
+  <wfs:Query xmlns:tns="http://cite.opengeospatial.org/gmlsf"
+    typeNames="tns:PrimitiveGeoFeature">
+    <fes:Filter xmlns:fes="http://www.opengis.net/fes/2.0">
+      <fes:BBOX>
+        <fes:ValueReference>tns:curveProperty</fes:ValueReference>
+        <gml:Envelope xmlns:gml="http://www.opengis.net/gml/3.2"
+          srsName="urn:ogc:def:crs:EPSG::4326">
+          <gml:lowerCorner>48.99 -123.45</gml:lowerCorner>
+          <gml:upperCorner>49.49 -122.45</gml:upperCorner>
+        </gml:Envelope>
+      </fes:BBOX>
+    </fes:Filter>
+  </wfs:Query>
+</wfs:GetFeature>

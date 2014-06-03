@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+  <head>
+    <title>WFS 2.0 (ISO 19142:2010) Conformance Test Suite</title>
+    <meta charset="UTF-8" />
+    <style type="text/css">
+body {
+  color: black;
+  background: white;
+  font-family: Georgia, serif;
+}
+h1, h2, h3 {
+  font-family: Verdana, sans-serif;
+  color: #000099;
+  text-align: left;
+}
+h1 {
+  font-size: 1.4em;
+  margin-top: 2em;
+}
+h2 {
+  font-size: 1.2em;
+}
+h3 {
+  font-size: 1em;
+  margin-bottom: 0.5em;
+}
+table {
+  margin-top: 0.5em;
+  margin-bottom: 1em;
+  border-collapse: collapse;
+}
+td, th {
+  padding: 0.25em;
+  border: 1px solid black;
+}
+caption, figcaption {
+  font-weight: bold;
+  text-align: left;
+  margin: 0.25em;
+}
+th {
+  font-weight: bold;
+  font-family: Verdana, sans-serif;
+  text-align: left;
+  vertical-align: top;
+  background: #eeeeee;
+  color: #000099;
+}
+dt {
+  margin-top: 0.5em;
+  font-weight: bold;
+}
+    </style>
+  </head>
+  <body>
+    <h1>WFS 2.0 (ISO 19142:2010) Conformance Test Suite</h1>
+
+    <h2>Scope</h2>
+    <p>This executable test suite (ETS) checks WFS 2.0 implementations for conformance 
+    with respect to ISO 19142:2010 (<em>Geographic information -- Web feature service</em>) 
+    and related standards as depicted in Figure 1. Conformance testing is a kind of 
+    "black box" testing that examines externally visible characteristics or behaviors 
+    of the SUT and is independent of any implementation details.</p>
+    <figure>
+      <img src="./img/specifications.png" alt="Set of relevant specifications"/>
+      <figcaption><p><strong>Figure 1</strong> - Relevant specifications</p></figcaption>
+    </figure>
+    <p>Several fundamental conformance levels are defined in ISO 19142:</p>
+    <dl>
+      <dt><strong>Simple WFS</strong></dt>
+      <dd>Implements the following operations: GetCapabilities, DescribeFeatureType, 
+      ListStoredQueries, DescribeStoredQueries, and the GetFeature operation with at 
+      least the StoredQuery action (GetFeatureById).</dd>
+      <dt><strong>Basic WFS</strong></dt>
+      <dd>As for <strong>Simple WFS</strong>, plus the GetFeature operation with the Query action and 
+      the GetPropertyValue operation.</dd>
+      <dt><strong>Transactional WFS</strong></dt>
+      <dd>As for <strong>Basic WFS</strong>, plus the Transaction operation.</dd>
+      <dt><strong>Locking WFS</strong></dt>
+      <dd>As for <strong>Transactional WFS</strong>, plus at least one of the GetFeatureWithLock or 
+      LockFeature operations.</dd>
+    </dl>
+
+    <h2>Test requirements</h2>
+    <p>The documents listed below stipulate requirements that must be satisfied by a conforming 
+    implementation.</p>
+    <ul>
+      <li style="list-style:square">[ISO 19142:2010] <a 
+      href="http://www.iso.org/iso/iso_catalogue/catalogue_tc/catalogue_detail.htm?csnumber=42136" 
+      target="_blank">Geographic information -- Web Feature Service</a>. Also published as <a 
+      target="_blank" href="http://portal.opengeospatial.org/files/?artifact_id=39967">OGC 09-025r1</a>.
+      </li>
+      <li style="list-style:square">[ISO 19143:2010] <a 
+      href="http://www.iso.org/iso/iso_catalogue/catalogue_tc/catalogue_detail.htm?csnumber=42137" 
+      target="_blank">Geographic information -- Filter encoding</a>. Also published as <a target="_blank" 
+      href="http://portal.opengeospatial.org/files/?artifact_id=39968">OGC 09-026r1</a>.
+      </li>
+    </ul>
+
+    <p>The test suite is schema-aware in the sense that the WFS under test does not need 
+    to support any particular application schema or to be loaded with specialized test data. 
+    However, the following preconditions must be satisfied by the implementation under test 
+    (IUT):</p>
+    <ol>
+      <li>The GML application schema meets the requirements of the GML conformance class 
+      "GML application schemas defining features and feature collections" (ISO 19136, 
+      A.1.4).</li>
+      <li>Data are available for at least one feature type advertised in the capabilities 
+      document.</li>
+    </ol>
+
+    <p>A feature identifier may be supplied for the purpose of verifying the behavior of the 
+      <code>GetFeatureById</code> stored query. If this test run parameter is missing or does not 
+    identify an available feature instance, a "Simple WFS" implementation must also implement the 
+      <code>GetFeatureByType</code> stored query (see the definition below). The parameter may be 
+    omitted if the WFS under test implements the "Basic WFS" conformance class.</p>
+
+    <pre>
+&lt;wfs:StoredQueryDefinition id="urn:ogc:def:query:OGC-WFS::GetFeatureByType"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"&gt;
+  &lt;wfs:Abstract&gt;
+    A parameterized GetFeature request that returns a collection of features by type name.
+  &lt;/wfs:Abstract&gt;
+  &lt;wfs:Parameter name="typeName" type="xs:QName"&gt;
+    &lt;wfs:Abstract&gt;A QName specifying a feature type name (required); a corresponding namespace 
+    binding must also be present.&lt;/wfs:Abstract&gt;
+  &lt;/wfs:Parameter&gt;
+  &lt;wfs:Parameter name="startIndex" type="xs:nonNegativeInteger"&gt;
+    &lt;wfs:Abstract&gt;Default value is 0&lt;/wfs:Abstract&gt;
+  &lt;/wfs:Parameter&gt;
+  &lt;wfs:Parameter name="count" type="xs:nonNegativeInteger"&gt;
+    &lt;wfs:Abstract&gt;Optional&lt;/wfs:Abstract&gt;
+  &lt;/wfs:Parameter&gt;
+  &lt;wfs:QueryExpressionText returnFeatureTypes="gml:AbstractFeature"
+    language="http://schemas.opengis.net/wfs/2.0/wfs.xsd#xmlns(wfs=http://www.opengis.net/wfs/2.0)xscd(/wfs:GetFeature)"&gt;
+    &lt;wfs:GetFeature startIndex="${startIndex}" count="${count}"&gt;
+      &lt;wfs:Query typeNames="tns:${typeName}"/&gt;
+    &lt;/wfs:GetFeature&gt;
+  &lt;/wfs:QueryExpressionText&gt;
+&lt;/wfs:StoredQueryDefinition&gt;
+    </pre>
+
+    <h2>Test coverage</h2>
+    <p>Several optional conformance classes are not covered by the current test suite. The following 
+    capabilities are <strong>not</strong> tested:</p>
+    <ul>
+      <li style="list-style:circle">Inheritance</li>
+      <li style="list-style:circle">Remote resolve</li>
+      <li style="list-style:circle">Response paging</li>
+      <li style="list-style:circle">Standard joins</li>
+      <li style="list-style:circle">Spatial joins</li>
+      <li style="list-style:circle">Temporal joins</li>
+      <li style="list-style:circle">Feature versions</li>
+      <li style="list-style:circle">Manage stored queries</li>
+    </ul>
+
+    <h2>Test suite structure</h2>
+    <p>The test suite definition file (testng.xml) is located in the root package, 
+      <code>org.opengis.cite.iso19142</code>. A conformance class corresponds to a &lt;test&gt;
+  element; each test element includes a set of test classes that contain the actual 
+  test methods. The general structure of the test suite is shown in Table 1. Note that 
+  some schema-related tests are imported from the GML 3.2 test suite.</p>
+
+    <table border="1" style="border-collapse: collapse;">
+      <caption>Table 1 - Test suite structure</caption>
+      <thead>
+        <tr style="background-color:#eeeeee;">
+          <th style="width: 35%;">Conformance class</th>
+          <th>Test classes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="vertical-align: top;">
+          <td>All GML application schemas</td>
+          <td>
+            <ul style="list-style: none;">
+              <li>org.opengis.cite.iso19136.general.XMLSchemaTests</li>
+              <li>org.opengis.cite.iso19136.general.GeneralSchemaTests</li>
+              <li>org.opengis.cite.iso19136.general.ModelAndSyntaxTests</li>
+              <li>org.opengis.cite.iso19136.general.ComplexPropertyTests</li>
+            </ul>
+          </td>
+        </tr>
+        <tr style="vertical-align: top;">
+          <td>GML application schemas defining features and feature collections</td>
+          <td>
+            <ul style="list-style: none;">
+              <li>org.opengis.cite.iso19136.components.FeatureComponentTests</li>
+            </ul>
+          </td>
+        </tr>
+        <tr style="vertical-align: top;">
+          <td>Simple WFS</td>
+          <td>
+            <ul style="list-style: none;">
+              <li>org.opengis.cite.iso19142.simple.DescribeFeatureTypeTests</li>
+              <li>org.opengis.cite.iso19142.simple.DescribeStoredQueriesTests</li>
+              <li>org.opengis.cite.iso19142.simple.ListStoredQueriesTests</li>
+              <li>org.opengis.cite.iso19142.simple.ServiceMetadataTests</li>
+              <li>org.opengis.cite.iso19142.simple.SimpleCapabilitiesTests</li>
+              <li>org.opengis.cite.iso19142.simple.StoredQueryTests</li>
+            </ul>
+          </td>
+        </tr>
+        <tr style="vertical-align: top;">
+          <td>Basic WFS</td>
+          <td>
+            <ul style="list-style: none;">
+              <li>org.opengis.cite.iso19142.basic.BasicCapabilitiesTests</li>
+              <li>org.opengis.cite.iso19142.basic.GetPropertyValueTests</li>
+              <li>org.opengis.cite.iso19142.basic.BasicGetFeatureTests</li>
+              <li>org.opengis.cite.iso19142.basic.filter.PropertyIsNullOperatorTests</li>
+              <li>org.opengis.cite.iso19142.basic.filter.PropertyIsNilOperatorTests</li>
+              <li>org.opengis.cite.iso19142.basic.filter.PropertyIsEqualToOperatorTests</li>
+              <li>org.opengis.cite.iso19142.basic.filter.RelationalOperatorTests</li>
+              <li>org.opengis.cite.iso19142.basic.filter.PropertyIsLikeOperatorTests</li>
+              <li>org.opengis.cite.iso19142.basic.filter.ResourceIdOperatorTests</li>
+              <li>org.opengis.cite.iso19142.basic.filter.BBOXOperatorTests</li>
+            </ul>
+          </td>
+        </tr>
+        <tr style="vertical-align: top;">
+          <td>Transactional WFS</td>
+          <td>
+            <ul style="list-style: none;">
+              <li>org.opengis.cite.iso19142.transaction.TransactionCapabilitiesTests</li>
+              <li>org.opengis.cite.iso19142.transaction.Update</li>
+              <li>org.opengis.cite.iso19142.transaction.InsertTests</li>
+              <li>org.opengis.cite.iso19142.transaction.ReplaceTests</li>
+              <li>org.opengis.cite.iso19142.transaction.DeleteTests</li>
+            </ul>
+          </td>
+        </tr>
+        <tr style="vertical-align: top;">
+          <td>Locking WFS</td>
+          <td>
+            <ul style="list-style: none;">
+              <li>org.opengis.cite.iso19142.locking.LockingCapabilitiesTests</li>
+              <li>org.opengis.cite.iso19142.locking.LockFeatureTests</li>
+              <li>org.opengis.cite.iso19142.locking.GetFeatureWithLockTests</li>
+            </ul>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>The Javadoc documentation provides more detailed information about the test 
+    methods that constitute the suite.</p>
+
+    <h2>How to run the tests</h2>
+    <p>The test suite may be run in any of the following environments:</p>
+    <ul>
+      <li style="list-style:square">Integrated development environment (IDE): The main Java class is <code>
+	  TestNGController</code>.</li>
+      <li style="list-style:square">REST API: Submit a request that includes the necessary 
+      arguments to the test run controller (/rest/suites/${ets-code}/${project.version}/run).</li>
+      <li style="list-style:square">TEAM-Engine: Run the CTL script located in the <code>/src/main/ctl/</code> 
+	  directory.</li>
+    </ul>
+    <p>The test run arguments are summarized in Table 2. The <em>Obligation</em> 
+	descriptor can have the following values: M (mandatory), O (optional), or C 
+	(conditional).</p>
+
+    <table border="1" style="border-collapse: collapse;">
+      <caption>Table 2 - Test run arguments</caption>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Value domain</th>
+          <th>Obligation</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>wfs</td>
+          <td>URI</td>
+          <td>M</td>
+          <td>A URI that refers to a representation of the service capabilities document. 
+        This document does not need to be obtained from the service under test (SUT),
+        but it must describe the SUT. Ampersand ('&amp;') characters appearing within 
+        a query parameter value must be percent-encoded as %26.</td>
+        </tr>
+        <tr>
+          <td>fid</td>
+          <td>NCName</td>
+          <td>O</td>
+          <td>An identifier that matches the @gml:id attribute value of an available feature 
+          instance (may be omitted for "Basic WFS" implementations).</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p><strong>Note:</strong> A test method is skipped if any preconditions were not satisfied. 
+    Test prerequisites are usually checked in a configuration method; the results of these can 
+    be viewed in the TestNG report by selecting the "Config" check box.
+    </p>
+
+  </body>
+</html>
