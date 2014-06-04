@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <iso:schema id="wfs-capabilities-2.0" 
-  schemaVersion="1.0-beta1"
+  schemaVersion="2.0"
   xmlns:iso="http://purl.oclc.org/dsdl/schematron" 
   xml:lang="en"
   queryBinding="xslt2">
@@ -68,15 +68,6 @@
       </iso:assert>
       <iso:assert test="ows:Constraint[@name='ImplementsLockingWFS']/ows:DefaultValue">
       The service constraint 'ImplementsLockingWFS' has no ows:DefaultValue child.
-      </iso:assert>
-      <iso:assert test="ows:Constraint[@name='KVPEncoding']/ows:DefaultValue">
-      The service constraint 'KVPEncoding' has no ows:DefaultValue child.
-      </iso:assert>
-      <iso:assert test="ows:Constraint[@name='XMLEncoding']/ows:DefaultValue">
-      The service constraint 'XMLEncoding' has no ows:DefaultValue child.
-      </iso:assert>
-      <iso:assert test="ows:Constraint[@name='SOAPEncoding']/ows:DefaultValue">
-      The service constraint 'SOAPEncoding' has no ows:DefaultValue child.
       </iso:assert>
       <iso:assert test="ows:Constraint[@name='ImplementsInheritance']/ows:DefaultValue">
       The service constraint 'ImplementsInheritance' has no ows:DefaultValue child.

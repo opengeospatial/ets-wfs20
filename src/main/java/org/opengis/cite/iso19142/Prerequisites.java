@@ -15,14 +15,28 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * Confirms the readiness of the SUT to undergo testing. If any of these tests
- * fail then all remaining tests in the suite are skipped.
+ * Confirms the readiness of the SUT to undergo testing. If any of these
+ * configuration methods fail then all remaining tests in the suite are skipped.
  * 
  */
 public class Prerequisites {
 
     private static final Logger LOGR = Logger.getLogger(Prerequisites.class
             .getName());
+
+    /**
+     * Verifies that the service capabilities description contains all required
+     * elements in accord with the "Simple WFS" conformance class.
+     * 
+     * @param testContext
+     *            The test run context (ITestContext).
+     */
+    @BeforeSuite(alwaysRun = true)
+    public void verifyServiceDescription(ITestContext testContext) {
+        Document wfsMetadata = (Document) testContext.getSuite().getAttribute(
+                SuiteAttribute.TEST_SUBJECT.getName());
+        ETSAssert.assertSimpleWFSCapabilities(wfsMetadata);
+    }
 
     /**
      * Confirms that the SUT is available and produces a service description in
@@ -33,7 +47,7 @@ public class Prerequisites {
      * <li>[namespace name] = "http://www.opengis.net/wfs/2.0"</li>
      * </ul>
      */
-    @BeforeSuite(description = "prerequisite", alwaysRun = true)
+    @BeforeSuite(dependsOnMethods = { "verifyServiceDescription" })
     public void serviceIsAvailable(ITestContext testContext) {
         Document wfsMetadata = (Document) testContext.getSuite().getAttribute(
                 SuiteAttribute.TEST_SUBJECT.getName());
@@ -52,7 +66,7 @@ public class Prerequisites {
      * Confirms that the SUT can supply data for at least one advertised feature
      * type.
      */
-    @BeforeSuite(description = "prerequisite", dependsOnMethods = { "serviceIsAvailable" })
+    @BeforeSuite(dependsOnMethods = { "verifyServiceDescription" })
     public void dataAreAvailable(ITestContext testContext) throws Exception {
         Document wfsMetadata = (Document) testContext.getSuite().getAttribute(
                 SuiteAttribute.TEST_SUBJECT.getName());

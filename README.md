@@ -22,6 +22,8 @@ data. However, the following preconditions must be satisfied:
 "GML application schemas defining features and feature collections" (ISO 19136, A.1.4).
 * Data are available for at least one feature type advertised in the capabilities 
 document.
+* The service capabilities description contains all required elements in accord 
+with the "Simple WFS" conformance class.
 
 Visit the [project documentation website](http://opengeospatial.github.io/ets-wfs20/) 
 for more information, including the API documentation.

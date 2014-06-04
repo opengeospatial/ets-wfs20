@@ -9,6 +9,7 @@ import java.util.logging.Level;
 import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMResult;
+import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Validator;
 import javax.xml.xpath.XPath;
@@ -19,6 +20,7 @@ import javax.xml.xpath.XPathFactory;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmValue;
 
+import org.opengis.cite.iso19142.util.ValidationUtils;
 import org.opengis.cite.iso19142.util.XMLUtils;
 import org.opengis.cite.iso19142.util.NamespaceBindings;
 import org.opengis.cite.iso19142.util.TestSuiteLogger;
@@ -315,5 +317,28 @@ public class ETSAssert {
                 String.format("Expected status code(s) %s but received %d.",
                         Arrays.toString(expectedCodes), actualCode));
 
+    }
+
+    /**
+     * Asserts that the given DOM document contains a description of a
+     * "Simple WFS" implementation.
+     * 
+     * @param doc
+     *            A Document node having {http://www.opengis.net/wfs/2.0}
+     *            {@value org.opengis.cite.iso19142.WFS2#WFS_CAPABILITIES} as
+     *            the root element.
+     */
+    public static void assertSimpleWFSCapabilities(Document doc) {
+        ETSAssert.assertQualifiedName(doc.getDocumentElement(), new QName(
+                Namespaces.WFS, WFS2.WFS_CAPABILITIES));
+        SchematronValidator validator = ValidationUtils
+                .buildSchematronValidator("wfs-capabilities-2.0.sch",
+                        "SimpleWFSPhase");
+        DOMResult result = validator.validate(new DOMSource(doc, doc
+                .getDocumentURI()));
+        Assert.assertFalse(validator.ruleViolationsDetected(), ErrorMessage
+                .format(ErrorMessageKeys.NOT_SCHEMA_VALID,
+                        validator.getRuleViolationCount(),
+                        XMLUtils.writeNodeToString(result.getNode())));
     }
 }
