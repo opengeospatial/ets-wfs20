@@ -2,12 +2,14 @@ package org.opengis.cite.iso19142.transaction;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
+
 import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.xpath.XPathConstants;
@@ -193,8 +195,11 @@ public class Update extends TransactionFixture {
                 + "[1]", newVal);
         this.rspEntity = wfsClient.updateFeature(this.reqEntity, featureId,
                 featureType, properties, binding);
-        ETSAssert.assertFeatureProperties(featureId, properties, null,
-                wfsClient);
+        ETSAssert.assertFeatureProperties(
+                featureId,
+                properties,
+                Collections.singletonMap(propName.getNamespaceURI(),
+                        propName.getPrefix()), wfsClient);
         modifiedFeatures.add(this.dataSampler.getFeatureById(featureId));
     }
 
