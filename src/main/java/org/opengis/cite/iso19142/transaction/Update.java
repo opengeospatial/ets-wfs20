@@ -113,8 +113,11 @@ public class Update extends TransactionFixture {
         properties.put("gml:name[1]", "Ce n'est pas Vieux-Port de Montréal!");
         this.rspEntity = wfsClient.updateFeature(this.reqEntity, gmlId,
                 featureType, properties, binding);
+        if (this.rspEntity.getDocumentElement().getLocalName()
+                .equals(WFS2.TRANSACTION_RSP)) {
+            modifiedFeatures.add(originalFeature);
+        }
         ETSAssert.assertFeatureProperties(gmlId, properties, null, wfsClient);
-        modifiedFeatures.add(originalFeature);
     }
 
     /**
@@ -195,12 +198,15 @@ public class Update extends TransactionFixture {
                 + "[1]", newVal);
         this.rspEntity = wfsClient.updateFeature(this.reqEntity, featureId,
                 featureType, properties, binding);
+        if (this.rspEntity.getDocumentElement().getLocalName()
+                .equals(WFS2.TRANSACTION_RSP)) {
+            modifiedFeatures.add(this.dataSampler.getFeatureById(featureId));
+        }
         ETSAssert.assertFeatureProperties(
                 featureId,
                 properties,
                 Collections.singletonMap(propName.getNamespaceURI(),
                         propName.getPrefix()), wfsClient);
-        modifiedFeatures.add(this.dataSampler.getFeatureById(featureId));
     }
 
     /**
