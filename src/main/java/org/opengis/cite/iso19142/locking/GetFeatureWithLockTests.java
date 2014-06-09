@@ -3,16 +3,16 @@ package org.opengis.cite.iso19142.locking;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.xml.namespace.QName;
+
 import org.opengis.cite.iso19142.ETSAssert;
 import org.opengis.cite.iso19142.ErrorMessage;
 import org.opengis.cite.iso19142.ErrorMessageKeys;
 import org.opengis.cite.iso19142.Namespaces;
 import org.opengis.cite.iso19142.ProtocolBinding;
-import org.opengis.cite.iso19142.SuiteAttribute;
 import org.opengis.cite.iso19142.WFS2;
 import org.opengis.cite.iso19142.util.WFSRequest;
-import org.opengis.cite.iso19142.util.XMLUtils;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.BeforeClass;
@@ -20,6 +20,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 import com.sun.jersey.api.client.ClientResponse;
 
 /**
@@ -41,10 +42,8 @@ public class GetFeatureWithLockTests extends LockingFixture {
      * Checks that the GetFeatureWithLock operation is implemented by the SUT.
      * If not, all test methods defined in this class are skipped.
      */
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void sutImplementsGetFeatureWithLock(ITestContext testContext) {
-        this.wfsMetadata = (Document) testContext.getSuite().getAttribute(
-                SuiteAttribute.TEST_SUBJECT.getName());
         String xpath = String.format("//ows:Operation[@name='%s']",
                 WFS2.GET_FEATURE_WITH_LOCK);
         ETSAssert.assertXPath(xpath, this.wfsMetadata, null);
@@ -84,18 +83,18 @@ public class GetFeatureWithLockTests extends LockingFixture {
 
     /**
      * [{@code Test}] Submits a request to lock all instances of a randomly
-     * selected feature type for 30 seconds. After this time has elapsed, an
+     * selected feature type for 20 seconds. After this time has elapsed, an
      * attempt is made to reset the lock; this LockFeature request should fail
      * with a 'LockHasExpired' exception.
      * 
      * @see "ISO 19142:2010, cl. 12.2.4.2: lockId parameter"
      */
     @Test
-    public void lockAllQueryResults_30Seconds() {
+    public void lockAllQueryResults_20Seconds() {
         QName featureType = LockFeatureTests
                 .selectRandomFeatureType(this.featureInfo);
         WFSRequest.appendSimpleQuery(this.reqEntity, featureType);
-        this.reqEntity.getDocumentElement().setAttribute("expiry", "30");
+        this.reqEntity.getDocumentElement().setAttribute("expiry", "20");
         ClientResponse rsp = wfsClient.submitRequest(this.reqEntity,
                 ProtocolBinding.ANY);
         this.rspEntity = rsp.getEntity(Document.class);
@@ -143,7 +142,6 @@ public class GetFeatureWithLockTests extends LockingFixture {
                 .selectRandomFeatureType(this.featureInfo);
         WFSRequest.appendSimpleQuery(this.reqEntity, featureType1);
         this.reqEntity.getDocumentElement().setAttribute("expiry", "60");
-        XMLUtils.writeNode(this.reqEntity, System.out);
         ClientResponse rsp = wfsClient.submitRequest(this.reqEntity,
                 ProtocolBinding.ANY);
         this.rspEntity = rsp.getEntity(Document.class);
@@ -162,7 +160,6 @@ public class GetFeatureWithLockTests extends LockingFixture {
         // WARNING: could be same feature type
         WFSRequest.appendSimpleQuery(this.reqEntity, featureType2);
         this.reqEntity.getDocumentElement().setAttribute("lockAction", "SOME");
-        XMLUtils.writeNode(this.reqEntity, System.out);
         rsp = wfsClient.submitRequest(this.reqEntity, ProtocolBinding.ANY);
         this.rspEntity = rsp.getEntity(Document.class);
         Assert.assertEquals(rsp.getStatus(),
