@@ -94,12 +94,12 @@ public class ReplaceTests extends TransactionFixture {
         String xpath = String.format("//wfs:totalReplaced = '%d'",
                 replacements.size());
         ETSAssert.assertXPath(xpath, this.rspEntity, null);
+        originalFeatures.add(originalFeature);
         String gmlId = originalFeature.getAttributeNS(Namespaces.GML, "id");
         @SuppressWarnings("unchecked")
         Map<String, Object> replProps = (Map<String, Object>) replacement
                 .getUserData(REPL_PROPS);
         ETSAssert.assertFeatureProperties(gmlId, replProps, null, wfsClient);
-        originalFeatures.add(originalFeature);
     }
 
     /**

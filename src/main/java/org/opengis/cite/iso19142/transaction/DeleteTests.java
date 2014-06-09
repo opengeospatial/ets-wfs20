@@ -95,7 +95,7 @@ public class DeleteTests extends TransactionFixture {
         String xpath = String.format("//wfs:totalDeleted = '%d'",
                 featuresToDelete.size());
         ETSAssert.assertXPath(xpath, this.rspEntity, null);
-        ETSAssert.assertFeatureAvailability(gmlId, false, wfsClient);
         deletedFeatures.add(originalFeature);
+        ETSAssert.assertFeatureAvailability(gmlId, false, wfsClient);
     }
 }

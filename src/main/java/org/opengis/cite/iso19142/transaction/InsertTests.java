@@ -101,8 +101,8 @@ public class InsertTests extends TransactionFixture {
                 this.rspEntity, null);
         List<String> newFeatureIDs = extractFeatureIdentifiers(this.rspEntity);
         String id = newFeatureIDs.get(0);
-        ETSAssert.assertFeatureAvailability(id, true, this.wfsClient);
         createdFeatures.put(id, featureType);
+        ETSAssert.assertFeatureAvailability(id, true, this.wfsClient);
     }
 
     /**
