@@ -88,7 +88,7 @@ public class InsertTests extends TransactionFixture {
     public void insertSupportedFeature(ProtocolBinding binding,
             QName featureType) {
         Node feature = createFeatureInstance(featureType);
-        insertNewFeature(this.reqEntity, feature);
+        WFSRequest.addInsertStatement(this.reqEntity, feature);
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(
                 this.wfsMetadata, WFS2.TRANSACTION, binding);
         ClientResponse rsp = this.wfsClient.submitRequest(new DOMSource(
@@ -163,24 +163,6 @@ public class InsertTests extends TransactionFixture {
             throw new RuntimeException(e);
         }
         return resourceIDs;
-    }
-
-    /**
-     * Appends a wfs:Insert element to the document element in the given request
-     * entity. The wfs:Insert element contains the supplied feature instance.
-     * 
-     * @param request
-     *            A wfs:Transaction request entity.
-     * @param feature
-     *            A Node representing a feature instance.
-     */
-    void insertNewFeature(Document request, Node feature) {
-        if (null == feature) {
-            throw new NullPointerException("Feature instance is null.");
-        }
-        Element insert = request.createElementNS(Namespaces.WFS, "Insert");
-        request.getDocumentElement().appendChild(insert);
-        insert.appendChild(request.importNode(feature, true));
     }
 
     /**

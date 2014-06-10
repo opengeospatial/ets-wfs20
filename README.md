@@ -32,6 +32,16 @@ document.
 * The service capabilities description contains all required elements in accord 
 with the "Simple WFS" conformance class.
 
+Several optional conformance classes are not currently covered by the test suite:
+
+* Inheritance
+* Remote resolve
+* Response paging
+* Standard joins
+* Spatial joins
+* Temporal joins
+* Feature versions
+* Manage stored queries
 
 Visit the [project documentation website](http://opengeospatial.github.io/ets-wfs20/) 
 for more information, including the API documentation.

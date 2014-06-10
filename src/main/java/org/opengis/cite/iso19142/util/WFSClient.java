@@ -218,34 +218,6 @@ public class WFSClient {
     }
 
     /**
-     * Submits a request to replace a collection of GML feature representations.
-     * 
-     * @param features
-     *            A List containing one or more replacement feature
-     *            representations (Element nodes).
-     * @param binding
-     *            The ProtocolBinding to use.
-     * @return A Document representing the XML response entity, or {@code null}
-     *         if the response doesn't contain one.
-     */
-    public Document replace(List<Element> features, ProtocolBinding binding) {
-        Document req = WFSRequest.createRequestEntity(WFS2.TRANSACTION);
-        for (Element featureRep : features) {
-            Element replace = req.createElementNS(Namespaces.WFS, "Replace");
-            replace.setPrefix("wfs");
-            replace.appendChild(req.importNode(featureRep, true));
-            Element filter = WFSRequest.newResourceIdFilter(featureRep
-                    .getAttributeNS(Namespaces.GML, "id"));
-            replace.appendChild(req.adoptNode(filter));
-            req.getDocumentElement().appendChild(replace);
-        }
-        if (TestSuiteLogger.isLoggable(Level.FINE)) {
-            TestSuiteLogger.log(Level.FINE, XMLUtils.writeNodeToString(req));
-        }
-        return executeTransaction(req, binding);
-    }
-
-    /**
      * Submits a request to update a feature using the POST protocol binding.
      * 
      * @see #updateFeature(Document, String, QName, Map, ProtocolBinding)
@@ -425,6 +397,15 @@ public class WFSClient {
         return trxBindings.iterator().next();
     }
 
+    /**
+     * Executes a WFS transaction.
+     * 
+     * @param request
+     *            A Document node representing a wfs:Transaction request entity.
+     * @param binding
+     *            The ProtocolBinding to use
+     * @return A Document node representing the response entity.
+     */
     Document executeTransaction(Document request, ProtocolBinding binding) {
         if (binding == ProtocolBinding.ANY) {
             binding = getAnyTransactionBinding();

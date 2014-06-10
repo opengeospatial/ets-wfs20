@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
@@ -365,4 +366,60 @@ public class WFSRequest {
                 XMLConstants.XMLNS_ATTRIBUTE + ":" + qName.getPrefix(),
                 qName.getNamespaceURI());
     }
+
+    /**
+     * Adds a sequence of wfs:Replace statements to the given transaction
+     * request entity.
+     * 
+     * @param trxRequest
+     *            A Document node representing a wfs:Transaction request entity.
+     * @param replacements
+     *            A List containing replacement feature representations (as
+     *            GML).
+     */
+    public static void addReplaceStatements(Document trxRequest,
+            List<Element> replacements) {
+        Element docElem = trxRequest.getDocumentElement();
+        if (!docElem.getLocalName().equals(WFS2.TRANSACTION)) {
+            throw new IllegalArgumentException(
+                    "Document node is not a Transaction request: "
+                            + docElem.getNodeName());
+        }
+        for (Element feature : replacements) {
+            Element replace = trxRequest.createElementNS(Namespaces.WFS,
+                    "Replace");
+            replace.setPrefix("wfs");
+            replace.appendChild(trxRequest.importNode(feature, true));
+            Element filter = WFSRequest.newResourceIdFilter(feature
+                    .getAttributeNS(Namespaces.GML, "id"));
+            replace.appendChild(trxRequest.adoptNode(filter));
+            docElem.appendChild(replace);
+        }
+        if (TestSuiteLogger.isLoggable(Level.FINE)) {
+            TestSuiteLogger.log(Level.FINE,
+                    XMLUtils.writeNodeToString(trxRequest));
+        }
+    }
+
+    /**
+     * Appends a wfs:Insert element to the document element in the given request
+     * entity. The wfs:Insert element contains the supplied feature instance.
+     * 
+     * @param request
+     *            A Document node representing a wfs:Transaction request entity.
+     * @param feature
+     *            A Node representing a GML feature instance.
+     */
+    public static void addInsertStatement(Document request, Node feature) {
+        Element docElem = request.getDocumentElement();
+        if (!docElem.getLocalName().equals(WFS2.TRANSACTION)) {
+            throw new IllegalArgumentException(
+                    "Document node is not a Transaction request: "
+                            + docElem.getNodeName());
+        }
+        Element insert = request.createElementNS(Namespaces.WFS, "Insert");
+        docElem.appendChild(insert);
+        insert.appendChild(request.importNode(feature, true));
+    }
+
 }

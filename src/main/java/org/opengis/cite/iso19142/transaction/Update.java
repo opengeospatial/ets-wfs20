@@ -65,8 +65,10 @@ public class Update extends TransactionFixture {
         if (modifiedFeatures.isEmpty()) {
             return;
         }
-        Document rspEntity = this.wfsClient.replace(modifiedFeatures,
-                ProtocolBinding.ANY);
+        Document req = WFSRequest.createRequestEntity(WFS2.TRANSACTION);
+        WFSRequest.addReplaceStatements(req, modifiedFeatures);
+        ClientResponse rsp = wfsClient.submitRequest(req, ProtocolBinding.ANY);
+        Document rspEntity = rsp.getEntity(Document.class);
         String expr = String.format("//wfs:totalReplaced = '%d'",
                 modifiedFeatures.size());
         Boolean result;

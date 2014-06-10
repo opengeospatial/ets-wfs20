@@ -15,6 +15,7 @@ import javax.xml.xpath.XPathExpressionException;
 import org.opengis.cite.iso19142.ETSAssert;
 import org.opengis.cite.iso19142.Namespaces;
 import org.opengis.cite.iso19142.ProtocolBinding;
+import org.opengis.cite.iso19142.WFS2;
 import org.opengis.cite.iso19142.util.XMLUtils;
 import org.opengis.cite.iso19142.util.TestSuiteLogger;
 import org.opengis.cite.iso19142.util.WFSRequest;
@@ -23,6 +24,8 @@ import org.testng.annotations.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import com.sun.jersey.api.client.ClientResponse;
 
 /**
  * Tests the response to a Transaction request that includes one or more replace
@@ -48,8 +51,10 @@ public class ReplaceTests extends TransactionFixture {
         if (originalFeatures.isEmpty()) {
             return;
         }
-        Document rspEntity = this.wfsClient.replace(originalFeatures,
-                ProtocolBinding.ANY);
+        Document req = WFSRequest.createRequestEntity(WFS2.TRANSACTION);
+        WFSRequest.addReplaceStatements(req, originalFeatures);
+        ClientResponse rsp = wfsClient.submitRequest(req, ProtocolBinding.ANY);
+        Document rspEntity = rsp.getEntity(Document.class);
         String expr = String.format("//wfs:totalReplaced = '%d'",
                 originalFeatures.size());
         Boolean result;
@@ -90,7 +95,9 @@ public class ReplaceTests extends TransactionFixture {
         Element originalFeature = (Element) features.item(0);
         Element replacement = createReplacementFeature(originalFeature);
         List<Element> replacements = Arrays.asList(replacement);
-        this.rspEntity = wfsClient.replace(replacements, binding);
+        WFSRequest.addReplaceStatements(this.reqEntity, replacements);
+        ClientResponse rsp = wfsClient.submitRequest(this.reqEntity, binding);
+        this.rspEntity = rsp.getEntity(Document.class);
         String xpath = String.format("//wfs:totalReplaced = '%d'",
                 replacements.size());
         ETSAssert.assertXPath(xpath, this.rspEntity, null);
