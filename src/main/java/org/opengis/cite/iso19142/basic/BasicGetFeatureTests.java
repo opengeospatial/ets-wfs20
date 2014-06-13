@@ -2,12 +2,14 @@ package org.opengis.cite.iso19142.basic;
 
 import java.net.URI;
 import java.util.logging.Level;
+
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
+
 import org.opengis.cite.iso19142.BaseFixture;
 import org.opengis.cite.iso19142.ETSAssert;
 import org.opengis.cite.iso19142.ErrorMessage;
@@ -18,6 +20,7 @@ import org.opengis.cite.iso19142.ProtocolBinding;
 import org.opengis.cite.iso19142.WFS2;
 import org.opengis.cite.iso19142.util.ServiceMetadataUtils;
 import org.opengis.cite.iso19142.util.TestSuiteLogger;
+import org.opengis.cite.iso19142.util.ValidationUtils;
 import org.opengis.cite.iso19142.util.WFSRequest;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
@@ -26,7 +29,9 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.ls.LSResourceResolver;
 import org.xml.sax.SAXException;
+
 import com.sun.jersey.api.client.ClientResponse;
 
 /**
@@ -47,11 +52,11 @@ public class BasicGetFeatureTests extends BaseFixture {
 
     private static final QName FEATURE_COLL = new QName(Namespaces.WFS,
             WFS2.FEATURE_COLLECTION);
-    private Validator hintsValidator;
+    Validator hintsValidator;
 
     /**
      * Creates a special XML Schema Validator that uses schema location hints
-     * specified in an XML instance document. Beware that this introduces a
+     * specified in an XML instance document. Beware that this can introduce a
      * vulnerability to denial-of-service attacks.
      */
     @BeforeClass
@@ -61,6 +66,9 @@ public class BasicGetFeatureTests extends BaseFixture {
         try {
             Schema schema = factory.newSchema();
             this.hintsValidator = schema.newValidator();
+            LSResourceResolver resolver = ValidationUtils
+                    .createSchemaResolver(Namespaces.XSD);
+            this.hintsValidator.setResourceResolver(resolver);
         } catch (SAXException e) {
             // won't happen--no schema to process here
         }

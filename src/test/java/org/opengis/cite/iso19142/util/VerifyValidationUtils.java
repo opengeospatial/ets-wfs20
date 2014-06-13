@@ -11,7 +11,11 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 
 import org.junit.Test;
+import org.opengis.cite.iso19142.Namespaces;
+import org.opengis.cite.iso19142.WFS2;
 import org.opengis.cite.validation.SchematronValidator;
+import org.w3c.dom.ls.LSInput;
+import org.w3c.dom.ls.LSResourceResolver;
 
 /**
  * Verifies the behavior of the ValidationUtils class.
@@ -44,5 +48,15 @@ public class VerifyValidationUtils {
     public void compileWFSSchema() {
         Schema schema = ValidationUtils.createWFSSchema();
         assertNotNull(schema);
+    }
+
+    @Test
+    public void createXMLSchemaResolver() {
+        LSResourceResolver resolver = ValidationUtils
+                .createSchemaResolver(Namespaces.XSD);
+        assertNotNull(resolver);
+        LSInput resource = resolver.resolveResource(Namespaces.XSD.toString(),
+                Namespaces.WFS, null, WFS2.SCHEMA_URI, null);
+        assertNotNull("Failed to resolve WFS2 schema resource.", resource);
     }
 }
