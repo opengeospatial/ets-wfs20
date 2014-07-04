@@ -9,7 +9,7 @@
     <xs:documentation>All include statements have been resolved.</xs:documentation>
   </xs:annotation>
   <xs:import namespace="http://www.w3.org/1999/xlink"
-    schemaLocation="http://schemas.opengis.net/xlink/1.0.0/xlinks.xsd"/>
+    schemaLocation="http://www.w3.org/1999/xlink.xsd"/>
   <xs:import namespace="http://www.opengis.net/gml/3.2"
     schemaLocation="http://schemas.opengis.net/gml/3.2.1/gml.xsd"/>
 
@@ -21,7 +21,7 @@
   <xs:element name="AbstractObject" type="gco:AbstractObject_Type" abstract="true"/>
 
   <xs:attributeGroup name="ObjectReference">
-    <xs:attributeGroup ref="xlink:simpleLink"/>
+    <xs:attributeGroup ref="xlink:simpleAttrs"/>
     <xs:attribute name="uuidref" type="xs:string"/>
   </xs:attributeGroup>
 
@@ -395,7 +395,7 @@
   <xs:complexType name="RecordType_Type">
     <xs:simpleContent>
       <xs:extension base="xs:string">
-        <xs:attributeGroup ref="xlink:simpleLink"/>
+        <xs:attributeGroup ref="xlink:simpleAttrs"/>
       </xs:extension>
     </xs:simpleContent>
   </xs:complexType>

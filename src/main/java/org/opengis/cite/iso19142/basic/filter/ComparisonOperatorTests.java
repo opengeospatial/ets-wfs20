@@ -45,7 +45,7 @@ import com.sun.jersey.api.client.ClientResponse;
 
 /**
  * Tests the response to a GetFeature request that includes a filter predicate
- * containing one of the following relational operators:
+ * containing one of the following comparison operators:
  * <ul>
  * <li>PropertyIsLessThan</li>
  * <li>PropertyIsGreaterThan</li>
@@ -67,7 +67,7 @@ import com.sun.jersey.api.client.ClientResponse;
  * <li>ISO 19143:2010, cl. A.5: Test cases for minimum standard filter</li>
  * </ul>
  */
-public class RelationalOperatorTests extends QueryFilterFixture {
+public class ComparisonOperatorTests extends QueryFilterFixture {
 
     private static String MATCH_ALL = "All";
     private static String MATCH_ANY = "Any";
@@ -102,7 +102,7 @@ public class RelationalOperatorTests extends QueryFilterFixture {
         XSElementDeclaration propDecl = propRange.getKey();
         QName propName = new QName(propDecl.getNamespace(), propDecl.getName());
         WFSRequest.appendSimpleQuery(this.reqEntity, featureType);
-        addRelationalPredicate(this.reqEntity, FES2.LESS_THAN, propName,
+        addComparisonPredicate(this.reqEntity, FES2.LESS_THAN, propName,
                 propValue, true, MATCH_ANY);
         ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
         this.rspEntity = extractBodyAsDocument(rsp, binding);
@@ -154,7 +154,7 @@ public class RelationalOperatorTests extends QueryFilterFixture {
         XSElementDeclaration propDecl = propRange.getKey();
         QName propName = new QName(propDecl.getNamespace(), propDecl.getName());
         WFSRequest.appendSimpleQuery(this.reqEntity, featureType);
-        addRelationalPredicate(this.reqEntity, FES2.LESS_THAN, propName,
+        addComparisonPredicate(this.reqEntity, FES2.LESS_THAN, propName,
                 propValue, true, MATCH_ALL);
         ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
         this.rspEntity = extractBodyAsDocument(rsp, binding);
@@ -206,7 +206,7 @@ public class RelationalOperatorTests extends QueryFilterFixture {
         XSElementDeclaration propDecl = propRange.getKey();
         QName propName = new QName(propDecl.getNamespace(), propDecl.getName());
         WFSRequest.appendSimpleQuery(this.reqEntity, featureType);
-        addRelationalPredicate(this.reqEntity, FES2.GREATER_THAN, propName,
+        addComparisonPredicate(this.reqEntity, FES2.GREATER_THAN, propName,
                 propValue, true, MATCH_ANY);
         ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
         this.rspEntity = extractBodyAsDocument(rsp, binding);
@@ -258,7 +258,7 @@ public class RelationalOperatorTests extends QueryFilterFixture {
         XSElementDeclaration propDecl = propRange.getKey();
         QName propName = new QName(propDecl.getNamespace(), propDecl.getName());
         WFSRequest.appendSimpleQuery(this.reqEntity, featureType);
-        addRelationalPredicate(this.reqEntity, FES2.GREATER_THAN_OR_EQUAL,
+        addComparisonPredicate(this.reqEntity, FES2.GREATER_THAN_OR_EQUAL,
                 propName, propValue, true, MATCH_ANY);
         ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
         this.rspEntity = extractBodyAsDocument(rsp, binding);
@@ -311,7 +311,7 @@ public class RelationalOperatorTests extends QueryFilterFixture {
         XSElementDeclaration propDecl = propRange.getKey();
         QName propName = new QName(propDecl.getNamespace(), propDecl.getName());
         WFSRequest.appendSimpleQuery(this.reqEntity, featureType);
-        addRelationalPredicate(this.reqEntity, FES2.LESS_THAN_OR_EQUAL,
+        addComparisonPredicate(this.reqEntity, FES2.LESS_THAN_OR_EQUAL,
                 propName, propValue, true, MATCH_ANY);
         ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
         this.rspEntity = extractBodyAsDocument(rsp, binding);
@@ -334,7 +334,7 @@ public class RelationalOperatorTests extends QueryFilterFixture {
     }
 
     /**
-     * [{@code Test}] Submits a GetFeature request containing a relational
+     * [{@code Test}] Submits a GetFeature request containing a comparison
      * filter predicate that refers to an invalid feature property. An exception
      * report is expected in response with status code 400 and exception code
      * {@code InvalidParameterValue}.
@@ -352,7 +352,7 @@ public class RelationalOperatorTests extends QueryFilterFixture {
         int index = rnd.nextInt(this.featureTypes.size());
         WFSRequest.appendSimpleQuery(this.reqEntity,
                 this.featureTypes.get(index));
-        addRelationalPredicate(this.reqEntity, FES2.LESS_THAN_OR_EQUAL,
+        addComparisonPredicate(this.reqEntity, FES2.LESS_THAN_OR_EQUAL,
                 propName, "1355941270", true, MATCH_ANY);
         ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
         this.rspEntity = rsp.getEntity(Document.class);
@@ -364,7 +364,7 @@ public class RelationalOperatorTests extends QueryFilterFixture {
     }
 
     /**
-     * [{@code Test}] Submits a GetFeature request containing a relational
+     * [{@code Test}] Submits a GetFeature request containing a comparison
      * filter predicate that refers to the complex feature property
      * gml:boundedBy (with fes:Literal/gml:Envelope as the literal operand).
      * 
@@ -389,7 +389,7 @@ public class RelationalOperatorTests extends QueryFilterFixture {
         WFSRequest.appendSimpleQuery(this.reqEntity,
                 this.featureTypes.get(index));
         Document gmlEnv = WFSRequest.createGMLEnvelope();
-        addRelationalPredicate(this.reqEntity, FES2.LESS_THAN_OR_EQUAL,
+        addComparisonPredicate(this.reqEntity, FES2.LESS_THAN_OR_EQUAL,
                 propName, gmlEnv, true, MATCH_ANY);
         ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
         this.rspEntity = rsp.getEntity(Document.class);
@@ -399,7 +399,7 @@ public class RelationalOperatorTests extends QueryFilterFixture {
     }
 
     /**
-     * Adds a relational predicate to a GetFeature request entity with the given
+     * Adds a comparison predicate to a GetFeature request entity with the given
      * property name and literal value. The predicate is structured as shown in
      * the listing below.
      * 
@@ -417,7 +417,7 @@ public class RelationalOperatorTests extends QueryFilterFixture {
      * @param request
      *            The request entity (/wfs:GetFeature).
      * @param operator
-     *            The name of the relational operator.
+     *            The name of the comparison operator.
      * @param propertyName
      *            A QName that specifies the feature property to check.
      * @param literalValue
@@ -431,7 +431,7 @@ public class RelationalOperatorTests extends QueryFilterFixture {
      *            A String specifying how the predicate should be applied to a
      *            multi-valued property; the default value is "Any".
      */
-    void addRelationalPredicate(Document request, String operator,
+    void addComparisonPredicate(Document request, String operator,
             QName propertyName, Object literalValue, boolean matchCase,
             String matchAction) {
         if (!request.getDocumentElement().getLocalName()

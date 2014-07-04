@@ -12,7 +12,7 @@
   </annotation>
 
   <import namespace="http://www.w3.org/1999/xlink"
-    schemaLocation="http://schemas.opengis.net/xlink/1.0.0/xlinks.xsd"/>
+    schemaLocation="http://www.w3.org/1999/xlink.xsd"/>
   <import namespace="http://www.isotc211.org/2005/gmd" 
     schemaLocation="http://schemas.opengis.net/iso/19139/20070417/gmd/gmd.xsd"/>
 
@@ -5802,7 +5802,7 @@
         the use of Xlinks as the method for indicating the value of a property by reference in a
         uniform manner in GML.</documentation>
     </annotation>
-    <attributeGroup ref="xlink:simpleLink"/>
+    <attributeGroup ref="xlink:simpleAttrs"/>
     <attribute name="nilReason" type="gml:NilReasonType"/>
     <attribute ref="gml:remoteSchema">
       <annotation>

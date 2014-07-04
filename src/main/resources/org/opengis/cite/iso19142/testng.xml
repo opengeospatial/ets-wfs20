@@ -36,12 +36,12 @@
       <class name="org.opengis.cite.iso19142.basic.filter.PropertyIsNullOperatorTests" />
       <class name="org.opengis.cite.iso19142.basic.filter.PropertyIsNilOperatorTests" />
       <class name="org.opengis.cite.iso19142.basic.filter.PropertyIsEqualToOperatorTests" />
-      <class name="org.opengis.cite.iso19142.basic.filter.RelationalOperatorTests" />
+      <class name="org.opengis.cite.iso19142.basic.filter.ComparisonOperatorTests" />
       <class name="org.opengis.cite.iso19142.basic.filter.PropertyIsLikeOperatorTests" />
       <class name="org.opengis.cite.iso19142.basic.filter.ResourceIdOperatorTests" />
       <class name="org.opengis.cite.iso19142.basic.filter.BBOXOperatorTests" />
     </classes>
-  </test> 
+  </test>
   <test name="Transactional WFS">
     <classes>
       <class name="org.opengis.cite.iso19142.transaction.TransactionCapabilitiesTests" />
