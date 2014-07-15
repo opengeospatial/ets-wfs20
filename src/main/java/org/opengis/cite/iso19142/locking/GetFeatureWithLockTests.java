@@ -116,9 +116,8 @@ public class GetFeatureWithLockTests extends LockingFixture {
 			// ignore interrupt should one occur
 		}
 		// try to reset expired lock with LockFeature request
-		reqEntity = WFSRequest.createRequestEntity("LockFeature");
-		WFSRequest.appendStoredQuery(reqEntity, WFS2.QRY_GET_FEATURE_BY_TYPE,
-				Collections.singletonMap("typeName", (Object) featureType));
+		this.reqEntity = WFSRequest.createRequestEntity("LockFeature");
+		WFSRequest.appendSimpleQuery(this.reqEntity, featureType);
 		reqEntity.getDocumentElement().setAttribute("lockId", lockId);
 		rsp = wfsClient.submitRequest(reqEntity, ProtocolBinding.ANY);
 		this.rspEntity = rsp.getEntity(Document.class);
