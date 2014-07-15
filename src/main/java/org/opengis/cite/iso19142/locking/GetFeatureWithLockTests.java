@@ -84,9 +84,13 @@ public class GetFeatureWithLockTests extends LockingFixture {
 	 * [{@code Test}] Submits a request to lock all instances of a randomly
 	 * selected feature type for 20 seconds. After this time has elapsed, an
 	 * attempt is made to reset the lock; this LockFeature request should fail
-	 * with a 'LockHasExpired' exception.
+	 * with a 'LockHasExpired' exception and HTTP status code 403 (Forbidden).
 	 * 
-	 * @see "ISO 19142:2010, cl. 12.2.4.2: lockId parameter"
+	 * <h6 style="margin-bottom: 0.5em">Sources</h6>
+	 * <ul>
+	 * <li>ISO 19142:2010, cl. 12.2.4.2: lockId parameter</li>
+	 * <li>ISO 19142:2010, Table D.2</li>
+	 * </ul>
 	 */
 	@Test
 	public void lockAllQueryResults_20Seconds() {
@@ -119,7 +123,7 @@ public class GetFeatureWithLockTests extends LockingFixture {
 		rsp = wfsClient.submitRequest(reqEntity, ProtocolBinding.ANY);
 		this.rspEntity = rsp.getEntity(Document.class);
 		Assert.assertEquals(rsp.getStatus(),
-				ClientResponse.Status.BAD_REQUEST.getStatusCode(),
+				ClientResponse.Status.FORBIDDEN.getStatusCode(),
 				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
 		String xpath = "//ows:Exception[@exceptionCode = 'LockHasExpired']";
 		ETSAssert.assertXPath(xpath, this.rspEntity.getDocumentElement(), null);
