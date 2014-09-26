@@ -113,7 +113,7 @@ public class Update extends TransactionFixture {
         String gmlId = originalFeature.getAttributeNS(Namespaces.GML, "id");
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("gml:name[1]",
-                "Ce n&apos;est pas Vieux-Port de Montréal!");
+                "Ce n&apos;est pas Vieux-Port de Montr&#xe9;al!");
         this.rspEntity = wfsClient.updateFeature(this.reqEntity, gmlId,
                 featureType, properties, binding);
         if (this.rspEntity.getDocumentElement().getLocalName()

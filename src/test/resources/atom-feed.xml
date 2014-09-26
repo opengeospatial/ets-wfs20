@@ -11,7 +11,7 @@
     <name>John Doe</name>
     <email>johndoe@example.com</email>
     <ns1:phone>tel:+1-514-555-0123</ns1:phone>
-    <ns1:city>Montréal, QC</ns1:city>
+    <ns1:city>Montr&#xe9;al, QC</ns1:city>
   </author>
   <entry>
     <title>Atom-Powered Robots Run Amok</title>
