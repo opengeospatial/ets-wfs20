@@ -160,4 +160,19 @@ public class VerifyXMLUtils {
                 result.contains("Montréal"));
     }
 
+    @Test
+    public void expandCharacterEntity() {
+        String text = "Ce n&apos;est pas";
+        String result = XMLUtils.expandReferencesInText(text);
+        Assert.assertTrue("Expected result to contain an apostrophe (')",
+                result.contains("'"));
+    }
+
+    @Test
+    public void expandNumericCharacterReference() {
+        String text = "Montr&#xe9;al";
+        String result = XMLUtils.expandReferencesInText(text);
+        Assert.assertEquals("Expected result to contain character é (U+00E9)",
+                "Montréal", result);
+    }
 }
