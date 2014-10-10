@@ -22,8 +22,8 @@ conformance classes apply to all WFS 2.0 implementations:
 * _GML application schemas defining features and feature collections_
 
 The WFS 2.0 test suite is schema-aware in the sense that the WFS under test does not 
-need to support any particular application schema or to be loaded with specialized 
-test data. However, the following preconditions must be satisfied:
+need to support any particular application schemas or to be loaded with special test 
+data. However, the following preconditions must be satisfied:
 
 * The GML application schema meets the requirements of the GML conformance class 
 "GML application schemas defining features and feature collections" (ISO 19136, A.1.4).

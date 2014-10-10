@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.xml.namespace.QName;
@@ -294,5 +295,20 @@ public class VerifyWFSRequest {
                         + typeName.getLocalPart(),
                 query.getAttribute("typeNames").endsWith(
                         typeName.getLocalPart()));
+    }
+
+    @Test
+    public void addResourceIdPredicateToGetFeatureWithLock()
+            throws SAXException, IOException {
+        Document doc = docBuilder.parse(this.getClass().getResourceAsStream(
+                "/GetFeature/GetFeatureWithLock.xml"));
+        String id = "id001";
+        Set<String> idSet = Collections.singleton(id);
+        WFSRequest.addResourceIdPredicate(doc, idSet);
+        NodeList filters = doc.getElementsByTagNameNS(Namespaces.FES, "Filter");
+        assertEquals("Unexpected number of filters.", 1, filters.getLength());
+        Element predicate = (Element) filters.item(0).getChildNodes().item(0);
+        assertEquals("Unexpected resource id.", id,
+                predicate.getAttribute("rid"));
     }
 }
