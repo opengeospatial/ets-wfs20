@@ -32,7 +32,39 @@ document.
 * The service capabilities description contains all required elements in accord 
 with the "Simple WFS" conformance class.
 
-Several optional conformance classes are not currently covered by the test suite:
+Which tests are actually run is determined by the content of the WFS capabilities 
+document; in particular, the conformance classes the implementation claims to support. 
+There is a service constraint defined for each conformance class, except for the 
+mandatory "Simple WFS" conformance class (see ISO 19142, Table 13). The boolean-valued 
+service constraints are listed in the OperationsMetadata section of the capabilities 
+document as shown below.
+
+    <OperationsMetadata xmlns="http://www.opengis.net/ows/1.1">
+      <!-- Operation and common Parameter definitions -->
+      <Constraint name="ImplementsBasicWFS">
+        <AllowedValues>
+          <Value>TRUE</Value>
+          <Value>FALSE</Value>
+        </AllowedValues>
+        <DefaultValue>TRUE</DefaultValue>
+      </Constraint>
+      <Constraint name="KVPEncoding">
+        <AllowedValues>
+          <Value>TRUE</Value>
+          <Value>FALSE</Value>
+        </AllowedValues>
+        <DefaultValue>TRUE</DefaultValue>
+      </Constraint>
+      <Constraint name="XMLEncoding">
+        <AllowedValues>
+          <Value>TRUE</Value>
+          <Value>FALSE</Value>
+        </AllowedValues>
+        <DefaultValue>TRUE</DefaultValue>
+      </Constraint>
+    </OperationsMetadata>
+
+Note that several optional conformance classes are not currently covered by the test suite:
 
 * Inheritance
 * Remote resolve

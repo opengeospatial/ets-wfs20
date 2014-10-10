@@ -297,5 +297,39 @@ dt {
     be viewed in the TestNG report by selecting the "Config" check box.
     </p>
 
+    <p>Which tests are actually run is determined by the content of the WFS capabilities 
+    document; in particular, the conformance classes the implementation claims to support. 
+    There is a service constraint defined for each conformance class, except for the mandatory 
+    "Simple WFS" conformance class (see ISO 19142, Table 13). The boolean-valued service 
+    constraints are listed in the OperationsMetadata section of the capabilities 
+    document as shown below.</p>
+
+    <pre>
+&lt;OperationsMetadata xmlns="http://www.opengis.net/ows/1.1"&gt;
+  &lt;!-- Operation and common Parameter definitions --&gt;
+  &lt;Constraint name="ImplementsBasicWFS"&gt;
+    &lt;AllowedValues&gt;
+      &lt;Value&gt;TRUE&lt;/Value&gt;
+      &lt;Value&gt;FALSE&lt;/Value&gt;
+    &lt;/AllowedValues&gt;
+    &lt;DefaultValue&gt;TRUE&lt;/DefaultValue&gt;
+  &lt;/Constraint&gt;
+  &lt;Constraint name="KVPEncoding"&gt;
+    &lt;AllowedValues&gt;
+      &lt;Value&gt;TRUE&lt;/Value&gt;
+      &lt;Value&gt;FALSE&lt;/Value&gt;
+    &lt;/AllowedValues&gt;
+    &lt;DefaultValue&gt;TRUE&lt;/DefaultValue&gt;
+  &lt;/Constraint&gt;
+  &lt;Constraint name="XMLEncoding"&gt;
+    &lt;AllowedValues&gt;
+      &lt;Value&gt;TRUE&lt;/Value&gt;
+      &lt;Value&gt;FALSE&lt;/Value&gt;
+    &lt;/AllowedValues&gt;
+    &lt;DefaultValue&gt;TRUE&lt;/DefaultValue&gt;
+  &lt;/Constraint&gt;
+&lt;/OperationsMetadata&gt;
+    </pre>
+
   </body>
 </html>
