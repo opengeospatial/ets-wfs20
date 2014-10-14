@@ -310,6 +310,7 @@ public class WFSClient {
             String queryString = WFSRequest.transformEntityToKVP(entity);
             URI requestURI = UriBuilder.fromUri(resource.getURI())
                     .replaceQuery(queryString).build();
+            LOGR.log(Level.FINE, String.format("Request URI: %s", requestURI));
             resource = resource.uri(requestURI);
             response = resource.get(ClientResponse.class);
             break;

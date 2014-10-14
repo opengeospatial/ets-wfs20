@@ -1,5 +1,7 @@
 ## WFS 2.0 (ISO 19142:2010) Conformance Test Suite
 
+### Scope
+
 This test suite checks Web Feature Service (WFS) 2.0 implementations for conformance 
 to ISO 19142:2010, _Geographic information -- Web Feature Service_ (also published as 
 [OGC 09-025r1](http://portal.opengeospatial.org/files/?artifact_id=39967)).
@@ -40,7 +42,7 @@ service constraints are listed in the OperationsMetadata section of the capabili
 document as shown below.
 
     <OperationsMetadata xmlns="http://www.opengis.net/ows/1.1">
-      <!-- Operation and common Parameter definitions -->
+      <!-- Operation and common Parameter definitions omitted -->
       <Constraint name="ImplementsBasicWFS">
         <AllowedValues>
           <Value>TRUE</Value>
@@ -77,3 +79,14 @@ Note that several optional conformance classes are not currently covered by the 
 
 Visit the [project documentation website](http://opengeospatial.github.io/ets-wfs20/) 
 for more information, including the API documentation.
+
+### How to contribute
+
+If you would like to get involved, you can:
+
+* [Report an issue](https://github.com/opengeospatial/ets-wfs20/issues) such as a defect or an 
+enhancement request
+* Help to resolve an [open issue](https://github.com/opengeospatial/ets-wfs20/issues?q=is%3Aopen)
+* Fix a bug: Fork the repository, apply the fix, and create a pull request
+* Add new tests: Fork the repository, implement (and verify) the tests on a new topic branch, 
+and create a pull request

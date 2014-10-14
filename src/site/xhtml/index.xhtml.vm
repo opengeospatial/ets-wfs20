@@ -306,7 +306,7 @@ dt {
 
     <pre>
 &lt;OperationsMetadata xmlns="http://www.opengis.net/ows/1.1"&gt;
-  &lt;!-- Operation and common Parameter definitions --&gt;
+  &lt;!-- Operation and common Parameter definitions omitted --&gt;
   &lt;Constraint name="ImplementsBasicWFS"&gt;
     &lt;AllowedValues&gt;
       &lt;Value&gt;TRUE&lt;/Value&gt;
