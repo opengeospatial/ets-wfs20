@@ -84,7 +84,7 @@ public class InsertTests extends TransactionFixture {
      * @see "ISO 19142:2010, cl. 15.3.3: TransactionSummary element"
      * @see "ISO 19142:2010, cl. 15.3.4: InsertResults element"
      */
-    @Test(dataProvider = "binding+availFeatureType")
+    @Test(description = "See ISO 19142: 15.2.4, 15.3.4", dataProvider = "binding+availFeatureType")
     public void insertSupportedFeature(ProtocolBinding binding,
             QName featureType) {
         Node feature = createFeatureInstance(featureType);
@@ -113,7 +113,7 @@ public class InsertTests extends TransactionFixture {
      * 
      * @see "ISO 19142:2010, Table 3:  WFS exception codes"
      */
-    @Test
+    @Test(description = "See ISO 19142: 7.5, 15.4")
     public void insertInvalidFeature() {
         try {
             this.reqEntity = docBuilder.parse(getClass().getResourceAsStream(

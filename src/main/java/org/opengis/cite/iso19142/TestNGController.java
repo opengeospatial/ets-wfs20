@@ -133,7 +133,7 @@ public class TestNGController implements TestSuiteController {
      */
     void validateTestRunArgs(Document testRunArgs) throws Exception {
         if (null == testRunArgs
-                || !testRunArgs.getDocumentElement().getLocalName()
+                || !testRunArgs.getDocumentElement().getNodeName()
                         .equals("properties")) {
             throw new IllegalArgumentException(
                     "Input is not an XML properties document.");

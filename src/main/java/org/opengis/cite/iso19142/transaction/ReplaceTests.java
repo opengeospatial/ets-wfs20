@@ -87,7 +87,7 @@ public class ReplaceTests extends TransactionFixture {
      *            A QName representing the qualified name of some feature type.
      * 
      */
-    @Test(description = "urn:iso:std:iso:19142:clause:15.3.3,15.3.6", dataProvider = "binding+availFeatureType")
+    @Test(description = "See ISO 19142: 15.3.3, 15.3.6", dataProvider = "binding+availFeatureType")
     public void replaceFeature(ProtocolBinding binding, QName featureType) {
         Document doc = wfsClient.getFeatureByType(featureType, 1, null);
         NodeList features = doc.getElementsByTagNameNS(

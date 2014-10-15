@@ -74,7 +74,7 @@ public class DeleteTests extends TransactionFixture {
      * 
      * @see "ISO 19142:2010, cl. 15.3.3: TransactionSummary element"
      */
-    @Test(dataProvider = "binding+availFeatureType")
+    @Test(description = "See ISO 19142: 15.2.7", dataProvider = "binding+availFeatureType")
     public void deleteFeature(ProtocolBinding binding, QName featureType) {
         Document doc = wfsClient.getFeatureByType(featureType, 10, null);
         NodeList features = doc.getElementsByTagNameNS(

@@ -104,7 +104,7 @@ public class Update extends TransactionFixture {
      *            A QName representing the name of some feature type for which
      *            data are available.
      */
-    @Test(description = "urn:iso:std:iso:19142:clause:15.3.3,15.3.5", dataProvider = "binding+availFeatureType")
+    @Test(description = "See ISO 19142: 15.3.3, 15.3.5", dataProvider = "binding+availFeatureType")
     public void updateGMLName(ProtocolBinding binding, QName featureType) {
         Document doc = wfsClient.getFeatureByType(featureType, 1, null);
         NodeList features = doc.getElementsByTagNameNS(
@@ -136,7 +136,7 @@ public class Update extends TransactionFixture {
      * </ul>
      * 
      */
-    @Test(description = "urn:iso:std:iso:19142:clause:7.5,15.2.5.2.1")
+    @Test(description = "See ISO 19142: 7.5, 15.2.5.2.1")
     public void updateBoundedByWithKMLPoint() {
         try {
             this.reqEntity = docBuilder.parse(getClass().getResourceAsStream(
@@ -179,7 +179,7 @@ public class Update extends TransactionFixture {
      *            A QName representing the name of some feature type for which
      *            data are available.
      */
-    @Test(description = "urn:iso:std:iso:19142:clause:15.3.3,15.3.5", dataProvider = "binding+availFeatureType")
+    @Test(description = "See ISO 19142: 15.3.3, 15.3.5", dataProvider = "binding+availFeatureType")
     public void updateSimplePropertyValue(ProtocolBinding binding,
             QName featureType) {
         List<XSElementDeclaration> simpleProps = AppSchemaUtils

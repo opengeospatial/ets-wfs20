@@ -77,7 +77,7 @@ public class LockingCapabilitiesTests extends BaseFixture {
      * </ul>
      * 
      */
-    @Test
+    @Test(description = "See ISO 19142: Table 13, A.2.23")
     public void capabilitiesDescribesLockingWFS() {
         SchematronValidator validator = ValidationUtils
                 .buildSchematronValidator(SCHEMATRON_METADATA,

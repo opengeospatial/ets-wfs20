@@ -64,7 +64,7 @@ public class GetFeatureWithLockTests extends LockingFixture {
      * 
      * @see "ISO 19142:2010, cl. 13.2.4.3: resultType parameter"
      */
-    @Test
+    @Test(description = "See ISO 19142: 13.2.4.3")
     public void lockQueryResults_hits() {
         QName featureType = LockFeatureTests
                 .selectRandomFeatureType(this.featureInfo);
@@ -92,7 +92,7 @@ public class GetFeatureWithLockTests extends LockingFixture {
      * <li>ISO 19142:2010, Table D.2</li>
      * </ul>
      */
-    @Test
+    @Test(description = "See ISO 19142: 12.2.4.2, Table D.2")
     public void lockAllQueryResults_20Seconds() {
         QName featureType = LockFeatureTests
                 .selectRandomFeatureType(this.featureInfo);
@@ -145,7 +145,7 @@ public class GetFeatureWithLockTests extends LockingFixture {
      * 
      * @see "ISO 19142:2010, cl. 13.2.4.2: lockAction parameter"
      */
-    @Test
+    @Test(description = "See ISO 19142: 13.2.4.2")
     public void lockSomeFeatures() {
         QName featureType = LockFeatureTests
                 .selectRandomFeatureType(this.featureInfo);
