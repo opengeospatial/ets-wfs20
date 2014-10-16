@@ -61,7 +61,7 @@ public class SimpleCapabilitiesTests extends BaseFixture {
      * @see "OGC 06-121r3, cl. 8: Exception reports"
      * @see "OGC 06-121r3, cl. A.4.1.5: HTTP response status code"
      */
-    @Test
+    @Test(description = "See ISO 19142: 7.5")
     public void getCapabilities_missingServiceParam() {
         WebResource resource = client.resource(reqEndpointUsingGET).queryParam(
                 WFS2.REQUEST_PARAM, WFS2.GET_CAPABILITIES);
@@ -90,7 +90,7 @@ public class SimpleCapabilitiesTests extends BaseFixture {
      * 
      * @see "OGC 06-121r3, cl. 7.2: GetCapabilities request"
      */
-    @Test
+    @Test(description = "See ISO 19142: 7.2")
     public void getFullCapabilities() {
         MultivaluedMap<String, String> params = new MultivaluedMapImpl();
         params.putSingle(WFS2.REQUEST_PARAM, WFS2.GET_CAPABILITIES);
@@ -129,7 +129,7 @@ public class SimpleCapabilitiesTests extends BaseFixture {
      * @see "OGC 06-121r3, cl. 7.2: GetCapabilities request"
      * @see "OGC 06-121r3, cl. 7.3.2: Version negotiation"
      */
-    @Test(dataProvider = "protocol-binding")
+    @Test(description = "See ISO 19142: 7.2, 7.3.2", dataProvider = "protocol-binding")
     public void getCapabilities_acceptVersions(ProtocolBinding binding) {
         InputStream entityStream = getClass().getResourceAsStream(
                 "getCapabilities_acceptVersions.xml");

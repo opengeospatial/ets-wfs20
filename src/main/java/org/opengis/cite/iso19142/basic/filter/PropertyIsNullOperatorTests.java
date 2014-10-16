@@ -29,6 +29,7 @@ import com.sun.jersey.api.client.ClientResponse;
  * <h6 style="margin-bottom: 0.5em">Sources</h6>
  * <ul>
  * <li>ISO 19142:2010, cl. A.1.2: Basic WFS</li>
+ * <li>ISO 19143:2010, cl. 7.7.3.5: PropertyIsNull operator</li>
  * <li>ISO 19143:2010, cl. A.6: Test cases for standard filter</li>
  * </ul>
  */
@@ -45,7 +46,7 @@ public class PropertyIsNullOperatorTests extends QueryFilterFixture {
      * @param featureType
      *            A QName representing the qualified name of some feature type.
      */
-    @Test(dataProvider = "protocol-featureType")
+    @Test(description = "See ISO 19143: 7.7.3.5", dataProvider = "protocol-featureType")
     public void gmlNameIsNull(ProtocolBinding binding, QName featureType) {
         WFSRequest.appendSimpleQuery(this.reqEntity, featureType);
         QName gmlName = new QName(Namespaces.GML, "name", "gml");
@@ -73,7 +74,7 @@ public class PropertyIsNullOperatorTests extends QueryFilterFixture {
      * @param featureType
      *            A QName representing the qualified name of some feature type.
      */
-    @Test(dataProvider = "protocol-featureType")
+    @Test(description = "See ISO 19143: 7.7.3.5, 7.10", dataProvider = "protocol-featureType")
     public void propertyIsNotNull(ProtocolBinding binding, QName featureType) {
         WFSRequest.appendSimpleQuery(this.reqEntity, featureType);
         List<XSElementDeclaration> props = AppSchemaUtils

@@ -54,7 +54,7 @@ public class PropertyIsLikeOperatorTests extends QueryFilterFixture {
      * @param featureType
      *            A QName representing the qualified name of some feature type.
      */
-    @Test(dataProvider = "protocol-featureType")
+    @Test(description = "See ISO 19143: 7.7.3.4, 7.10", dataProvider = "protocol-featureType")
     public void propertyIsNotLike(ProtocolBinding binding, QName featureType) {
         WFSRequest.appendSimpleQuery(this.reqEntity, featureType);
         Map<QName, String> patternMap = generateMatchingStringPattern(featureType);
@@ -97,7 +97,7 @@ public class PropertyIsLikeOperatorTests extends QueryFilterFixture {
      * @param featureType
      *            A QName representing the qualified name of some feature type.
      */
-    @Test(dataProvider = "protocol-featureType")
+    @Test(description = "See ISO 19143: 7.7.3.4", dataProvider = "protocol-featureType")
     public void propertyIsLike(ProtocolBinding binding, QName featureType) {
         WFSRequest.appendSimpleQuery(this.reqEntity, featureType);
         Map<QName, String> patternMap = generateMatchingStringPattern(featureType);

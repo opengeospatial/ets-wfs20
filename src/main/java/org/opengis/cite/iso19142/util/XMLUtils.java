@@ -29,8 +29,6 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import net.sf.saxon.Configuration;
-import net.sf.saxon.dom.NodeOverNodeInfo;
 import net.sf.saxon.s9api.DOMDestination;
 import net.sf.saxon.s9api.DocumentBuilder;
 import net.sf.saxon.s9api.Processor;
@@ -42,7 +40,6 @@ import net.sf.saxon.s9api.XdmValue;
 import net.sf.saxon.s9api.XsltCompiler;
 import net.sf.saxon.s9api.XsltExecutable;
 import net.sf.saxon.s9api.XsltTransformer;
-import net.sf.saxon.xpath.XPathFactoryImpl;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -197,14 +194,8 @@ public class XMLUtils {
         NamespaceBindings bindings = NamespaceBindings.withStandardBindings();
         bindings.addAllBindings(namespaceBindings);
         XPathFactory factory = XPATH_FACTORY;
-        if (NodeOverNodeInfo.class.isInstance(context)
-                && XPathFactoryImpl.class.isInstance(factory)) {
-            // Use same configuration to prevent IllegalArgumentException
-            NodeOverNodeInfo doc = NodeOverNodeInfo.class.cast(context);
-            Configuration config = doc.getUnderlyingNodeInfo()
-                    .getConfiguration();
-            factory = new XPathFactoryImpl(config);
-        }
+        // WARNING: If context node is Saxon NodeOverNodeInfo, the factory must
+        // use the same Configuration object to avoid IllegalArgumentException
         XPath xpath = factory.newXPath();
         xpath.setNamespaceContext(bindings);
         Object result = xpath.evaluate(expr, context, returnType);

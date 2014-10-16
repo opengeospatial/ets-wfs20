@@ -110,7 +110,7 @@ public class DescribeFeatureTypeTests extends BaseFixture {
      * 
      * @see "ISO 19142:2010, cl. 9.2.4.1: typeNames parameter"
      */
-    @Test(dataProvider = "protocol-binding")
+    @Test(description = "See ISO 19142: 9.2.4.1", dataProvider = "protocol-binding")
     public void describeAllFeatureTypes(ProtocolBinding binding) {
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(
                 this.wfsMetadata, WFS2.DESCRIBE_FEATURE_TYPE, binding);
@@ -137,10 +137,11 @@ public class DescribeFeatureTypeTests extends BaseFixture {
      * @param binding
      *            The ProtocolBinding to use.
      * 
+     * @see "ISO 19142:2010, cl. 8.3.4: FeatureTypeList section"
      * @see "ISO 19142:2010, cl. 9.2.4.1: typeNames parameter"
      * @see "OGC 06-121r3, cl. 8.3: exceptionCode parameter values"
      */
-    @Test(dataProvider = "protocol-binding")
+    @Test(description = "See ISO 19142: 8.3.4, 9.2.4.1", dataProvider = "protocol-binding")
     public void describeUnknownFeatureType(ProtocolBinding binding) {
         addFeatureType(this.reqEntity, new QName("http://example.org",
                 "Unknown1.Type"));

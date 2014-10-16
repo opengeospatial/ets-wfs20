@@ -50,108 +50,108 @@ import com.sun.jersey.api.client.ClientResponse;
  */
 public class BasicGetFeatureTests extends BaseFixture {
 
-	private static final QName FEATURE_COLL = new QName(Namespaces.WFS,
-			WFS2.FEATURE_COLLECTION);
-	Validator hintsValidator;
+    private static final QName FEATURE_COLL = new QName(Namespaces.WFS,
+            WFS2.FEATURE_COLLECTION);
+    Validator hintsValidator;
 
-	/**
-	 * Creates a special XML Schema validator that uses schema location hints
-	 * specified in an XML instance document. Beware that this can introduce a
-	 * vulnerability to denial-of-service attacks, even though local copies of
-	 * standard schemas will be used.
-	 */
-	@BeforeClass
-	public void buildValidator() {
-		SchemaFactory factory = SchemaFactory
-				.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-		try {
-			Schema schema = factory.newSchema();
-			this.hintsValidator = schema.newValidator();
-			LSResourceResolver resolver = ValidationUtils
-					.createSchemaResolver(Namespaces.XSD);
-			this.hintsValidator.setResourceResolver(resolver);
-		} catch (SAXException e) {
-			// very unlikely to occur with no schema to process
-			TestSuiteLogger
-					.log(Level.WARNING,
-							"Failed to build XML Schema Validator that heeds location hints.",
-							e);
-		}
-	}
+    /**
+     * Creates a special XML Schema validator that uses schema location hints
+     * specified in an XML instance document. Beware that this can introduce a
+     * vulnerability to denial-of-service attacks, even though local copies of
+     * standard schemas will be used.
+     */
+    @BeforeClass
+    public void buildValidator() {
+        SchemaFactory factory = SchemaFactory
+                .newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        try {
+            Schema schema = factory.newSchema();
+            this.hintsValidator = schema.newValidator();
+            LSResourceResolver resolver = ValidationUtils
+                    .createSchemaResolver(Namespaces.XSD);
+            this.hintsValidator.setResourceResolver(resolver);
+        } catch (SAXException e) {
+            // very unlikely to occur with no schema to process
+            TestSuiteLogger
+                    .log(Level.WARNING,
+                            "Failed to build XML Schema Validator that heeds location hints.",
+                            e);
+        }
+    }
 
-	/**
-	 * Builds a DOM Document node representing the entity body for a GetFeature
-	 * request. A minimal XML representation is read from the classpath
-	 * ("GetFeature-Minimal.xml").
-	 */
-	@BeforeMethod
-	public void buildRequestEntity() {
-		String resourceName = "GetFeature-Minimal.xml";
-		try {
-			this.reqEntity = this.docBuilder.parse(getClass()
-					.getResourceAsStream(resourceName));
-		} catch (Exception x) {
-			TestSuiteLogger.log(Level.WARNING,
-					"Failed to parse request entity from classpath: "
-							+ resourceName, x);
-		}
-	}
+    /**
+     * Builds a DOM Document node representing the entity body for a GetFeature
+     * request. A minimal XML representation is read from the classpath
+     * ("GetFeature-Minimal.xml").
+     */
+    @BeforeMethod
+    public void buildRequestEntity() {
+        String resourceName = "GetFeature-Minimal.xml";
+        try {
+            this.reqEntity = this.docBuilder.parse(getClass()
+                    .getResourceAsStream(resourceName));
+        } catch (Exception x) {
+            TestSuiteLogger.log(Level.WARNING,
+                    "Failed to parse request entity from classpath: "
+                            + resourceName, x);
+        }
+    }
 
-	/**
-	 * Resets the validator to its original configuration.
-	 */
-	@AfterMethod
-	public void resetValidator() {
-		this.hintsValidator.reset();
-	}
+    /**
+     * Resets the validator to its original configuration.
+     */
+    @AfterMethod
+    public void resetValidator() {
+        this.hintsValidator.reset();
+    }
 
-	/**
-	 * Submits a minimal GetFeature request for features of a specified type
-	 * (obtained from the capabilities document). The test is run for all
-	 * supported protocol bindings and feature types. The response entity
-	 * (wfs:FeatureCollection) must be schema-valid and contain only instances
-	 * of the requested type as members.
-	 * 
-	 * @param binding
-	 *            A supported message binding.
-	 * @param featureType
-	 *            A QName representing the qualified name of some feature type.
-	 */
-	@Test(dataProvider = "all-protocols-featureTypes")
-	public void getFeaturesByType(ProtocolBinding binding, QName featureType) {
-		WFSRequest.appendSimpleQuery(this.reqEntity, featureType);
-		URI endpoint = ServiceMetadataUtils.getOperationEndpoint(
-				this.wfsMetadata, WFS2.GET_FEATURE, binding);
-		ClientResponse rsp = wfsClient.submitRequest(new DOMSource(reqEntity),
-				binding, endpoint);
-		Assert.assertEquals(rsp.getStatus(),
-				ClientResponse.Status.OK.getStatusCode(),
-				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
-		Document entity = extractBodyAsDocument(rsp, binding);
-		ETSAssert
-				.assertQualifiedName(entity.getDocumentElement(), FEATURE_COLL);
-		ETSAssert.assertSchemaValid(
-				this.hintsValidator,
-				new DOMSource(entity.getDocumentElement(), entity
-						.getDocumentURI()));
-	}
+    /**
+     * Submits a minimal GetFeature request (without a filter predicate) for
+     * feature types listed in the WFS the capabilities document. The test is
+     * run for all supported protocol bindings and feature types. The response
+     * entity (wfs:FeatureCollection) must be schema-valid and contain only
+     * instances of the requested type as members.
+     * 
+     * @param binding
+     *            A supported message binding.
+     * @param featureType
+     *            A QName representing the qualified name of some feature type.
+     */
+    @Test(description = "See ISO 19142: 11.2.2, 11.2.3", dataProvider = "all-protocols-featureTypes")
+    public void getFeaturesByType(ProtocolBinding binding, QName featureType) {
+        WFSRequest.appendSimpleQuery(this.reqEntity, featureType);
+        URI endpoint = ServiceMetadataUtils.getOperationEndpoint(
+                this.wfsMetadata, WFS2.GET_FEATURE, binding);
+        ClientResponse rsp = wfsClient.submitRequest(new DOMSource(reqEntity),
+                binding, endpoint);
+        Assert.assertEquals(rsp.getStatus(),
+                ClientResponse.Status.OK.getStatusCode(),
+                ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
+        Document entity = extractBodyAsDocument(rsp, binding);
+        ETSAssert
+                .assertQualifiedName(entity.getDocumentElement(), FEATURE_COLL);
+        ETSAssert.assertSchemaValid(
+                this.hintsValidator,
+                new DOMSource(entity.getDocumentElement(), entity
+                        .getDocumentURI()));
+    }
 
-	/**
-	 * Sets the availability status of instances of a given feature type
-	 * according to the content of a GetFeature response entity. Availability is
-	 * set to {@code true} if the response entity contains at least one
-	 * instance.
-	 * 
-	 * @param featureInfo
-	 *            A FeatureTypeInfo object that provides information about a
-	 *            feature type.
-	 * @param entity
-	 *            A GetFeature response entity (wfs:FeatureCollection).
-	 */
-	void setFeatureAvailability(FeatureTypeInfo featureInfo, Document entity) {
-		QName typeName = featureInfo.getTypeName();
-		NodeList features = entity.getElementsByTagNameNS(
-				typeName.getNamespaceURI(), typeName.getLocalPart());
-		featureInfo.setInstantiated(features.getLength() > 0);
-	}
+    /**
+     * Sets the availability status of instances of a given feature type
+     * according to the content of a GetFeature response entity. Availability is
+     * set to {@code true} if the response entity contains at least one
+     * instance.
+     * 
+     * @param featureInfo
+     *            A FeatureTypeInfo object that provides information about a
+     *            feature type.
+     * @param entity
+     *            A GetFeature response entity (wfs:FeatureCollection).
+     */
+    void setFeatureAvailability(FeatureTypeInfo featureInfo, Document entity) {
+        QName typeName = featureInfo.getTypeName();
+        NodeList features = entity.getElementsByTagNameNS(
+                typeName.getNamespaceURI(), typeName.getLocalPart());
+        featureInfo.setInstantiated(features.getLength() > 0);
+    }
 }

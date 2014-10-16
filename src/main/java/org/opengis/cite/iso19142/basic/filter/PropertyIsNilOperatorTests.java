@@ -60,7 +60,7 @@ public class PropertyIsNilOperatorTests extends QueryFilterFixture {
      * @param featureType
      *            A QName representing the qualified name of some feature type.
      */
-    @Test(dataProvider = "protocol-featureType")
+    @Test(description = "See ISO 19143: 7.7.3.6, A.6", dataProvider = "protocol-featureType")
     public void propertyIsNil(ProtocolBinding binding, QName featureType) {
         WFSRequest.appendSimpleQuery(this.reqEntity, featureType);
         List<XSElementDeclaration> nillables = AppSchemaUtils

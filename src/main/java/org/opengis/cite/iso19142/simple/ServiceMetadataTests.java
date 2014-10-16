@@ -46,8 +46,10 @@ public class ServiceMetadataTests extends BaseFixture {
     /**
      * Verifies that the WFS capabilities document is valid with respect to the
      * official {@code wfs.xsd} schema.
+     * 
+     * @see "ISO 19142:2010, cl. 8.3.2: GetCapabilities - Response"
      */
-    @Test
+    @Test(description = "See ISO 19142: 8.3.2")
     public void capabilitiesDocIsXmlSchemaValid() {
         Validator validator = this.wfsSchema.newValidator();
         ETSAssert.assertSchemaValid(validator, new DOMSource(this.wfsMetadata,
@@ -63,7 +65,7 @@ public class ServiceMetadataTests extends BaseFixture {
      * @see "ISO 19142:2010, cl. A.1.1: Simple WFS"
      * @see "ISO 19142:2010, cl. A.2.23: Declaring conformance"
      */
-    @Test
+    @Test(description = "See ISO 19142: A.1.1, A.2.23")
     public void capabilitiesDocCorrespondsToWfsSimple() {
         SchematronValidator validator = ValidationUtils
                 .buildSchematronValidator("wfs-capabilities-2.0.sch",

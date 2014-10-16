@@ -84,7 +84,7 @@ public class ComparisonOperatorTests extends QueryFilterFixture {
      * @param featureType
      *            A QName representing the qualified name of some feature type.
      */
-    @Test(dataProvider = "protocol-featureType")
+    @Test(description = "See ISO 19143: 7.7", dataProvider = "protocol-featureType")
     public void propertyIsLessThan_matchAny(ProtocolBinding binding,
             QName featureType) {
         Set<XSTypeDefinition> dataTypes = getNumericDataTypes(this.model);
@@ -136,7 +136,7 @@ public class ComparisonOperatorTests extends QueryFilterFixture {
      * @param featureType
      *            A QName representing the qualified name of some feature type.
      */
-    @Test(dataProvider = "protocol-featureType")
+    @Test(description = "See ISO 19143: 7.7.3.3", dataProvider = "protocol-featureType")
     public void propertyIsLessThan_matchAll(ProtocolBinding binding,
             QName featureType) {
         Set<XSTypeDefinition> dataTypes = getNumericDataTypes(this.model);
@@ -188,7 +188,7 @@ public class ComparisonOperatorTests extends QueryFilterFixture {
      * @param featureType
      *            A QName representing the qualified name of some feature type.
      */
-    @Test(dataProvider = "protocol-featureType")
+    @Test(description = "See ISO 19143: 7.7.3.1", dataProvider = "protocol-featureType")
     public void propertyIsGreaterThan_matchAny(ProtocolBinding binding,
             QName featureType) {
         Set<XSTypeDefinition> dataTypes = getNumericDataTypes(this.model);
@@ -240,7 +240,7 @@ public class ComparisonOperatorTests extends QueryFilterFixture {
      * @param featureType
      *            A QName representing the qualified name of some feature type.
      */
-    @Test(dataProvider = "protocol-featureType")
+    @Test(description = "See ISO 19143: 7.7.3.1", dataProvider = "protocol-featureType")
     public void propertyIsGreaterThanEqualTo_matchAny(ProtocolBinding binding,
             QName featureType) {
         Set<XSTypeDefinition> dataTypes = getNumericDataTypes(this.model);
@@ -293,7 +293,7 @@ public class ComparisonOperatorTests extends QueryFilterFixture {
      *            A QName representing the qualified name of some feature type.
      */
 
-    @Test(dataProvider = "protocol-featureType")
+    @Test(description = "See ISO 19143: 7.7.3.1", dataProvider = "protocol-featureType")
     public void propertyIsLessThanEqualTo_matchAny(ProtocolBinding binding,
             QName featureType) {
         Set<XSTypeDefinition> dataTypes = getNumericDataTypes(this.model);
@@ -344,7 +344,7 @@ public class ComparisonOperatorTests extends QueryFilterFixture {
      * 
      * @see "ISO 19143:2010, cl. 8.3: Exceptions"
      */
-    @Test(dataProvider = "protocol-binding")
+    @Test(description = "See ISO 19143: 8.3", dataProvider = "protocol-binding")
     public void invalidPropertyReference(ProtocolBinding binding) {
         QName propName = new QName("http://example.org", "undefined", "ex");
         // randomly select a feature type
@@ -380,7 +380,7 @@ public class ComparisonOperatorTests extends QueryFilterFixture {
      * @param binding
      *            The ProtocolBinding to use for this request.
      */
-    @Test(dataProvider = "protocol-binding")
+    @Test(description = "See ISO 19142: 7.5, 11.4", dataProvider = "protocol-binding")
     public void invalidOperand_boundedBy(ProtocolBinding binding) {
         QName propName = new QName(Namespaces.GML, "boundedBy", "gml");
         // randomly select a feature type

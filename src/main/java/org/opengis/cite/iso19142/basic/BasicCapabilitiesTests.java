@@ -85,7 +85,7 @@ public class BasicCapabilitiesTests extends BaseFixture {
      * @see "ISO 19142:2010, cl. A.1.2: Basic WFS"
      * @see "ISO 19143:2010, Table 5: Names of conformance class constraints"
      */
-    @Test(dataProvider = "protocol-binding")
+    @Test(description = "See ISO 19142: Table 1, Table 13, A.1.2", dataProvider = "protocol-binding")
     public void wfsCapabilitiesDescribesBasicWFS(ProtocolBinding binding)
             throws SOAPException {
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(

@@ -71,7 +71,7 @@ public class ListStoredQueriesTests extends BaseFixture {
      * 
      * @see "ISO 19142:2010, cl. 14.3.4: Response"
      */
-    @Test(dataProvider = "protocol-binding")
+    @Test(description = "See ISO 19142: 14.3.4", dataProvider = "protocol-binding")
     public void listStoredQueries(ProtocolBinding binding) {
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(
                 this.wfsMetadata, WFS2.LIST_STORED_QUERIES, binding);

@@ -72,15 +72,17 @@ public class GetPropertyValueTests extends BaseFixture {
     }
 
     /**
-     * Submits a GetPropertyByValue request for a known feature type with
+     * Submits a GetPropertyValue request for a known feature type with
      * valueReference="@gml:id". The members in the resulting ValueCollection
      * element are expected to contain simple (atomic) text values representing
      * the server-assigned object identifiers (xsd:ID).
      * 
      * @param binding
      *            The ProtocolBinding to use.
+     * 
+     * @see "ISO 19142:2010, cl. 10.2.4.3: GetPropertyValue - valueReference parameter"
      */
-    @Test(dataProvider = "protocol-binding")
+    @Test(description = "See ISO 19142: 10.2.4.3", dataProvider = "protocol-binding")
     public void getProperty_gmlId(ProtocolBinding binding) {
         setValueReference(reqEntity, "@gml:id");
         addQuery(reqEntity, this.featureTypes.get(0));
@@ -108,8 +110,10 @@ public class GetPropertyValueTests extends BaseFixture {
      * 
      * @param binding
      *            The ProtocolBinding to use.
+     * 
+     * @see "ISO 19142:2010, cl. 10.4: GetPropertyValue - Exceptions"
      */
-    @Test(dataProvider = "protocol-binding")
+    @Test(description = "See ISO 19142: 7.5, 10.4", dataProvider = "protocol-binding")
     public void getProperty_emptyValueRef(ProtocolBinding binding) {
         setValueReference(reqEntity, "");
         addQuery(reqEntity, this.featureTypes.get(0));

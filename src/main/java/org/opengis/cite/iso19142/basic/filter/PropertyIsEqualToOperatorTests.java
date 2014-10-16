@@ -59,7 +59,7 @@ public class PropertyIsEqualToOperatorTests extends QueryFilterFixture {
      * @param featureType
      *            A QName representing the qualified name of some feature type.
      */
-    @Test(dataProvider = "protocol-featureType")
+    @Test(description = "See ISO 19143: 7.7.3.2", dataProvider = "protocol-featureType")
     public void propertyIsEqualTo_caseSensitive(ProtocolBinding binding,
             QName featureType) {
         WFSRequest.appendSimpleQuery(this.reqEntity, featureType);
@@ -108,7 +108,7 @@ public class PropertyIsEqualToOperatorTests extends QueryFilterFixture {
      * @param featureType
      *            A QName representing the qualified name of some feature type.
      */
-    @Test(dataProvider = "protocol-featureType")
+    @Test(description = "See ISO 19143: 7.7.3.2", dataProvider = "protocol-featureType")
     public void propertyIsNotEqualTo_caseSensitive(ProtocolBinding binding,
             QName featureType) {
         WFSRequest.appendSimpleQuery(this.reqEntity, featureType);

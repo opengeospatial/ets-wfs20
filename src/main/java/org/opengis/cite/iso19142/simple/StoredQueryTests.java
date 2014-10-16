@@ -92,8 +92,10 @@ public class StoredQueryTests extends BaseFixture {
      * 
      * @param binding
      *            The ProtocolBinding to use.
+     * 
+     * @see "ISO 19142:2010, cl. 7.9.3.4: Stored query identifier"
      */
-    @Test(dataProvider = "protocol-binding")
+    @Test(description = "See ISO 19142: 7.9.3.4", dataProvider = "protocol-binding")
     public void unknownStoredQuery(ProtocolBinding binding) {
         WFSRequest.appendStoredQuery(this.reqEntity,
                 "http://docbook.org/ns/docbook",
@@ -127,8 +129,10 @@ public class StoredQueryTests extends BaseFixture {
      * 
      * @param binding
      *            The ProtocolBinding to use.
+     *
+     * @see "ISO 19142:2010, cl. 7.9.3.6: GetFeatureById stored query"
      */
-    @Test(dataProvider = "protocol-binding")
+    @Test(description = "See ISO 19142: 7.9.3.6, 11.4", dataProvider = "protocol-binding")
     public void invokeGetFeatureByIdWithUnknownID(ProtocolBinding binding) {
         String id = "uuid-" + UUID.randomUUID().toString();
         WFSRequest.appendStoredQuery(this.reqEntity,
@@ -155,8 +159,10 @@ public class StoredQueryTests extends BaseFixture {
      * 
      * @param binding
      *            The ProtocolBinding to use.
+     * 
+     * @see "ISO 19142:2010, cl. 7.9.3.6: GetFeatureById stored query"
      */
-    @Test(dataProvider = "protocol-binding")
+    @Test(description = "See ISO 19142: 7.9.3.6", dataProvider = "protocol-binding")
     public void invokeGetFeatureById(ProtocolBinding binding) {
         if (null == this.featureId || this.featureId.isEmpty()) {
             this.featureId = findFeatureIdentifier(this.wfsMetadata);

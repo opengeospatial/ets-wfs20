@@ -74,7 +74,7 @@ public class BBOXOperatorTests extends QueryFilterFixture {
      * 
      * @see "ISO 19143:2010, 7.8.3.2: BBOX operator"
      */
-    @Test(dataProvider = "protocol-featureType")
+    @Test(description = "See ISO 19143: 7.8.3.2", dataProvider = "protocol-featureType")
     public void withBroadBBOXFilter(ProtocolBinding binding, QName featureType) {
         List<XSElementDeclaration> geomProps = AppSchemaUtils
                 .getFeaturePropertiesByType(model, featureType, gmlGeomBaseType);
@@ -129,7 +129,7 @@ public class BBOXOperatorTests extends QueryFilterFixture {
      *            A QName representing the qualified name of some feature type.
      * 
      */
-    @Test(dataProvider = "protocol-featureType")
+    @Test(description = "See ISO 19143: 7.8.3.2, A.7", dataProvider = "protocol-featureType")
     public void withBBOXFilter(ProtocolBinding binding, QName featureType) {
         List<XSElementDeclaration> geomProps = AppSchemaUtils
                 .getFeaturePropertiesByType(model, featureType, gmlGeomBaseType);
@@ -202,9 +202,10 @@ public class BBOXOperatorTests extends QueryFilterFixture {
      *            A QName representing the qualified name of a feature type for
      *            which instances exist.
      * 
+     * @see "ISO 19142:2010, 11.4: GetFeature - Exceptions"
      * @see "ISO 19143:2010, 8.3: Exceptions"
      */
-    @Test(dataProvider = "instantiated-feature-types")
+    @Test(description = "See ISO 19142: 11.4; ISO 19143: 8.3", dataProvider = "instantiated-feature-types")
     public void invalidGeometryOperand(QName featureType) {
         XSElementDeclaration gmlDesc = this.model.getElementDeclaration(
                 "description", Namespaces.GML);

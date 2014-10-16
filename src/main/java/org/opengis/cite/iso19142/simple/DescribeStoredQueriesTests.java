@@ -79,7 +79,7 @@ public class DescribeStoredQueriesTests extends BaseFixture {
      * @see "ISO 19142:2010, cl. 14.4.2: XML encoding"
      * @see "ISO 19142:2010, Table 21: Keywords for DescribeStoredQueries KVP-encoding"
      */
-    @Test(dataProvider = "protocol-binding")
+    @Test(description = "See ISO 19142: 14.4.2, Table 21", dataProvider = "protocol-binding")
     public void describeAllStoredQueries(ProtocolBinding binding) {
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(
                 this.wfsMetadata, WFS2.DESC_STORED_QUERIES, binding);
@@ -116,7 +116,7 @@ public class DescribeStoredQueriesTests extends BaseFixture {
      * 
      * @see "ISO 19142:2010, cl. 7.9.3.6: GetFeatureById stored query"
      */
-    @Test(dataProvider = "protocol-binding")
+    @Test(description = "See ISO 19142: 7.9.3.6", dataProvider = "protocol-binding")
     public void describeStoredQuery_GetFeatureById(ProtocolBinding binding) {
         addQueryIdentifier(this.reqEntity, WFS2.QRY_GET_FEATURE_BY_ID);
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(
