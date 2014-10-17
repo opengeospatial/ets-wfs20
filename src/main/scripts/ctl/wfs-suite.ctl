@@ -94,7 +94,7 @@
           <entry key="wfs">
             <xsl:choose>
               <xsl:when test="empty($wfs-file)">
-                <xsl:value-of select="$form-data/values/value[@key='wfs-uri']"/>
+                <xsl:value-of select="normalize-space($form-data/values/value[@key='wfs-uri'])"/>
               </xsl:when>
               <xsl:otherwise>
                 <xsl:copy-of select="concat('file:///', $wfs-file)" />
