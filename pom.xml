@@ -54,7 +54,7 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>ets-gml32</artifactId>
-      <version>19</version>
+      <version>3.2.1-r18</version>
     </dependency>
     <dependency>
       <groupId>joda-time</groupId>
