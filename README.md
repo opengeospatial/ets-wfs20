@@ -80,6 +80,52 @@ Note that several optional conformance classes are not currently covered by the 
 Visit the [project documentation website](http://opengeospatial.github.io/ets-wfs20/) 
 for more information, including the API documentation.
 
+
+### How to run the tests
+
+#### Integrated development environment (IDE)
+You can use a Java IDE such as Eclipse, NetBeans, or IntelliJ to run the test 
+suite. Clone the repository and build the project. The runtime configuration 
+is summarized below.
+
+__Main class__: `org.opengis.cite.iso19142.TestNGController`
+
+__Arguments__: The first argument must refer to an XML properties file containing 
+the required test run argument (a reference to a KML resource). If not specified, 
+the default location at `${user.home}/test-run-props.xml` will be used.
+   
+You can modify the default settings in the sample [test-run-props.xml](src/main/config/test-run-props.xml) 
+file:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties version="1.0">
+    <comment>Test run arguments (ets-wfs20)</comment>
+	<entry key="wfs">wfs2-capabilities.xml</entry>
+</properties>
+```
+
+The TestNG results file (testng-results.xml) will be written to a subdirectory 
+in ${user.home}/testng/ having a UUID value as its name.
+
+#### Command shell (console)
+
+One of the build artifacts is an "all-in-one" JAR file that includes the test 
+suite with all of its dependencies. This makes it very easy to execute the test 
+suite in a command shell like so:
+
+`java -jar ets-wfs20-${version}-aio.jar  [test-run-props.xml]`
+
+#### OGC test harness
+
+Use [TEAMengine](https://github.com/opengeospatial/teamengine), the official 
+OGC test harness. The latest test suite release should be available at the 
+[beta testing facility](http://cite.opengeospatial.org/te2/). You can also 
+[build and deploy](https://github.com/opengeospatial/teamengine) the test 
+harness yourself and use a local installation.
+
+
 ### How to contribute
 
 If you would like to get involved, you can:

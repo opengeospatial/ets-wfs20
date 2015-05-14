@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties version="1.0">
-    <comment>Sample test run arguments (ets-iso19142)</comment>
-    <entry key="wfs">atom-feed.xml</entry>
-    <entry key="ics">Simple</entry>
+    <comment>Sample test run arguments (ets-wfs20)</comment>
+    <entry key="wfs">wfs2-capabilities.xml</entry>
 </properties>

@@ -136,6 +136,15 @@ Test method <xsl:value-of select="./@name"/>: <xsl:value-of select=".//message"/
         </xsl:for-each>
         <ctl:fail/>
       </xsl:if>
+	  <xsl:if test="xs:integer($test-results/testng-results/@skipped) eq xs:integer($test-results/testng-results/@total)">
+        <ctl:message>All tests were skipped. One or more preconditions were not satisfied.</ctl:message>
+        <xsl:for-each select="$test-results//test-method[@status='FAIL' and @is-config='true']">
+          <ctl:message>
+            <xsl:value-of select="./@name"/>: <xsl:value-of select=".//message"/>
+          </ctl:message>
+        </xsl:for-each>
+        <ctl:skipped />
+      </xsl:if>
     </ctl:code>
   </ctl:test>
 

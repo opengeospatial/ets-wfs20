@@ -15,7 +15,6 @@ import org.opengis.cite.iso19142.util.XMLUtils;
 import org.opengis.cite.iso19142.util.TestSuiteLogger;
 import org.testng.ISuite;
 import org.testng.ISuiteListener;
-import org.testng.Reporter;
 import org.w3c.dom.Document;
 
 /**
@@ -41,22 +40,13 @@ public class SuiteFixtureListener implements ISuiteListener {
         }
         processWfsParameter(suite);
         setAppSchemaParameter(suite);
-        Reporter.clear(); // clear output from previous test runs
         StringBuilder str = new StringBuilder("Initial test run parameters:\n");
         str.append(suite.getXmlSuite().getAllParameters().toString());
-        Reporter.log(str.toString());
         TestSuiteLogger.log(Level.CONFIG, str.toString());
     }
 
     @Override
     public void onFinish(ISuite suite) {
-        Reporter.log("Success? " + !suite.getSuiteState().isFailed());
-        String reportDir = suite.getOutputDirectory();
-        String msg = String.format(
-                "Test run directory: %s",
-                reportDir.substring(0,
-                        reportDir.lastIndexOf(File.separatorChar)));
-        Reporter.log(msg);
     }
 
     /**

@@ -15,7 +15,6 @@
       </suite>
       <revision>
         <name>${project.version}</name>
-        <status>Beta</status>
         <sources>
           <source>${ets-code}/${spec-version}/ctl</source>
         </sources>
