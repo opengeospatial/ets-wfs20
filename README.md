@@ -91,9 +91,9 @@ is summarized below.
 __Main class__: `org.opengis.cite.iso19142.TestNGController`
 
 __Arguments__: The first argument must refer to an XML properties file containing 
-the required test run argument (a reference to a KML resource). If not specified, 
-the default location at `${user.home}/test-run-props.xml` will be used.
-   
+the required test run argument (a reference to a WFSv2 capabilities document). If 
+not specified, the default location at `${user.home}/test-run-props.xml` will be used.
+
 You can modify the default settings in the sample [test-run-props.xml](src/main/config/test-run-props.xml) 
 file:
 

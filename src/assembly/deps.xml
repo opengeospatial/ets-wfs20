@@ -19,7 +19,6 @@
         <exclude>org.opengis.cite.teamengine:teamengine-spi</exclude>
         <exclude>com.sun.jersey:jersey-core</exclude>
         <exclude>xerces:xercesImpl</exclude>
-        <exclude>net.sourceforge.saxon:saxon9*</exclude>
         <exclude>xml-resolver:xml-resolver</exclude>
         <exclude>com.thaiopensource:jing</exclude>
       </excludes>

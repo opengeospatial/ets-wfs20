@@ -1,6 +1,5 @@
 package org.opengis.cite.iso19142;
 
-import java.io.File;
 import java.net.URI;
 import java.util.Map;
 import java.util.logging.Level;
@@ -9,10 +8,10 @@ import javax.xml.namespace.QName;
 import javax.xml.validation.Schema;
 
 import org.opengis.cite.iso19142.util.ServiceMetadataUtils;
+import org.opengis.cite.iso19142.util.TestSuiteLogger;
 import org.opengis.cite.iso19142.util.URIUtils;
 import org.opengis.cite.iso19142.util.ValidationUtils;
 import org.opengis.cite.iso19142.util.XMLUtils;
-import org.opengis.cite.iso19142.util.TestSuiteLogger;
 import org.testng.ISuite;
 import org.testng.ISuiteListener;
 import org.w3c.dom.Document;

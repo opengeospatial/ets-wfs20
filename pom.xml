@@ -56,6 +56,11 @@
       <artifactId>ets-gml32</artifactId>
       <version>1.20</version>
     </dependency>
+	<dependency>
+      <groupId>org.opengis.cite</groupId>
+      <artifactId>schema-utils</artifactId>
+      <version>1.6</version>
+    </dependency>
     <dependency>
       <groupId>joda-time</groupId>
       <artifactId>joda-time</artifactId>
