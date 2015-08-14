@@ -8,7 +8,7 @@
     <format>zip</format>
   </formats>
   <includeBaseDirectory>true</includeBaseDirectory>
-  <baseDirectory>${ets-code}/${spec-version}</baseDirectory>
+  <baseDirectory>wfs/${spec-version}</baseDirectory>
   <includeSiteDirectory>true</includeSiteDirectory>
   <fileSets>
     <fileSet>
