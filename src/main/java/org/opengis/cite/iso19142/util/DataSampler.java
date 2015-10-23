@@ -110,6 +110,7 @@ public class DataSampler {
         }
         int sampleSize = result.size();
         Random random = new Random();
+        numId = numId > sampleSize ? sampleSize : numId;
         while (idSet.size() < numId) {
             int randomInt = random.nextInt(sampleSize);
             idSet.add(result.itemAt(randomInt).getStringValue());
