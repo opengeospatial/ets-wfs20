@@ -11,7 +11,7 @@
  * <li>LockFeature</li>
  * </ul>
  *
- * <h6 style="margin-bottom: 0.5em">Sources</h6>
+ * <p style="margin-bottom: 0.5em"><strong>Sources</strong></p>
  * <ul>
  * <li>ISO ISO 19142:2010, cl. 2, Table 1</li>
  * <li>ISO ISO 19142:2010, cl. A.1.4: Locking WFS</li>

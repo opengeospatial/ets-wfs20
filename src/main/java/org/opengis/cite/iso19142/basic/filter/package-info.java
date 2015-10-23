@@ -13,7 +13,7 @@
  * <li>ImplementsMinimumXPath</li>
  * </ul>
  *
- * <h6 style="margin-bottom: 0.5em">Sources</h6>
+ * <p style="margin-bottom: 0.5em"><strong>Sources</strong></p>
  * <ul>
  * <li>ISO 19142:2010, cl. A.1.2: Basic WFS</li>
  * <li>ISO 19142:2010, Table 1: Conformance classes (FES Conformance Tests)</li>

@@ -131,7 +131,7 @@ public class TestNGController implements TestSuiteController {
 	 * @throws IllegalArgumentException
 	 *             If any arguments are missing or invalid for some reason.
 	 */
-	void validateTestRunArgs(Document testRunArgs) throws Exception {
+	void validateTestRunArgs(Document testRunArgs) {
 		if (null == testRunArgs
 				|| !testRunArgs.getDocumentElement().getNodeName()
 						.equals("properties")) {

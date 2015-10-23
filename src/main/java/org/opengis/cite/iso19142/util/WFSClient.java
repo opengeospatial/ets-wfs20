@@ -116,7 +116,8 @@ public class WFSClient {
 	 *            The stored query identifier.
 	 * @param params
 	 *            A collection of query parameters distinguished by name (may be
-	 *            empty, e.g. Collections.<String, Object> emptyMap()).
+	 *            empty, e.g. {@literal Collections.<String, Object>.emptyMap()}
+	 *            ).
 	 * @return A Document representing the XML response entity, or {@code null}
 	 *         if the response doesn't contain one.
 	 */
@@ -133,8 +134,8 @@ public class WFSClient {
 	 * @param typeName
 	 *            A QName denoting the feature type.
 	 * @param count
-	 *            The maximum number of features to fetch (> 0). If count < 1,
-	 *            the default value (10) applies.
+	 *            The maximum number of features to fetch (&gt; 0). If count
+	 *            &lt; 1, the default value (10) applies.
 	 * @param binding
 	 *            The ProtocolBinding to use for this request; if {@code null} a
 	 *            global binding will be used.
@@ -194,7 +195,7 @@ public class WFSClient {
 	 * Submits a request to insert a collection of GML feature instances.
 	 * 
 	 * @param features
-	 *            A List<Element> containing one or more feature
+	 *            A {@literal List<Element>} containing one or more feature
 	 *            representations.
 	 * @param binding
 	 *            The ProtocolBinding to use.
@@ -221,6 +222,14 @@ public class WFSClient {
 
 	/**
 	 * Submits a request to update a feature using the POST protocol binding.
+	 * 
+	 * @param id
+	 *            A feature identifier.
+	 * @param featureType
+	 *            The qualified name of the feature type.
+	 * @param properties
+	 *            A Map containing the feature properties to be updated.
+	 * @return A Document representing the XML response entity.
 	 * 
 	 * @see #updateFeature(Document, String, QName, Map, ProtocolBinding)
 	 */
