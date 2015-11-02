@@ -66,7 +66,8 @@ document as shown below.
       </Constraint>
     </OperationsMetadata>
 
-Note that several optional conformance classes are not currently covered by the test suite:
+Note that several optional conformance classes are **not** currently covered by the 
+test suite:
 
 * Inheritance
 * Remote resolve
