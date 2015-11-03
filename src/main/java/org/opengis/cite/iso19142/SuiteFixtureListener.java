@@ -1,20 +1,23 @@
 package org.opengis.cite.iso19142;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
 import javax.xml.validation.Schema;
 
 import org.opengis.cite.iso19142.util.ServiceMetadataUtils;
-import org.opengis.cite.iso19142.util.TestSuiteLogger;
 import org.opengis.cite.iso19142.util.URIUtils;
 import org.opengis.cite.iso19142.util.ValidationUtils;
 import org.opengis.cite.iso19142.util.XMLUtils;
 import org.testng.ISuite;
 import org.testng.ISuiteListener;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
 /**
  * A listener that performs various tasks before and after a test suite is run,
@@ -31,6 +34,9 @@ import org.w3c.dom.Document;
  */
 public class SuiteFixtureListener implements ISuiteListener {
 
+	private final static Logger LOGR = Logger
+			.getLogger(SuiteFixtureListener.class.getName());
+
 	@Override
 	public void onStart(ISuite suite) {
 		Schema wfsSchema = ValidationUtils.createWFSSchema();
@@ -39,9 +45,8 @@ public class SuiteFixtureListener implements ISuiteListener {
 		}
 		processWfsParameter(suite);
 		setAppSchemaParameter(suite);
-		StringBuilder str = new StringBuilder("Initial test run parameters:\n");
-		str.append(suite.getXmlSuite().getAllParameters().toString());
-		TestSuiteLogger.log(Level.CONFIG, str.toString());
+		LOGR.log(Level.CONFIG, "Initial test run parameters:\n{0}", suite
+				.getXmlSuite().getAllParameters());
 	}
 
 	@Override
@@ -76,13 +81,14 @@ public class SuiteFixtureListener implements ISuiteListener {
 		Document doc = null;
 		try {
 			doc = URIUtils.resolveURIAsDocument(wfsURI);
-			if (!doc.getDocumentElement().getLocalName()
-					.equals(WFS2.WFS_CAPABILITIES)) {
-				throw new RuntimeException(
-						"Did not receive WFS capabilities document: "
-								+ doc.getDocumentElement().getNodeName());
+			Element docElem = doc.getDocumentElement();
+			QName qName = new QName(docElem.getNamespaceURI(),
+					docElem.getLocalName());
+			if (!qName.equals(WFS2.QNAME_WFS_CAPABILITIES)) {
+				throw new RuntimeException("Not a WFS2 capabilities document: "
+						+ qName);
 			}
-		} catch (Exception ex) {
+		} catch (SAXException | IOException ex) {
 			// push exception up through TestNG ISuiteListener interface
 			throw new RuntimeException("Failed to parse resource located at "
 					+ wfsURI, ex);
@@ -93,14 +99,8 @@ public class SuiteFixtureListener implements ISuiteListener {
 					.extractFeatureInfo(doc);
 			suite.setAttribute(SuiteAttribute.FEATURE_INFO.getName(),
 					featureInfo);
-			if (TestSuiteLogger.isLoggable(Level.FINER)) {
-				// log service description
-				StringBuilder logMsg = new StringBuilder(
-						"Parsed resource from ");
-				logMsg.append(wfsURI).append("\n");
-				logMsg.append(XMLUtils.writeNodeToString(doc));
-				TestSuiteLogger.log(Level.FINER, logMsg.toString());
-			}
+			LOGR.log(Level.FINER, "Parsed resource from {0}\n{1}",
+					new Object[] { wfsURI, XMLUtils.writeNodeToString(doc) });
 		}
 	}
 
@@ -124,12 +124,21 @@ public class SuiteFixtureListener implements ISuiteListener {
 				.getAttribute(SuiteAttribute.TEST_SUBJECT.getName());
 		URI endpoint = ServiceMetadataUtils.getOperationEndpoint(wfsMetadata,
 				WFS2.DESCRIBE_FEATURE_TYPE, ProtocolBinding.GET);
+		if (endpoint.toString().isEmpty()) {
+			throw new RuntimeException(
+					"DescribeFeatureType request endpoint (GET method) not found in capabilities.");
+		}
+		LOGR.log(Level.CONFIG, "DescribeFeatureType request endpoint: {0}",
+				endpoint);
 		if (endpoint.isAbsolute()) {
 			StringBuilder reqURI = new StringBuilder(endpoint.toString());
 			reqURI.append("?service=WFS&version=2.0.0&request=DescribeFeatureType");
 			Map<String, String> params = suite.getXmlSuite().getParameters();
 			params.put(org.opengis.cite.iso19136.TestRunArg.XSD.toString(),
 					reqURI.toString());
+			LOGR.log(Level.CONFIG, "Set suite parameter {0}: {1}",
+					new Object[] { org.opengis.cite.iso19136.TestRunArg.XSD,
+							reqURI });
 		}
 	}
 }
