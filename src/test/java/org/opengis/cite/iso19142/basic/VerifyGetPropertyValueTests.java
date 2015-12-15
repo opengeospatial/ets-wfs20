@@ -6,9 +6,8 @@ import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import junit.framework.Assert;
-
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -27,43 +26,43 @@ import org.xml.sax.SAXException;
  */
 public class VerifyGetPropertyValueTests {
 
-    private static ITestContext testContext;
-    private static ISuite suite;
-    private static DocumentBuilder docBuilder;
+	private static ITestContext testContext;
+	private static ISuite suite;
+	private static DocumentBuilder docBuilder;
 
-    public VerifyGetPropertyValueTests() {
-    }
+	public VerifyGetPropertyValueTests() {
+	}
 
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-        testContext = mock(ITestContext.class);
-        suite = mock(ISuite.class);
-        when(testContext.getSuite()).thenReturn(suite);
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-        docBuilder = dbf.newDocumentBuilder();
-    }
+	@BeforeClass
+	public static void setUpClass() throws Exception {
+		testContext = mock(ITestContext.class);
+		suite = mock(ISuite.class);
+		when(testContext.getSuite()).thenReturn(suite);
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		dbf.setNamespaceAware(true);
+		docBuilder = dbf.newDocumentBuilder();
+	}
 
-    @Before
-    public void setUp() {
-    }
+	@Before
+	public void setUp() {
+	}
 
-    @After
-    public void tearDown() {
-    }
+	@After
+	public void tearDown() {
+	}
 
-    @Test
-    public void addTwoQueries() throws SAXException, IOException {
-        Document doc = docBuilder.parse(this.getClass().getResourceAsStream(
-                "/GetPropertyValue.xml"));
-        GetPropertyValueTests iut = new GetPropertyValueTests();
-        iut.addQuery(doc, new QName("http://cite.opengeospatial.org/gmlsf",
-                "PrimitiveGeoFeature"));
-        iut.addQuery(doc, new QName(
-                "http://www.opengis.net/citygml/building/2.0", "Building"));
-        NodeList qryElems = doc.getElementsByTagNameNS(Namespaces.WFS,
-                WFS2.QUERY_ELEM);
-        Assert.assertEquals("Unexpected number of wfs:Query elements.", 3,
-                qryElems.getLength());
-    }
+	@Test
+	public void addTwoQueries() throws SAXException, IOException {
+		Document doc = docBuilder.parse(this.getClass().getResourceAsStream(
+				"/GetPropertyValue.xml"));
+		GetPropertyValueTests iut = new GetPropertyValueTests();
+		iut.addQuery(doc, new QName("http://cite.opengeospatial.org/gmlsf",
+				"PrimitiveGeoFeature"));
+		iut.addQuery(doc, new QName(
+				"http://www.opengis.net/citygml/building/2.0", "Building"));
+		NodeList qryElems = doc.getElementsByTagNameNS(Namespaces.WFS,
+				WFS2.QUERY_ELEM);
+		Assert.assertEquals("Unexpected number of wfs:Query elements.", 3,
+				qryElems.getLength());
+	}
 }

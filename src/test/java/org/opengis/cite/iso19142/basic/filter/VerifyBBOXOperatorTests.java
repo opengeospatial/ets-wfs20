@@ -7,8 +7,7 @@ import java.io.IOException;
 
 import javax.xml.namespace.QName;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opengis.cite.iso19142.CommonTestFixture;
@@ -28,51 +27,51 @@ import org.xml.sax.SAXException;
  */
 public class VerifyBBOXOperatorTests extends CommonTestFixture {
 
-    private static final String NS1 = "http://example.org/ns1";
-    private static ITestContext testContext;
-    private static ISuite suite;
+	private static final String NS1 = "http://example.org/ns1";
+	private static ITestContext testContext;
+	private static ISuite suite;
 
-    public VerifyBBOXOperatorTests() {
-    }
+	public VerifyBBOXOperatorTests() {
+	}
 
-    @BeforeClass
-    public static void initClass() throws Exception {
-        testContext = mock(ITestContext.class);
-        suite = mock(ISuite.class);
-        when(testContext.getSuite()).thenReturn(suite);
-    }
+	@BeforeClass
+	public static void initClass() throws Exception {
+		testContext = mock(ITestContext.class);
+		suite = mock(ISuite.class);
+		when(testContext.getSuite()).thenReturn(suite);
+	}
 
-    @Test
-    public void addBBOX() throws SAXException, IOException {
-        Document req = docBuilder.parse(this.getClass().getResourceAsStream(
-                "/GetFeature/GetFeature-Minimal.xml"));
-        WFSRequest.appendSimpleQuery(req, new QName(NS1, "Type1"));
-        Document env = docBuilder.parse(this.getClass().getResourceAsStream(
-                "/Envelope.xml"));
-        BBOXOperatorTests iut = new BBOXOperatorTests();
-        iut.addBBOXPredicate(req, env.getDocumentElement(), null);
-        NodeList envElems = req.getElementsByTagNameNS(Namespaces.GML,
-                "Envelope");
-        Assert.assertEquals("Unexpected number of gml:Envelope elements.", 1,
-                envElems.getLength());
-    }
+	@Test
+	public void addBBOX() throws SAXException, IOException {
+		Document req = docBuilder.parse(this.getClass().getResourceAsStream(
+				"/GetFeature/GetFeature-Minimal.xml"));
+		WFSRequest.appendSimpleQuery(req, new QName(NS1, "Type1"));
+		Document env = docBuilder.parse(this.getClass().getResourceAsStream(
+				"/Envelope.xml"));
+		BBOXOperatorTests iut = new BBOXOperatorTests();
+		iut.addBBOXPredicate(req, env.getDocumentElement(), null);
+		NodeList envElems = req.getElementsByTagNameNS(Namespaces.GML,
+				"Envelope");
+		Assert.assertEquals("Unexpected number of gml:Envelope elements.", 1,
+				envElems.getLength());
+	}
 
-    @Test
-    public void addBBOXWithValueReference() throws SAXException, IOException {
-        Document req = docBuilder.parse(this.getClass().getResourceAsStream(
-                "/GetFeature/GetFeature-Minimal.xml"));
-        WFSRequest.appendSimpleQuery(req, new QName(NS1, "Type1"));
-        Document env = docBuilder.parse(this.getClass().getResourceAsStream(
-                "/Envelope.xml"));
-        BBOXOperatorTests iut = new BBOXOperatorTests();
-        Element valueRef = XMLUtils.createElement(new QName(Namespaces.FES,
-                "ValueReference", "fes"));
-        valueRef.setTextContent("tns:geom");
-        iut.addBBOXPredicate(req, env.getDocumentElement(), valueRef);
-        Node node = req
-                .getElementsByTagNameNS(Namespaces.FES, "ValueReference").item(
-                        0);
-        Assert.assertEquals("Unexpected fes:ValueReference.", "tns:geom",
-                node.getTextContent());
-    }
+	@Test
+	public void addBBOXWithValueReference() throws SAXException, IOException {
+		Document req = docBuilder.parse(this.getClass().getResourceAsStream(
+				"/GetFeature/GetFeature-Minimal.xml"));
+		WFSRequest.appendSimpleQuery(req, new QName(NS1, "Type1"));
+		Document env = docBuilder.parse(this.getClass().getResourceAsStream(
+				"/Envelope.xml"));
+		BBOXOperatorTests iut = new BBOXOperatorTests();
+		Element valueRef = XMLUtils.createElement(new QName(Namespaces.FES,
+				"ValueReference", "fes"));
+		valueRef.setTextContent("tns:geom");
+		iut.addBBOXPredicate(req, env.getDocumentElement(), valueRef);
+		Node node = req
+				.getElementsByTagNameNS(Namespaces.FES, "ValueReference").item(
+						0);
+		Assert.assertEquals("Unexpected fes:ValueReference.", "tns:geom",
+				node.getTextContent());
+	}
 }
