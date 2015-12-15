@@ -2,21 +2,27 @@ package org.opengis.cite.iso19142.basic.filter;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
+import java.util.logging.Level;
+
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 
 import org.apache.xerces.xs.XSElementDeclaration;
+import org.opengis.cite.iso19136.util.TestSuiteLogger;
 import org.opengis.cite.iso19142.ETSAssert;
 import org.opengis.cite.iso19142.ErrorMessage;
 import org.opengis.cite.iso19142.ErrorMessageKeys;
+import org.opengis.cite.iso19142.FeatureTypeInfo;
 import org.opengis.cite.iso19142.Namespaces;
 import org.opengis.cite.iso19142.ProtocolBinding;
 import org.opengis.cite.iso19142.WFS2;
 import org.opengis.cite.iso19142.util.AppSchemaUtils;
 import org.opengis.cite.iso19142.util.WFSRequest;
 import org.testng.Assert;
-import org.testng.SkipException;
+import org.testng.ITestContext;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -28,7 +34,9 @@ import com.sun.jersey.api.client.ClientResponse;
  * Tests the response to a GetFeature request that includes a
  * {@code PropertyIsNil} filter predicate that tests the content of a specified
  * property and evaluates if it is nil. It is also possible to check the reason
- * for a missing value by matching on the nilReason parameter.
+ * for a missing value by matching on the nilReason parameter. While the
+ * gml:boundedBy property is nillable, it is ignored; the application schema
+ * must define at least one nillable feature property.
  * 
  * <blockquote> In the GML schema and in GML application schemas, the "nillable"
  * and "nilReason" construction may be used on elements representing GML
@@ -52,44 +60,76 @@ import com.sun.jersey.api.client.ClientResponse;
  */
 public class PropertyIsNilOperatorTests extends QueryFilterFixture {
 
+	Map<QName, List<XSElementDeclaration>> nillableProperties;
+
+	@BeforeClass
+	public void findNillableProperties(ITestContext testContext) {
+		this.nillableProperties = new HashMap<QName, List<XSElementDeclaration>>();
+		ListIterator<QName> typesItr = this.featureTypes.listIterator();
+		while (typesItr.hasNext()) {
+			QName typeName = typesItr.next();
+			TestSuiteLogger.log(Level.FINE,
+					"Checking feature type for nillable properties: "
+							+ typeName);
+			List<XSElementDeclaration> nillableProps = AppSchemaUtils
+					.getNillableProperties(this.model, typeName);
+			TestSuiteLogger.log(Level.FINE, nillableProps.toString());
+			FeatureTypeInfo typeInfo = this.dataSampler.getFeatureTypeInfo()
+					.get(typeName);
+			// ignore nillable gml:boundedBy property
+			if (typeInfo.isInstantiated() && nillableProps.size() > 1) {
+				this.nillableProperties.put(typeName, nillableProps);
+			}
+		}
+	}
+
 	/**
 	 * [{@code Test}] Submits a GetFeature request containing a
 	 * {@code PropertyIsNil} predicate designating a nillable feature property
-	 * (the last one in document order, if any). The response entity must
-	 * include only features that include the specified property with
+	 * (the last one in document order). The response entity must include only
+	 * feature instances that include the specified property with
 	 * {@literal @xsi:nil="true"}.
+	 * 
+	 * <p>
+	 * All <strong>Basic</strong> WFS implementations must support the
+	 * <strong>Standard Filter</strong> conformance class defined in
+	 * <em>OpenGIS Filter Encoding 2.0 Encoding Standard</em> (ISO 19143).
+	 * </p>
 	 * 
 	 * @param binding
 	 *            The ProtocolBinding to use for this request.
-	 * @param featureType
-	 *            A QName representing the qualified name of some feature type.
 	 */
-	@Test(description = "See ISO 19143: 7.7.3.6, A.6", dataProvider = "protocol-featureType")
-	public void propertyIsNil(ProtocolBinding binding, QName featureType) {
-		WFSRequest.appendSimpleQuery(this.reqEntity, featureType);
-		List<XSElementDeclaration> nillables = AppSchemaUtils
-				.getNillableProperties(model, featureType);
-		if (nillables.size() == 1) { // ignore gml:boundedBy
-			throw new SkipException("Feature type has no nillable properties: "
-					+ featureType);
+	@Test(description = "See ISO 19143: 7.7.3.6, A.6", dataProvider = "protocol-binding")
+	public void propertyIsNil(ProtocolBinding binding) {
+		if (this.nillableProperties.isEmpty()) {
+			throw new AssertionError(
+					ErrorMessage
+							.format(ErrorMessageKeys.CAPABILITY_NOT_TESTED,
+									"PropertyIsNil",
+									"No feature type for which instances exist has nillable properties"));
 		}
-		// get last nillable property in document order
-		XSElementDeclaration prop = nillables.get(nillables.size() - 1);
-		QName propName = new QName(prop.getNamespace(), prop.getName());
-		addPropertyIsNilPredicate(this.reqEntity, propName, null, false);
-		ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
-		Assert.assertEquals(rsp.getStatus(),
-				ClientResponse.Status.OK.getStatusCode(),
-				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
-		this.rspEntity = extractBodyAsDocument(rsp, binding);
-		NodeList features = this.rspEntity.getElementsByTagNameNS(
-				featureType.getNamespaceURI(), featureType.getLocalPart());
-		String xpath = String.format("ns1:%s[@xsi:nil='true']",
-				propName.getLocalPart());
-		Map<String, String> nsBindings = new HashMap<String, String>();
-		nsBindings.put(propName.getNamespaceURI(), "ns1");
-		for (int i = 0; i < features.getLength(); i++) {
-			ETSAssert.assertXPath(xpath, features.item(i), nsBindings);
+		for (QName typeName : this.nillableProperties.keySet()) {
+			List<XSElementDeclaration> nillables = this.nillableProperties
+					.get(typeName);
+			WFSRequest.appendSimpleQuery(this.reqEntity, typeName);
+			// get last nillable property in document order
+			XSElementDeclaration prop = nillables.get(nillables.size() - 1);
+			QName propName = new QName(prop.getNamespace(), prop.getName());
+			addPropertyIsNilPredicate(this.reqEntity, propName, null, false);
+			ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
+			Assert.assertEquals(rsp.getStatus(),
+					ClientResponse.Status.OK.getStatusCode(),
+					ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
+			this.rspEntity = extractBodyAsDocument(rsp, binding);
+			NodeList features = this.rspEntity.getElementsByTagNameNS(
+					typeName.getNamespaceURI(), typeName.getLocalPart());
+			String xpath = String.format("ns1:%s[@xsi:nil='true']",
+					propName.getLocalPart());
+			Map<String, String> nsBindings = new HashMap<String, String>();
+			nsBindings.put(propName.getNamespaceURI(), "ns1");
+			for (int i = 0; i < features.getLength(); i++) {
+				ETSAssert.assertXPath(xpath, features.item(i), nsBindings);
+			}
 		}
 	}
 

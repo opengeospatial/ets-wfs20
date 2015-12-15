@@ -23,4 +23,5 @@ public class ErrorMessageKeys {
     public static final String DATA_UNAVAILABLE = "DataNotAvailable";
     public static final String UNEXPECTED_ID = "UnexpectedIdentifier";
     public static final String FID_NOT_FOUND = "FidNotFound";
+    public static final String CAPABILITY_NOT_TESTED = "CapabilityNotTested";
 }
