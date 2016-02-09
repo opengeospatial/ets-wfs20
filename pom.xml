@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.opengis.cite</groupId>
     <artifactId>ets-common</artifactId>
-    <version>4</version>
+    <version>6</version>
   </parent>
   <artifactId>ets-wfs20</artifactId>
   <version>1.21-SNAPSHOT</version>
@@ -52,17 +52,15 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>ets-gml32</artifactId>
-      <version>1.22</version>
+      <version>1.23</version>
     </dependency>
 	<dependency>
       <groupId>org.opengis.cite</groupId>
       <artifactId>schema-utils</artifactId>
-      <version>1.7</version>
     </dependency>
     <dependency>
       <groupId>joda-time</groupId>
       <artifactId>joda-time</artifactId>
-      <version>2.8</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -99,7 +97,6 @@
       </plugin>
 	  <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.6</version>
         <configuration>
           <archive>
             <manifest>
