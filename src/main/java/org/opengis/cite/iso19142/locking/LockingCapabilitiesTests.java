@@ -2,6 +2,7 @@ package org.opengis.cite.iso19142.locking;
 
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
+
 import org.opengis.cite.iso19142.ETSAssert;
 import org.opengis.cite.iso19142.ErrorMessage;
 import org.opengis.cite.iso19142.ErrorMessageKeys;
@@ -14,6 +15,7 @@ import org.opengis.cite.iso19142.util.ValidationUtils;
 import org.opengis.cite.validation.SchematronValidator;
 import org.testng.Assert;
 import org.testng.ITestContext;
+import org.testng.SkipException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
@@ -30,6 +32,17 @@ public class LockingCapabilitiesTests extends BaseFixture {
 
 	static final String LOCKING_WFS_PHASE = "LockingWFSPhase";
 	static final String SCHEMATRON_METADATA = "wfs-capabilities-2.0.sch";
+
+	@BeforeTest
+	public void checkSuitePreconditions(ITestContext context) {
+		Object failedPreconditions = context.getSuite().getAttribute(
+				SuiteAttribute.FAILED_PRECONDITIONS.getName());
+		if (null != failedPreconditions) {
+			throw new SkipException(
+					"One or more test suite preconditions were not satisfied: "
+							+ failedPreconditions);
+		}
+	}
 
 	/**
 	 * Confirms that the service constraint

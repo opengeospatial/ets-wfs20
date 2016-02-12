@@ -13,8 +13,7 @@
       <unpack>true</unpack>
       <scope>runtime</scope>
       <excludes>
-        <exclude>com.sun.jersey:jersey-servlet</exclude>
-		<exclude>com.sun.jersey:jersey-server</exclude>
+        <exclude>com.sun.jersey:jersey-server</exclude>
       </excludes>
     </dependencySet>
   </dependencySets>

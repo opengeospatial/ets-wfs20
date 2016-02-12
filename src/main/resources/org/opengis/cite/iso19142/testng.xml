@@ -9,9 +9,13 @@
     <listener class-name="org.opengis.cite.iso19142.SuiteFixtureListener" />
     <listener class-name="org.opengis.cite.iso19136.SuiteFixtureListener" />
   </listeners>
+  <test name="Preconditions">
+    <classes>
+      <class name="org.opengis.cite.iso19142.SuitePreconditions"/>
+    </classes>
+  </test>
   <test name="All GML application schemas">
     <classes>
-      <class name="org.opengis.cite.iso19142.Prerequisites" />
       <class name="org.opengis.cite.iso19136.general.XMLSchemaTests" />
       <class name="org.opengis.cite.iso19136.general.GeneralSchemaTests" />
       <class name="org.opengis.cite.iso19136.general.ModelAndSyntaxTests" />
@@ -29,18 +33,9 @@
     </packages>
   </test>
   <test name="Basic WFS">
-    <classes>
-      <class name="org.opengis.cite.iso19142.basic.BasicCapabilitiesTests" />
-      <class name="org.opengis.cite.iso19142.basic.GetPropertyValueTests" />
-      <class name="org.opengis.cite.iso19142.basic.BasicGetFeatureTests" />
-      <class name="org.opengis.cite.iso19142.basic.filter.PropertyIsNullOperatorTests" />
-      <class name="org.opengis.cite.iso19142.basic.filter.PropertyIsNilOperatorTests" />
-      <class name="org.opengis.cite.iso19142.basic.filter.PropertyIsEqualToOperatorTests" />
-      <class name="org.opengis.cite.iso19142.basic.filter.ComparisonOperatorTests" />
-      <class name="org.opengis.cite.iso19142.basic.filter.PropertyIsLikeOperatorTests" />
-      <class name="org.opengis.cite.iso19142.basic.filter.ResourceIdOperatorTests" />
-      <class name="org.opengis.cite.iso19142.basic.filter.BBOXOperatorTests" />
-    </classes>
+    <packages>
+      <package name="org.opengis.cite.iso19142.basic.*" />
+    </packages>
   </test>
   <test name="Transactional WFS">
     <classes>

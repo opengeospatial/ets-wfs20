@@ -1,5 +1,6 @@
 package org.opengis.cite.iso19142;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.validation.Schema;
@@ -32,7 +33,12 @@ public enum SuiteAttribute {
 	/**
 	 * A DataSampler object that obtains sample data from the WFS under test.
 	 */
-	SAMPLER("sampler", DataSampler.class);
+	SAMPLER("sampler", DataSampler.class),
+	/**
+	 * A {@literal List<String>} of test suite preconditions that were not
+	 * satisfied.
+	 */
+	FAILED_PRECONDITIONS("failedPreconditions", List.class);
 	private final Class attrType;
 	private final String attrName;
 
