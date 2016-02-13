@@ -13,6 +13,7 @@ public class WFS2 {
 	private WFS2() {
 	}
 
+	public static final String NS_URI = "http://www.opengis.net/wfs/2.0";
 	public static final String SCHEMA_URI = "http://schemas.opengis.net/wfs/2.0/wfs.xsd";
 	public static final String SERVICE_TYPE_CODE = "WFS";
 	public static final String VERSION = "2.0.0";

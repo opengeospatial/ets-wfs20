@@ -36,7 +36,7 @@ import com.sun.jersey.api.client.ClientResponse;
  * <li>ISO 19143:2010, cl. A.4: Test cases for resource identification</li>
  * </ul>
  */
-public class ResourceIdOperatorTests extends QueryFilterFixture {
+public class ResourceIdFilterTests extends QueryFilterFixture {
 
 	/**
 	 * [{@code Test}] Submits a GetFeature request containing a ResourceId
@@ -67,18 +67,17 @@ public class ResourceIdOperatorTests extends QueryFilterFixture {
 
 	/**
 	 * [{@code Test}] Submits a GetFeature request containing a ResourceId
-	 * predicate with an unknown feature identifier. The response entity is
-	 * expected to be a wfs:FeatureCollection with no feature members.
+	 * predicate with an unknown feature identifier. No feature type is
+	 * specified, since this is not required when a feature identifier is given.
+	 * The response entity is expected to be a wfs:FeatureCollection with no
+	 * feature members.
 	 * 
 	 * @param binding
 	 *            The ProtocolBinding to use for this request.
-	 * @param featureType
-	 *            A QName representing the qualified name of some feature type.
 	 */
-	@Test(description = "See ISO 19142: 11.1", dataProvider = "protocol-featureType")
-	public void unknownFeatureIdentifier(ProtocolBinding binding,
-			QName featureType) {
-		WFSRequest.appendSimpleQuery(this.reqEntity, featureType);
+	@Test(description = "See ISO 19142: Table 8", dataProvider = "protocol-binding")
+	public void unknownFeatureIdentifier(ProtocolBinding binding) {
+		WFSRequest.appendSimpleQuery(this.reqEntity, new QName[] {});
 		Set<String> idSet = new HashSet<String>();
 		idSet.add("test-" + UUID.randomUUID());
 		WFSRequest.addResourceIdPredicate(this.reqEntity, idSet);
@@ -89,18 +88,31 @@ public class ResourceIdOperatorTests extends QueryFilterFixture {
 		this.rspEntity = extractBodyAsDocument(rsp, binding);
 		ETSAssert.assertQualifiedName(this.rspEntity.getDocumentElement(),
 				new QName(Namespaces.WFS, WFS2.FEATURE_COLLECTION));
-		ETSAssert.assertDescendantElementCount(this.rspEntity, featureType, 0);
+		ETSAssert.assertFeatureCount(this.rspEntity, null, 0);
 	}
 
-	/*
-	 * If both the TYPENAMES and RESOURCEID parameters are specified then all
-	 * the feature instances identified by the RESOURCEID parameter shall be of
-	 * the type specified by the TYPENAMES parameter; otherwise the server shall
-	 * raise an InvalidParameterValue exception where the "locator" attribute
-	 * value shall be set to "RESOURCEID".
+	/**
+	 * [{@code Test}] If a feature instance identified by the RESOURCEID
+	 * parameter is not of the type specified by the TYPENAMES parameter, the
+	 * server shall raise an InvalidParameterValue exception where the "locator"
+	 * attribute value shall be set to "RESOURCEID".
+	 * 
+	 * @param binding
+	 *            The ProtocolBinding to use for this request.
+	 * @param featureType
+	 *            A QName representing the qualified name of some feature type.
+	 * 
+	 * @see "OGC 09-025r1, cl. 7.9.2.4.1: typeNames parameter"
 	 */
+	@Test(description = "See ISO 19142: 7.9.2.4.1", dataProvider = "protocol-featureType")
 	public void inconsistentFeatureIdentifierAndType(ProtocolBinding binding,
 			QName featureType) {
-		// TODO: Implement test.
+		WFSRequest.appendSimpleQuery(this.reqEntity, featureType);
+		Set<String> idSet = new HashSet<String>();
+		idSet.add("test-" + UUID.randomUUID());
+		WFSRequest.addResourceIdPredicate(this.reqEntity, idSet);
+		ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
+		ETSAssert.assertExceptionReport(rsp, "InvalidParameterValue",
+				"RESOURCEID");
 	}
 }

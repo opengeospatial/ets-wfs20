@@ -218,8 +218,10 @@
 
   <xsl:template name="TypeNamesParam">
     <xsl:param name="typeNames" as="xs:string*" />
-    <xsl:text>&amp;typenames=</xsl:text>
-    <xsl:value-of select="$typeNames" separator="," />
+    <xsl:if test="exists($typeNames)">
+      <xsl:text>&amp;typenames=</xsl:text>
+      <xsl:value-of select="$typeNames" separator="," />
+    </xsl:if>
   </xsl:template>
 
   <xsl:template name="NamespacesParam">
