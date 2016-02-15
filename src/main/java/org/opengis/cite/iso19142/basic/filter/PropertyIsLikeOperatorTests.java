@@ -70,10 +70,10 @@ public class PropertyIsLikeOperatorTests extends QueryFilterFixture {
 		addPropertyIsLikePredicate(this.reqEntity, propPattern.getKey(),
 				propPattern.getValue(), true);
 		ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
+		this.rspEntity = extractBodyAsDocument(rsp, binding);
 		Assert.assertEquals(rsp.getStatus(),
 				ClientResponse.Status.OK.getStatusCode(),
 				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
-		this.rspEntity = extractBodyAsDocument(rsp, binding);
 		NodeList features = this.rspEntity.getElementsByTagNameNS(
 				featureType.getNamespaceURI(), featureType.getLocalPart());
 		// convert wildcards in pattern to proper regular expression
@@ -113,10 +113,10 @@ public class PropertyIsLikeOperatorTests extends QueryFilterFixture {
 		addPropertyIsLikePredicate(this.reqEntity, propPattern.getKey(),
 				propPattern.getValue(), false);
 		ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
+		this.rspEntity = extractBodyAsDocument(rsp, binding);
 		Assert.assertEquals(rsp.getStatus(),
 				ClientResponse.Status.OK.getStatusCode(),
 				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
-		this.rspEntity = extractBodyAsDocument(rsp, binding);
 		NodeList features = this.rspEntity.getElementsByTagNameNS(
 				featureType.getNamespaceURI(), featureType.getLocalPart());
 		// convert wildcards in pattern to proper regular expression

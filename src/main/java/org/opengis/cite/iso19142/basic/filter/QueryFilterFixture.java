@@ -19,62 +19,70 @@ import org.testng.annotations.BeforeMethod;
  */
 public class QueryFilterFixture extends BaseFixture {
 
-    /** Acquires and saves sample data. */
-    protected DataSampler dataSampler;
-    /**
-     * An XSModel object representing the application schema supported by the
-     * SUT.
-     */
-    protected XSModel model;
-    protected final String GET_FEATURE_ENTITY = "/org/opengis/cite/iso19142/basic/GetFeature-Minimal.xml";
+	/** Acquires and saves sample data. */
+	protected DataSampler dataSampler;
+	/**
+	 * An XSModel object representing the application schema supported by the
+	 * SUT.
+	 */
+	protected XSModel model;
+	protected final String GET_FEATURE_ENTITY = "/org/opengis/cite/iso19142/basic/GetFeature-Minimal.xml";
 
-    public QueryFilterFixture() {
-        super();
-    }
+	public QueryFilterFixture() {
+		super();
+	}
 
-    /**
-     * Obtains a DataSampler object from the test suite context (the value of
-     * the {@link SuiteAttribute#SAMPLER SuiteAttribute.SAMPLER attribute}), or
-     * adds one if it's not found there.
-     * 
-     * A schema model (XSModel) is also obtained from the test suite context by
-     * accessing the {@link org.opengis.cite.iso19136.SuiteAttribute#XSMODEL
-     * xsmodel} attribute.
-     * 
-     * @param testContext
-     *            The test (set) context.
-     */
-    @BeforeClass(alwaysRun = true)
-    public void initQueryFilterFixture(ITestContext testContext) {
-        ISuite suite = testContext.getSuite();
-        if (null == suite.getAttribute(SuiteAttribute.SAMPLER.getName())) {
-            DataSampler sampler = new DataSampler(this.wfsMetadata);
-            sampler.acquireFeatureData();
-            suite.setAttribute(SuiteAttribute.SAMPLER.getName(), sampler);
-        }
-        this.dataSampler = (DataSampler) suite
-                .getAttribute(SuiteAttribute.SAMPLER.getName());
-        this.model = (XSModel) suite
-                .getAttribute(org.opengis.cite.iso19136.SuiteAttribute.XSMODEL
-                        .getName());
-    }
+	/**
+	 * Obtains a DataSampler object from the test suite context (the value of
+	 * the {@link SuiteAttribute#SAMPLER SuiteAttribute.SAMPLER attribute}), or
+	 * adds one if it's not found there.
+	 * 
+	 * A schema model (XSModel) is also obtained from the test suite context by
+	 * accessing the {@link org.opengis.cite.iso19136.SuiteAttribute#XSMODEL
+	 * xsmodel} attribute.
+	 * 
+	 * @param testContext
+	 *            The test (set) context.
+	 */
+	@BeforeClass(alwaysRun = true)
+	public void initQueryFilterFixture(ITestContext testContext) {
+		ISuite suite = testContext.getSuite();
+		if (null == suite.getAttribute(SuiteAttribute.SAMPLER.getName())) {
+			DataSampler sampler = new DataSampler(this.wfsMetadata);
+			sampler.acquireFeatureData();
+			suite.setAttribute(SuiteAttribute.SAMPLER.getName(), sampler);
+		}
+		this.dataSampler = (DataSampler) suite
+				.getAttribute(SuiteAttribute.SAMPLER.getName());
+		this.model = (XSModel) suite
+				.getAttribute(org.opengis.cite.iso19136.SuiteAttribute.XSMODEL
+						.getName());
+	}
 
-    /**
-     * Builds a DOM Document node representing the entity body for a GetFeature
-     * request. A minimal XML representation is read from the classpath
-     * ("GetFeature-Minimal.xml").
-     */
-    @BeforeMethod
-    public void buildRequestEntity() {
-        String resourceName = GET_FEATURE_ENTITY;
-        try {
-            this.reqEntity = this.docBuilder.parse(getClass()
-                    .getResourceAsStream(resourceName));
-        } catch (Exception x) {
-            TestSuiteLogger.log(Level.WARNING,
-                    "Failed to parse request entity from classpath: "
-                            + resourceName, x);
-        }
-    }
+	/**
+	 * Builds a DOM Document node representing the entity body for a GetFeature
+	 * request. A minimal XML representation is read from the classpath
+	 * ("GetFeature-Minimal.xml"). The response entity is cleared.
+	 */
+	@BeforeMethod
+	public void buildRequestEntity() {
+		String resourceName = GET_FEATURE_ENTITY;
+		try {
+			this.reqEntity = this.docBuilder.parse(getClass()
+					.getResourceAsStream(resourceName));
+		} catch (Exception x) {
+			TestSuiteLogger.log(Level.WARNING,
+					"Failed to parse request entity from classpath: "
+							+ resourceName, x);
+		}
+	}
+
+	/**
+	 * Eliminate obsolete reference to previous response entity.
+	 */
+	@BeforeMethod
+	public void clearResponseEntity() {
+		this.rspEntity = null;
+	}
 
 }

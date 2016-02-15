@@ -117,10 +117,10 @@ public class PropertyIsNilOperatorTests extends QueryFilterFixture {
 			QName propName = new QName(prop.getNamespace(), prop.getName());
 			addPropertyIsNilPredicate(this.reqEntity, propName, null, false);
 			ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
+			this.rspEntity = extractBodyAsDocument(rsp, binding);
 			Assert.assertEquals(rsp.getStatus(),
 					ClientResponse.Status.OK.getStatusCode(),
 					ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
-			this.rspEntity = extractBodyAsDocument(rsp, binding);
 			NodeList features = this.rspEntity.getElementsByTagNameNS(
 					typeName.getNamespaceURI(), typeName.getLocalPart());
 			String xpath = String.format("ns1:%s[@xsi:nil='true']",

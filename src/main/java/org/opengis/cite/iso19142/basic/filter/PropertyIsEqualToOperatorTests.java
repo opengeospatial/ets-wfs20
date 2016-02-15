@@ -76,10 +76,10 @@ public class PropertyIsEqualToOperatorTests extends QueryFilterFixture {
         addPropertyIsEqualToPredicate(this.reqEntity, propName,
                 propValue.getValue(), true, null, false);
         ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
+        this.rspEntity = extractBodyAsDocument(rsp, binding);
         Assert.assertEquals(rsp.getStatus(),
                 ClientResponse.Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
-        this.rspEntity = extractBodyAsDocument(rsp, binding);
         NodeList features = this.rspEntity.getElementsByTagNameNS(
                 featureType.getNamespaceURI(), featureType.getLocalPart());
         // Add constructor functions for property type (XML Schema datatype)
@@ -125,10 +125,10 @@ public class PropertyIsEqualToOperatorTests extends QueryFilterFixture {
         addPropertyIsEqualToPredicate(this.reqEntity, propName,
                 propValue.getValue(), true, MATCH_ALL, true);
         ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
+        this.rspEntity = extractBodyAsDocument(rsp, binding);
         Assert.assertEquals(rsp.getStatus(),
                 ClientResponse.Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
-        this.rspEntity = extractBodyAsDocument(rsp, binding);
         NodeList features = this.rspEntity.getElementsByTagNameNS(
                 featureType.getNamespaceURI(), featureType.getLocalPart());
         // Add constructor functions for property type (XML Schema datatype)

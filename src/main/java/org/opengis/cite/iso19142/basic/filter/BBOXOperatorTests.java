@@ -92,10 +92,10 @@ public class BBOXOperatorTests extends QueryFilterFixture {
 				this.wfsMetadata, WFS2.GET_FEATURE, binding);
 		ClientResponse rsp = wfsClient.submitRequest(new DOMSource(reqEntity),
 				binding, endpoint);
+		this.rspEntity = extractBodyAsDocument(rsp, binding);
 		Assert.assertEquals(rsp.getStatus(),
 				ClientResponse.Status.OK.getStatusCode(),
 				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
-		this.rspEntity = extractBodyAsDocument(rsp, binding);
 		Map<String, String> nsBindings = new HashMap<String, String>();
 		nsBindings.put(Namespaces.WFS, "wfs");
 		NodeList members;
@@ -148,10 +148,10 @@ public class BBOXOperatorTests extends QueryFilterFixture {
 				.getGeoExtent());
 		addBBOXPredicate(this.reqEntity, gmlEnv.getDocumentElement(), valueRef);
 		ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
+		this.rspEntity = extractBodyAsDocument(rsp, binding);
 		Assert.assertEquals(rsp.getStatus(),
 				ClientResponse.Status.OK.getStatusCode(),
 				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
-		this.rspEntity = extractBodyAsDocument(rsp, binding);
 		Map<String, String> nsBindings = new HashMap<String, String>();
 		nsBindings.put(featureType.getNamespaceURI(), "ns1");
 		String xpath;
@@ -220,10 +220,10 @@ public class BBOXOperatorTests extends QueryFilterFixture {
 		addBBOXPredicate(this.reqEntity, gmlEnv.getDocumentElement(), valueRef);
 		ClientResponse rsp = wfsClient.submitRequest(reqEntity,
 				ProtocolBinding.ANY);
+		this.rspEntity = rsp.getEntity(Document.class);
 		Assert.assertEquals(rsp.getStatus(),
 				ClientResponse.Status.BAD_REQUEST.getStatusCode(),
 				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
-		this.rspEntity = rsp.getEntity(Document.class);
 		String xpath = "//ows:Exception[@exceptionCode='InvalidParameterValue']";
 		ETSAssert.assertXPath(xpath, this.rspEntity, null);
 	}

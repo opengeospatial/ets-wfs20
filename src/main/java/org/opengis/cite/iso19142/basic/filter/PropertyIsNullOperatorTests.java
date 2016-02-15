@@ -54,10 +54,10 @@ public class PropertyIsNullOperatorTests extends QueryFilterFixture {
 		QName gmlName = new QName(Namespaces.GML, "name", "gml");
 		addPropertyIsNullPredicate(this.reqEntity, gmlName, false);
 		ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
+		this.rspEntity = extractBodyAsDocument(rsp, binding);
 		Assert.assertEquals(rsp.getStatus(),
 				ClientResponse.Status.OK.getStatusCode(),
 				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
-		this.rspEntity = extractBodyAsDocument(rsp, binding);
 		Map<String, String> nsBindings = new HashMap<String, String>();
 		nsBindings.put(featureType.getNamespaceURI(), "tns");
 		String xpath = String.format("not(//tns:%s[gml:name])",
@@ -86,10 +86,10 @@ public class PropertyIsNullOperatorTests extends QueryFilterFixture {
 		QName propName = new QName(lastProp.getNamespace(), lastProp.getName());
 		addPropertyIsNullPredicate(this.reqEntity, propName, true);
 		ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
+		this.rspEntity = extractBodyAsDocument(rsp, binding);
 		Assert.assertEquals(rsp.getStatus(),
 				ClientResponse.Status.OK.getStatusCode(),
 				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
-		this.rspEntity = extractBodyAsDocument(rsp, binding);
 		Map<String, String> nsBindings = new HashMap<String, String>();
 		nsBindings.put(featureType.getNamespaceURI(), "ns1");
 		String nsPrefix = "ns1";
