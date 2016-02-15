@@ -23,11 +23,11 @@ import javax.xml.xpath.XPathFactoryConfigurationException;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmValue;
 
-import org.opengis.cite.iso19142.util.ValidationUtils;
-import org.opengis.cite.iso19142.util.XMLUtils;
 import org.opengis.cite.iso19142.util.NamespaceBindings;
 import org.opengis.cite.iso19142.util.TestSuiteLogger;
+import org.opengis.cite.iso19142.util.ValidationUtils;
 import org.opengis.cite.iso19142.util.WFSClient;
+import org.opengis.cite.iso19142.util.XMLUtils;
 import org.opengis.cite.validation.SchematronValidator;
 import org.opengis.cite.validation.ValidationErrorHandler;
 import org.testng.Assert;
@@ -35,8 +35,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import com.sun.jersey.api.client.ClientResponse;
 
 /**
  * Provides a set of custom assertion methods.
@@ -408,8 +406,8 @@ public class ETSAssert {
 	 * <li>[namespace name] = "http://www.opengis.net/ows/1.1"</li>
 	 * </ul>
 	 *
-	 * @param rsp
-	 *            A ClientResponse object representing an HTTP response message.
+	 * @param rspEntity
+	 *            A Document node representing an HTTP response entity.
 	 * @param exceptionCode
 	 *            The expected OGC exception code.
 	 * @param locator
@@ -417,17 +415,13 @@ public class ETSAssert {
 	 *            locator attribute (e.g. a parameter name); the attribute value
 	 *            will be ignored if the argument is null or empty.
 	 */
-	public static void assertExceptionReport(ClientResponse rsp,
+	public static void assertExceptionReport(Document rspEntity,
 			String exceptionCode, String locator) {
-		Assert.assertEquals(rsp.getStatus(),
-				ClientResponse.Status.BAD_REQUEST.getStatusCode(),
-				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
-		Document doc = rsp.getEntity(Document.class);
 		String expr = String.format("//ows11:Exception[@exceptionCode = '%s']",
 				exceptionCode);
 		NodeList nodeList = null;
 		try {
-			nodeList = XMLUtils.evaluateXPath(doc, expr,
+			nodeList = XMLUtils.evaluateXPath(rspEntity, expr,
 					Collections.singletonMap(Namespaces.OWS, "ows11"));
 		} catch (XPathExpressionException xpe) {
 			// won't happen

@@ -123,7 +123,10 @@ public class ResourceIdFilterTests extends QueryFilterFixture {
 		WFSRequest.addResourceIdPredicate(this.reqEntity, idSet);
 		ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
 		this.rspEntity = extractBodyAsDocument(rsp, binding);
-		ETSAssert.assertExceptionReport(rsp, "InvalidParameterValue",
-				"RESOURCEID");
+		Assert.assertEquals(rsp.getStatus(),
+				ClientResponse.Status.BAD_REQUEST.getStatusCode(),
+				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
+		ETSAssert.assertExceptionReport(this.rspEntity,
+				"InvalidParameterValue", "RESOURCEID");
 	}
 }
