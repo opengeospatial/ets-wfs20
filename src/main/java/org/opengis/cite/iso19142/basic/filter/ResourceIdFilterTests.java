@@ -14,17 +14,18 @@ import org.opengis.cite.iso19142.ProtocolBinding;
 import org.opengis.cite.iso19142.WFS2;
 import org.opengis.cite.iso19142.util.WFSRequest;
 import org.testng.Assert;
+import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 import com.sun.jersey.api.client.ClientResponse;
 
 /**
  * Tests the response to a GetFeature request that includes a ResourceId filter
- * predicate, which is used to identify a feature instance (or a version of it).
- * The resource identifier maps to the standard gml:id attribute common to all
- * features; its value is assigned by the server when the instance is created. A
- * feature identifier cannot be reused once it has been assigned, even after the
- * feature is deleted.
+ * predicate, which is used to identify a feature instance (or some version of
+ * it). The resource identifier maps to the standard gml:id attribute common to
+ * all features; its value is assigned by the server when the instance is
+ * created. A feature identifier cannot be reused once it has been assigned,
+ * even after the feature is deleted.
  * 
  * <p style="margin-bottom: 0.5em">
  * <strong>Sources</strong>
@@ -57,38 +58,41 @@ public class ResourceIdFilterTests extends QueryFilterFixture {
 				featureType, 2);
 		WFSRequest.addResourceIdPredicate(this.reqEntity, idSet);
 		ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
+		this.rspEntity = extractBodyAsDocument(rsp, binding);
 		Assert.assertEquals(rsp.getStatus(),
 				ClientResponse.Status.OK.getStatusCode(),
 				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
-		this.rspEntity = extractBodyAsDocument(rsp, binding);
 		ETSAssert.assertDescendantElementCount(this.rspEntity, featureType,
 				idSet.size());
 	}
 
 	/**
 	 * [{@code Test}] Submits a GetFeature request containing a ResourceId
-	 * predicate with an unknown feature identifier. No feature type is
-	 * specified, since this is not required when a feature identifier is given.
-	 * The response entity is expected to be a wfs:FeatureCollection with no
-	 * feature members.
+	 * predicate with an unknown feature identifier. The response entity is
+	 * expected to be a wfs:FeatureCollection that has no matching feature
+	 * member.
 	 * 
 	 * @param binding
-	 *            The ProtocolBinding to use for this request.
+	 *            The ProtocolBinding to use for this request (e.g. GET, POST).
+	 * @param featureType
+	 *            A QName representing the qualified name of some supported
+	 *            feature type.
 	 */
-	@Test(description = "See ISO 19142: Table 8", dataProvider = "protocol-binding")
-	public void unknownFeatureIdentifier(ProtocolBinding binding) {
-		WFSRequest.appendSimpleQuery(this.reqEntity, new QName[] {});
+	@Test(description = "See ISO 19142: 7.2.2, Table 8", dataProvider = "protocol-featureType")
+	public void unknownFeatureIdentifier(ProtocolBinding binding,
+			QName featureType) {
+		WFSRequest.appendSimpleQuery(this.reqEntity, featureType);
 		Set<String> idSet = new HashSet<String>();
 		idSet.add("test-" + UUID.randomUUID());
 		WFSRequest.addResourceIdPredicate(this.reqEntity, idSet);
 		ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
+		this.rspEntity = extractBodyAsDocument(rsp, binding);
 		Assert.assertEquals(rsp.getStatus(),
 				ClientResponse.Status.OK.getStatusCode(),
 				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
-		this.rspEntity = extractBodyAsDocument(rsp, binding);
 		ETSAssert.assertQualifiedName(this.rspEntity.getDocumentElement(),
 				new QName(Namespaces.WFS, WFS2.FEATURE_COLLECTION));
-		ETSAssert.assertFeatureCount(this.rspEntity, null, 0);
+		ETSAssert.assertFeatureCount(this.rspEntity, featureType, 0);
 	}
 
 	/**
@@ -109,9 +113,16 @@ public class ResourceIdFilterTests extends QueryFilterFixture {
 			QName featureType) {
 		WFSRequest.appendSimpleQuery(this.reqEntity, featureType);
 		Set<String> idSet = new HashSet<String>();
-		idSet.add("test-" + UUID.randomUUID());
+		String featureId = this.dataSampler.getFeatureId(featureType, false);
+		if (null == featureId) {
+			throw new SkipException(
+					"Unable to find id of feature instance that is NOT of type "
+							+ featureType);
+		}
+		idSet.add(featureId);
 		WFSRequest.addResourceIdPredicate(this.reqEntity, idSet);
 		ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
+		this.rspEntity = extractBodyAsDocument(rsp, binding);
 		ETSAssert.assertExceptionReport(rsp, "InvalidParameterValue",
 				"RESOURCEID");
 	}

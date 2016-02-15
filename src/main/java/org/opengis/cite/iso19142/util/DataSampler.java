@@ -305,4 +305,42 @@ public class DataSampler {
 		}
 		return feature;
 	}
+
+	/**
+	 * Returns the identifier (gml:id attribute value) for an existing feature
+	 * instance.
+	 * 
+	 * @param featureType
+	 *            The qualified name of a supported feature type.
+	 * @param matchFeatureType
+	 *            A boolean value indicating whether or not the feature is an
+	 *            instance of the given type.
+	 * @return A feature identifier, or null if one cannot be found.
+	 */
+	public String getFeatureId(QName featureType, boolean matchFeatureType) {
+		String featureId = null;
+		for (Map.Entry<QName, FeatureTypeInfo> entry : featureInfo.entrySet()) {
+			QName typeName = entry.getKey();
+			if (typeName.equals(featureType) != matchFeatureType
+					|| !entry.getValue().isInstantiated()) {
+				continue;
+			}
+			File dataFile = entry.getValue().getSampleData();
+			String expr = "(//wfs:member/*/@gml:id)[1]";
+			Map<String, String> nsBindings = new HashMap<String, String>();
+			nsBindings.put(Namespaces.GML, "gml");
+			nsBindings.put(Namespaces.WFS, "wfs");
+			try {
+				XdmValue result = XMLUtils.evaluateXPath2(new StreamSource(
+						dataFile), expr, nsBindings);
+				featureId = result.itemAt(0).getStringValue();
+			} catch (SaxonApiException e) {
+				LOGR.log(Level.WARNING, String.format(
+						"Failed to evaluate XPath %s against data file at %s",
+						expr, dataFile.getAbsolutePath()));
+			}
+			break;
+		}
+		return featureId;
+	}
 }
