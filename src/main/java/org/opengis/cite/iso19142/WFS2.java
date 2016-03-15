@@ -16,7 +16,7 @@ public class WFS2 {
 	public static final String NS_URI = "http://www.opengis.net/wfs/2.0";
 	public static final String SCHEMA_URI = "http://schemas.opengis.net/wfs/2.0/wfs.xsd";
 	public static final String SERVICE_TYPE_CODE = "WFS";
-	public static final String VERSION = "2.0.0";
+	public static final String VERSION = "2.0";
 	public static final String GET_CAPABILITIES = "GetCapabilities";
 	public static final String DESCRIBE_FEATURE_TYPE = "DescribeFeatureType";
 	public static final String LIST_STORED_QUERIES = "ListStoredQueries";

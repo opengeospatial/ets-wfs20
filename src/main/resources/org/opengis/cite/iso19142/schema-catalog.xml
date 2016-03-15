@@ -16,10 +16,14 @@
 			uri="./xsd/opengis/gml/3.2.1/gml-3.2.1.xsd" />
 		<system systemId="http://schemas.opengis.net/ows/1.1.0/owsAll.xsd"
 			uri="./xsd/opengis/ows/1.1/ows-1.1.0.xsd" />
-		<system systemId="http://schemas.opengis.net/filter/2.0/filterAll.xsd"
+    <system systemId="filter-2.0.0.xsd"
 			uri="./xsd/opengis/filter/2.0/filter-2.0.0.xsd" />
-		<system systemId="http://schemas.opengis.net/wfs/2.0/wfs.xsd"
+		<system systemId="http://schemas.opengis.net/filter/2.0/filterAll.xsd"
+			uri="./xsd/opengis/filter/2.0/filter-2.0.2.xsd" />
+		<system systemId="wfs-2.0.0.xsd"
 			uri="./xsd/opengis/wfs/2.0/wfs-2.0.0.xsd" />
+    <system systemId="http://schemas.opengis.net/wfs/2.0/wfs.xsd"
+			uri="./xsd/opengis/wfs/2.0/wfs-2.0.2.xsd" />
 	</group>
 	<group id="isotc211.org">
 		<system systemId="http://schemas.opengis.net/iso/19139/20070417/gmd/gmd.xsd"

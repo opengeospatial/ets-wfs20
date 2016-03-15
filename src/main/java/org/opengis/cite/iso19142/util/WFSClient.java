@@ -377,7 +377,9 @@ public class WFSClient {
 
 	/**
 	 * Retrieves a complete representation of the capabilities document from the
-	 * WFS implementation described by the service metadata.
+	 * WFS implementation described by the service metadata. The
+	 * <code>acceptVersions</code> parameter is omitted, so the response shall
+	 * reflect the latest version supported by the SUT.
 	 * 
 	 * @return A Document containing the response to a GetCapabilities request,
 	 *         or {@code null} if one could not be obtained.
@@ -393,7 +395,6 @@ public class WFSClient {
 		MultivaluedMap<String, String> queryParams = new MultivaluedMapImpl();
 		queryParams.add(WFS2.REQUEST_PARAM, WFS2.GET_CAPABILITIES);
 		queryParams.add(WFS2.SERVICE_PARAM, WFS2.SERVICE_TYPE_CODE);
-		queryParams.add(WFS2.VERSION_PARAM, WFS2.VERSION);
 		return resource.queryParams(queryParams).get(Document.class);
 	}
 

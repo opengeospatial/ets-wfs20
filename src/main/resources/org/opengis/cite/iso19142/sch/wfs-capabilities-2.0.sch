@@ -40,8 +40,8 @@
       <iso:assert test="wfs:WFS_Capabilities" diagnostics="dmsg.root.en">
 	  The document element must have [local name] = "WFS_Capabilities" and [namespace name] = "http://www.opengis.net/wfs/2.0.
       </iso:assert>
-      <iso:assert test="wfs:WFS_Capabilities/@version = '2.0.0'" diagnostics="dmsg.version.en">
-	  The capabilities document must have @version = 2.0.0 .
+      <iso:assert test="matches(wfs:WFS_Capabilities/@version, '2\.0\.\d')" diagnostics="dmsg.version.en">
+      The capabilities document must have @version = '2.0.[0-9]'.
       </iso:assert>
     </iso:rule>
   </iso:pattern>
@@ -187,9 +187,8 @@
         diagnostics="dmsg.serviceType.en"> 
         The value of the ows:ServiceType element must be "wfs" (case-insensitive).
       </iso:assert>
-      <iso:assert test="ows:ServiceTypeVersion = '2.0.0'" 
-        diagnostics="dmsg.serviceTypeVersion.en">
-        An ows:ServiceTypeVersion element having value "2.0.0" must be present.
+      <iso:assert test="matches(ows:ServiceTypeVersion, '2\.0\.\d')" diagnostics="dmsg.serviceTypeVersion.en">
+      An ows:ServiceTypeVersion element having value '2.0.[0-9]' must be present.
       </iso:assert>
     </iso:rule>
   </iso:pattern>

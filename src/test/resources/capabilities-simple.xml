@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<wfs:WFS_Capabilities version="2.0.0"
+<wfs:WFS_Capabilities version="2.0.2"
 	xmlns="http://www.opengis.net/ows/1.1" xmlns:xlink="http://www.w3.org/1999/xlink"
 	xmlns:wfs="http://www.opengis.net/wfs/2.0" xmlns:ows="http://www.opengis.net/ows/1.1"
 	xmlns:fes="http://www.opengis.net/fes/2.0">
 
 	<ServiceIdentification>
 		<ServiceType codeSpace="http://www.opengeospatial.org/standards/">WFS</ServiceType>
-		<ServiceTypeVersion>2.0.0</ServiceTypeVersion>
+		<ServiceTypeVersion>2.0.2</ServiceTypeVersion>
 	</ServiceIdentification>
 	<ServiceProvider>
 		<ProviderName>ACME Corp</ProviderName>
