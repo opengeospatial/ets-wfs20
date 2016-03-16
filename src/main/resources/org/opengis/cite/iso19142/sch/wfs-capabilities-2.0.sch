@@ -183,12 +183,13 @@
 
   <iso:pattern id="ServiceIdentificationPattern">
     <iso:rule context="//ows:ServiceIdentification">
+      <iso:let name="supportedVersions" value="string-join(ows:ServiceTypeVersion,',')"/>
       <iso:assert test="lower-case(ows:ServiceType) = 'wfs'"
         diagnostics="dmsg.serviceType.en"> 
         The value of the ows:ServiceType element must be "wfs" (case-insensitive).
       </iso:assert>
-      <iso:assert test="matches(ows:ServiceTypeVersion, '2\.0\.\d')" diagnostics="dmsg.serviceTypeVersion.en">
-      An ows:ServiceTypeVersion element having value '2.0.[0-9]' must be present.
+      <iso:assert test="matches($supportedVersions, '2\.0\.\d')" diagnostics="dmsg.serviceTypeVersion.en">
+      An ows:ServiceTypeVersion element matching the value '2.0.[0-9]' must be present.
       </iso:assert>
     </iso:rule>
   </iso:pattern>
@@ -204,7 +205,7 @@
     The reported ServiceType is '<iso:value-of select="./ows:ServiceType"/>'.
     </iso:diagnostic>
     <iso:diagnostic id="dmsg.serviceTypeVersion.en" xml:lang="en">
-    The reported ServiceTypeVersion is <iso:value-of select="./ows:ServiceTypeVersion"/>.
+    The supported versions are <iso:value-of select="$supportedVersions"/>.
     </iso:diagnostic>
   </iso:diagnostics>
 
