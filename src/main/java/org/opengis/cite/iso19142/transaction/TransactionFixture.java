@@ -66,7 +66,8 @@ public class TransactionFixture extends BaseFixture {
 	 */
 	@BeforeMethod
 	public void buildTransactionRequest() {
-		this.reqEntity = WFSRequest.createRequestEntity(WFS2.TRANSACTION);
+		this.reqEntity = WFSRequest.createRequestEntity(WFS2.TRANSACTION,
+				this.wfsVersion);
 	}
 
 	/**

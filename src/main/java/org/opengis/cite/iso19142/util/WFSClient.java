@@ -50,6 +50,8 @@ public class WFSClient {
 	protected Set<ProtocolBinding> globalBindings;
 	/** The list of feature types recognized by the SUT. */
 	protected List<QName> featureTypes;
+	/** The WFS version supported by the IUT. */
+	private String wfsVersion;
 
 	/**
 	 * Default client constructor. The client is configured to consume SOAP
@@ -64,14 +66,22 @@ public class WFSClient {
 	}
 
 	/**
-	 * Constructs a client that is aware of the capabilities of some WFS.
+	 * Constructs a client that is aware of the capabilities of a WFS
+	 * implementation.
 	 * 
 	 * @param wfsMetadata
 	 *            A service description (e.g. WFS capabilities document).
 	 */
 	public WFSClient(Document wfsMetadata) {
 		this();
+		String docElemName = wfsMetadata.getDocumentElement().getLocalName();
+		if (!docElemName.equals(WFS2.WFS_CAPABILITIES)) {
+			throw new IllegalArgumentException(
+					"Not a WFS service description: " + docElemName);
+		}
 		this.wfsMetadata = wfsMetadata;
+		this.wfsVersion = wfsMetadata.getDocumentElement().getAttribute(
+				"version");
 		this.featureTypes = ServiceMetadataUtils.getFeatureTypes(wfsMetadata);
 		this.globalBindings = ServiceMetadataUtils
 				.getGlobalBindings(wfsMetadata);
@@ -122,7 +132,8 @@ public class WFSClient {
 	 *         if the response doesn't contain one.
 	 */
 	public Document invokeStoredQuery(String queryId, Map<String, Object> params) {
-		Document req = WFSRequest.createRequestEntity("GetFeature");
+		Document req = WFSRequest.createRequestEntity("GetFeature",
+				this.wfsVersion);
 		WFSRequest.appendStoredQuery(req, queryId, params);
 		ProtocolBinding binding = globalBindings.iterator().next();
 		return retrieveXMLResponseEntity(req, binding);
@@ -147,7 +158,8 @@ public class WFSClient {
 		if (null == binding) {
 			binding = globalBindings.iterator().next();
 		}
-		Document req = WFSRequest.createRequestEntity("GetFeature");
+		Document req = WFSRequest.createRequestEntity("GetFeature",
+				this.wfsVersion);
 		if (count > 0) {
 			req.getDocumentElement().setAttribute("count",
 					Integer.toString(count));
@@ -169,7 +181,8 @@ public class WFSClient {
 	 *         if the response doesn't contain one.
 	 */
 	public Document delete(Map<String, QName> features, ProtocolBinding binding) {
-		Document req = WFSRequest.createRequestEntity(WFS2.TRANSACTION);
+		Document req = WFSRequest.createRequestEntity(WFS2.TRANSACTION,
+				this.wfsVersion);
 		for (Map.Entry<String, QName> entry : features.entrySet()) {
 			QName typeName = entry.getValue();
 			Element delete = req.createElementNS(Namespaces.WFS, "Delete");
@@ -207,7 +220,8 @@ public class WFSClient {
 			throw new IllegalArgumentException(
 					"No features instances to insert.");
 		}
-		Document req = WFSRequest.createRequestEntity(WFS2.TRANSACTION);
+		Document req = WFSRequest.createRequestEntity(WFS2.TRANSACTION,
+				this.wfsVersion);
 		Element insert = req.createElementNS(Namespaces.WFS, "Insert");
 		insert.setPrefix("wfs");
 		req.getDocumentElement().appendChild(insert);
@@ -235,7 +249,8 @@ public class WFSClient {
 	 */
 	public Document updateFeature(String id, QName featureType,
 			Map<String, Object> properties) {
-		Document req = WFSRequest.createRequestEntity(WFS2.TRANSACTION);
+		Document req = WFSRequest.createRequestEntity(WFS2.TRANSACTION,
+				this.wfsVersion);
 		return updateFeature(req, id, featureType, properties,
 				ProtocolBinding.POST);
 	}

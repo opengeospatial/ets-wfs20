@@ -1,23 +1,22 @@
 package org.opengis.cite.iso19142.basic;
 
-import com.sun.jersey.api.client.ClientResponse;
-import java.lang.reflect.Method;
 import java.net.URI;
-import java.util.logging.Level;
+
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.validation.Schema;
+
+import org.opengis.cite.iso19142.BaseFixture;
+import org.opengis.cite.iso19142.ETSAssert;
 import org.opengis.cite.iso19142.ErrorMessage;
 import org.opengis.cite.iso19142.ErrorMessageKeys;
-import org.opengis.cite.iso19142.BaseFixture;
 import org.opengis.cite.iso19142.Namespaces;
 import org.opengis.cite.iso19142.ProtocolBinding;
 import org.opengis.cite.iso19142.SuiteAttribute;
 import org.opengis.cite.iso19142.WFS2;
-import org.opengis.cite.iso19142.ETSAssert;
 import org.opengis.cite.iso19142.util.ServiceMetadataUtils;
-import org.opengis.cite.iso19142.util.TestSuiteLogger;
+import org.opengis.cite.iso19142.util.WFSRequest;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.BeforeClass;
@@ -26,6 +25,8 @@ import org.testng.annotations.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import com.sun.jersey.api.client.ClientResponse;
 
 /**
  * Tests the service response to a GetPropertyValue request. The
@@ -53,25 +54,14 @@ public class GetPropertyValueTests extends BaseFixture {
 	}
 
 	/**
-	 * Builds a DOM Document node representing the entity body for this request.
-	 * A default representation is read from the classpath; it is assumed to be
-	 * named after the test class, with ".xml" appended (e.g. "AlphaTests" -&gt;
-	 * "AlphaTests.xml").
-	 * 
-	 * @param method
-	 *            The method that will be called.
+	 * Builds a DOM Document node representing the entity body for a
+	 * GetPropertyValue request. A minimal XML representation is read from the
+	 * classpath (at util/GetPropertyValue.xml).
 	 */
 	@BeforeMethod
-	public void buildRequestEntity(Method method) {
-		String className = method.getDeclaringClass().getSimpleName();
-		try {
-			this.reqEntity = docBuilder.parse(getClass().getResourceAsStream(
-					className + ".xml"));
-		} catch (Exception x) {
-			TestSuiteLogger.log(Level.WARNING,
-					"Failed to parse request entity from classpath: "
-							+ className, x);
-		}
+	public void buildRequestEntity() {
+		this.reqEntity = WFSRequest.createRequestEntity("GetPropertyValue",
+				this.wfsVersion);
 	}
 
 	/**
@@ -88,7 +78,7 @@ public class GetPropertyValueTests extends BaseFixture {
 	@Test(description = "See ISO 19142: 10.2.4.3", dataProvider = "protocol-binding")
 	public void getProperty_gmlId(ProtocolBinding binding) {
 		setValueReference(reqEntity, "@gml:id");
-		addQuery(reqEntity, this.featureTypes.get(0));
+		addQuery(this.reqEntity, this.featureTypes.get(0));
 		URI endpoint = ServiceMetadataUtils.getOperationEndpoint(
 				this.wfsMetadata, WFS2.GET_PROP_VALUE, binding);
 		ClientResponse rsp = wfsClient.submitRequest(new DOMSource(reqEntity),

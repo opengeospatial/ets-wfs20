@@ -88,6 +88,8 @@ public class SuiteFixtureListener implements ISuiteListener {
 				throw new RuntimeException("Not a WFS2 capabilities document: "
 						+ qName);
 			}
+			suite.setAttribute(SuiteAttribute.WFS_VERSION.getName(),
+					docElem.getAttribute("version"));
 		} catch (SAXException | IOException ex) {
 			// push exception up through TestNG ISuiteListener interface
 			throw new RuntimeException("Failed to parse resource located at "

@@ -56,7 +56,8 @@ public class LockFeatureTests extends LockingFixture {
 	 */
 	@BeforeMethod
 	public void buildSimpleLockFeatureRequest() {
-		this.reqEntity = WFSRequest.createRequestEntity("LockFeature");
+		this.reqEntity = WFSRequest.createRequestEntity("LockFeature",
+				this.wfsVersion);
 	}
 
 	/**

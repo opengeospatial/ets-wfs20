@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
+
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -28,6 +29,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 import com.sun.jersey.api.client.ClientResponse;
 
 /**
@@ -57,6 +59,8 @@ public class BaseFixture {
 	protected Document reqEntity;
 	/** A Document representing the content of the response message. */
 	protected Document rspEntity;
+	/** Highest version supported by the IUT. */
+	protected String wfsVersion;
 
 	public void setWfsClient(WFSClient wfsClient) {
 		this.wfsClient = wfsClient;
@@ -88,6 +92,8 @@ public class BaseFixture {
 		if (null != this.featureTypes && !this.featureTypes.isEmpty()) {
 			return;
 		}
+		this.wfsVersion = (String) testContext.getSuite().getAttribute(
+				SuiteAttribute.WFS_VERSION.getName());
 		this.wfsMetadata = (Document) testContext.getSuite().getAttribute(
 				SuiteAttribute.TEST_SUBJECT.getName());
 		this.wfsClient = new WFSClient(this.wfsMetadata);

@@ -23,6 +23,7 @@ import javax.xml.transform.stream.StreamSource;
 import org.apache.xerces.xs.XSElementDeclaration;
 import org.opengis.cite.iso19142.Namespaces;
 import org.opengis.cite.iso19142.WFS2;
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -192,12 +193,16 @@ public class WFSRequest {
 	/**
 	 * Creates an XML request entity of the specified request type.
 	 * 
-	 * @param requestType
-	 *            The local name of the document element.
+	 * @param reqResource
+	 *            The name of a classpath resource containing an XML request
+	 *            entity.
+	 * @param wfsVersion
+	 *            A WFS version identifier ("2.0.0" if not specified).
 	 * @return A Document representing a WFS request entity.
 	 */
-	public static Document createRequestEntity(String requestType) {
-		String resourceName = requestType + ".xml";
+	public static Document createRequestEntity(String reqResource,
+			String wfsVersion) {
+		String resourceName = reqResource + ".xml";
 		Document doc = null;
 		try {
 			doc = BUILDER.parse(WFSRequest.class
@@ -206,6 +211,11 @@ public class WFSRequest {
 			TestSuiteLogger.log(Level.WARNING,
 					"Failed to parse request entity from classpath: "
 							+ resourceName, e);
+		}
+		Attr verAttr = doc.getDocumentElement().getAttributeNode("version");
+		if (null != verAttr && null != wfsVersion && !wfsVersion.isEmpty()) {
+			doc.getDocumentElement().getAttributeNode("version")
+					.setValue(wfsVersion);
 		}
 		return doc;
 	}

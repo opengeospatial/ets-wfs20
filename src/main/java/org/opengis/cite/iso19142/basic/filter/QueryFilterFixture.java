@@ -1,12 +1,10 @@
 package org.opengis.cite.iso19142.basic.filter;
 
-import java.util.logging.Level;
-
 import org.apache.xerces.xs.XSModel;
 import org.opengis.cite.iso19142.BaseFixture;
 import org.opengis.cite.iso19142.SuiteAttribute;
 import org.opengis.cite.iso19142.util.DataSampler;
-import org.opengis.cite.iso19142.util.TestSuiteLogger;
+import org.opengis.cite.iso19142.util.WFSRequest;
 import org.testng.ISuite;
 import org.testng.ITestContext;
 import org.testng.annotations.BeforeClass;
@@ -26,7 +24,7 @@ public class QueryFilterFixture extends BaseFixture {
 	 * SUT.
 	 */
 	protected XSModel model;
-	protected final String GET_FEATURE_ENTITY = "/org/opengis/cite/iso19142/basic/GetFeature-Minimal.xml";
+	protected final String GET_FEATURE_MINIMAL = "GetFeature-Minimal";
 
 	public QueryFilterFixture() {
 		super();
@@ -62,19 +60,12 @@ public class QueryFilterFixture extends BaseFixture {
 	/**
 	 * Builds a DOM Document node representing the entity body for a GetFeature
 	 * request. A minimal XML representation is read from the classpath
-	 * ("GetFeature-Minimal.xml"). The response entity is cleared.
+	 * ("util/GetFeature-Minimal.xml").
 	 */
 	@BeforeMethod
 	public void buildRequestEntity() {
-		String resourceName = GET_FEATURE_ENTITY;
-		try {
-			this.reqEntity = this.docBuilder.parse(getClass()
-					.getResourceAsStream(resourceName));
-		} catch (Exception x) {
-			TestSuiteLogger.log(Level.WARNING,
-					"Failed to parse request entity from classpath: "
-							+ resourceName, x);
-		}
+		this.reqEntity = WFSRequest.createRequestEntity(GET_FEATURE_MINIMAL,
+				this.wfsVersion);
 	}
 
 	/**

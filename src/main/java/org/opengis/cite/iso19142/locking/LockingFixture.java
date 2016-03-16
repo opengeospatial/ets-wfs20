@@ -23,51 +23,52 @@ import com.sun.jersey.api.client.ClientResponse;
  */
 public class LockingFixture extends BaseFixture {
 
-    /** List containing lock identifiers */
-    protected List<String> locks = new ArrayList<String>();
-    /** Acquires and saves sample feature data. */
-    protected DataSampler dataSampler;
+	/** List containing lock identifiers */
+	protected List<String> locks = new ArrayList<String>();
+	/** Acquires and saves sample feature data. */
+	protected DataSampler dataSampler;
 
-    public LockingFixture() {
-        super();
-    }
+	public LockingFixture() {
+		super();
+	}
 
-    /**
-     * Obtains a DataSampler object from the test run context (the value of the
-     * {@link SuiteAttribute#SAMPLER SuiteAttribute.SAMPLER attribute}).
-     * 
-     * @param testContext
-     *            The test run context.
-     */
-    @BeforeClass(alwaysRun = true)
-    public void initLockingFixture(ITestContext testContext) {
-        this.dataSampler = (DataSampler) testContext.getSuite().getAttribute(
-                SuiteAttribute.SAMPLER.getName());
-        this.featureInfo = this.dataSampler.getFeatureTypeInfo();
-    }
+	/**
+	 * Obtains a DataSampler object from the test run context (the value of the
+	 * {@link SuiteAttribute#SAMPLER SuiteAttribute.SAMPLER attribute}).
+	 * 
+	 * @param testContext
+	 *            The test run context.
+	 */
+	@BeforeClass(alwaysRun = true)
+	public void initLockingFixture(ITestContext testContext) {
+		this.dataSampler = (DataSampler) testContext.getSuite().getAttribute(
+				SuiteAttribute.SAMPLER.getName());
+		this.featureInfo = this.dataSampler.getFeatureTypeInfo();
+	}
 
-    /**
-     * Releases all locks by submitting empty Transaction requests that include
-     * the lockId and releaseAction (="ALL") attributes. An unsuccessful request
-     * is logged (as a {@link Level#WARNING}).
-     */
-    @AfterMethod(alwaysRun = true)
-    public void releaseAllLocks() {
-        if (locks.isEmpty()) {
-            return;
-        }
-        Document trxEntity = WFSRequest.createRequestEntity("Transaction");
-        trxEntity.getDocumentElement().setAttribute("releaseAction", "ALL");
-        for (String lockId : locks) {
-            trxEntity.getDocumentElement().setAttribute("lockId", lockId);
-            ClientResponse rsp = this.wfsClient.submitRequest(trxEntity,
-                    ProtocolBinding.ANY);
-            if (rsp.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
-                String entity = rsp.getEntity(String.class);
-                TestSuiteLogger.log(Level.WARNING, "Failed to release lock "
-                        + lockId + "\n" + entity);
-            }
-        }
-        locks.clear();
-    }
+	/**
+	 * Releases all locks by submitting empty Transaction requests that include
+	 * the lockId and releaseAction (="ALL") attributes. An unsuccessful request
+	 * is logged (as a {@link Level#WARNING}).
+	 */
+	@AfterMethod(alwaysRun = true)
+	public void releaseAllLocks() {
+		if (locks.isEmpty()) {
+			return;
+		}
+		Document trxEntity = WFSRequest.createRequestEntity("Transaction",
+				this.wfsVersion);
+		trxEntity.getDocumentElement().setAttribute("releaseAction", "ALL");
+		for (String lockId : locks) {
+			trxEntity.getDocumentElement().setAttribute("lockId", lockId);
+			ClientResponse rsp = this.wfsClient.submitRequest(trxEntity,
+					ProtocolBinding.ANY);
+			if (rsp.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
+				String entity = rsp.getEntity(String.class);
+				TestSuiteLogger.log(Level.WARNING, "Failed to release lock "
+						+ lockId + "\n" + entity);
+			}
+		}
+		locks.clear();
+	}
 }

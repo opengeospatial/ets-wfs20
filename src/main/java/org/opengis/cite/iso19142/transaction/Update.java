@@ -65,7 +65,8 @@ public class Update extends TransactionFixture {
 		if (modifiedFeatures.isEmpty()) {
 			return;
 		}
-		Document req = WFSRequest.createRequestEntity(WFS2.TRANSACTION);
+		Document req = WFSRequest.createRequestEntity(WFS2.TRANSACTION,
+				this.wfsVersion);
 		WFSRequest.addReplaceStatements(req, modifiedFeatures);
 		ClientResponse rsp = wfsClient.submitRequest(req, ProtocolBinding.ANY);
 		Document rspEntity = rsp.getEntity(Document.class);

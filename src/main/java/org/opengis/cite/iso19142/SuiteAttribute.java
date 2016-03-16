@@ -38,7 +38,11 @@ public enum SuiteAttribute {
 	 * A {@literal List<String>} of test suite preconditions that were not
 	 * satisfied.
 	 */
-	FAILED_PRECONDITIONS("failedPreconditions", List.class);
+	FAILED_PRECONDITIONS("failedPreconditions", List.class),
+	/**
+	 * The highest specification version supported by the IUT.
+	 */
+	WFS_VERSION("wfsVersion", String.class);
 	private final Class attrType;
 	private final String attrName;
 

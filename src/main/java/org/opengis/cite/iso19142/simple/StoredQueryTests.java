@@ -85,7 +85,8 @@ public class StoredQueryTests extends BaseFixture {
 	 */
 	@BeforeMethod
 	public void buildGetFeatureRequestEntity() {
-		this.reqEntity = WFSRequest.createRequestEntity("GetFeature");
+		this.reqEntity = WFSRequest.createRequestEntity("GetFeature",
+				this.wfsVersion);
 	}
 
 	/**
