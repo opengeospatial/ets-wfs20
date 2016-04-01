@@ -123,7 +123,7 @@ public class WFSClient {
 	 * encoding).
 	 * 
 	 * @param queryId
-	 *            The stored query identifier.
+	 *            A stored query identifier.
 	 * @param params
 	 *            A collection of query parameters distinguished by name (may be
 	 *            empty, e.g. {@literal Collections.<String, Object>.emptyMap()}
@@ -132,6 +132,11 @@ public class WFSClient {
 	 *         if the response doesn't contain one.
 	 */
 	public Document invokeStoredQuery(String queryId, Map<String, Object> params) {
+		if (this.wfsVersion.equals(WFS2.V2_0_0)
+				&& queryId.equals(WFS2.QRY_GET_FEATURE_BY_ID)) {
+			// use deprecated URN identifier in WFS 2.0.0
+			queryId = WFS2.QRY_GET_FEATURE_BY_ID_URN;
+		}
 		Document req = WFSRequest.createRequestEntity("GetFeature",
 				this.wfsVersion);
 		WFSRequest.appendStoredQuery(req, queryId, params);

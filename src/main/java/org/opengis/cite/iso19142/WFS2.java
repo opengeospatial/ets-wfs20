@@ -17,6 +17,7 @@ public class WFS2 {
 	public static final String SCHEMA_URI = "http://schemas.opengis.net/wfs/2.0/wfs.xsd";
 	public static final String SERVICE_TYPE_CODE = "WFS";
 	public static final String VERSION = "2.0";
+	public static final String V2_0_0 = "2.0.0";
 	public static final String GET_CAPABILITIES = "GetCapabilities";
 	public static final String DESCRIBE_FEATURE_TYPE = "DescribeFeatureType";
 	public static final String LIST_STORED_QUERIES = "ListStoredQueries";
@@ -30,7 +31,10 @@ public class WFS2 {
 	public static final String NAMESPACES_PARAM = "namespaces";
 	public static final String STOREDQUERY_ID_PARAM = "storedquery_id";
 	public static final String ID_PARAM = "id";
-	public static final String QRY_GET_FEATURE_BY_ID = "urn:ogc:def:query:OGC-WFS::GetFeatureById";
+	/** Stored query identifier: GetFeatureById */
+	public static final String QRY_GET_FEATURE_BY_ID = "http://www.opengis.net/def/query/OGC-WFS/0/GetFeatureById";
+	/** Stored query identifier: GetFeatureById (deprecated in v2.0.2 */
+	public static final String QRY_GET_FEATURE_BY_ID_URN = "urn:ogc:def:query:OGC-WFS::GetFeatureById";
 	public static final String QRY_GET_FEATURE_BY_TYPE = "urn:ogc:def:query:OGC-WFS::GetFeatureByType";
 	/** Service constraint indicating support for HTTP GET method bindings. */
 	public static final String KVP_ENC = "KVPEncoding";

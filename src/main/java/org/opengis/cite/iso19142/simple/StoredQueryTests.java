@@ -58,6 +58,7 @@ public class StoredQueryTests extends BaseFixture {
 
 	private String featureId;
 	private Schema wfsSchema;
+	private String queryId;
 
 	/**
 	 * Initializes the test class fixture. The (pre-compiled) WFS schema and the
@@ -75,6 +76,8 @@ public class StoredQueryTests extends BaseFixture {
 		this.featureId = fid;
 		this.wfsSchema = (Schema) testContext.getSuite().getAttribute(
 				SuiteAttribute.WFS_SCHEMA.getName());
+		this.queryId = (this.wfsVersion.equals(WFS2.V2_0_0)) ? WFS2.QRY_GET_FEATURE_BY_ID_URN
+				: WFS2.QRY_GET_FEATURE_BY_ID;
 		Assert.assertNotNull(this.wfsSchema,
 				"WFS schema not found in suite fixture.");
 	}
@@ -123,23 +126,25 @@ public class StoredQueryTests extends BaseFixture {
 	/**
 	 * [{@code Test}] Invoking the {@code GetFeatureById} query with an
 	 * {@code id} parameter value that does not match any feature should produce
-	 * an error response with status code 404 (Not Found) or 403 (Forbidden).
+	 * an error response with status code 404 (Not Found). The corresponding OGC
+	 * exception code in the response entity, if present, must be "NotFound".
 	 * 
-	 * Clause 11.4 stipulates that "In the event that a web feature service
-	 * encounters an error processing a GetFeature request, it shall raise an
-	 * OperationProcessingFailed exception as described in 7.5." In Table D.2
-	 * this exception code is mapped to status code 403 for some reason.
+	 * In the WFS 2.0.0 specification, clause 11.4 stipulates that "In the event
+	 * that a web feature service encounters an error processing a GetFeature
+	 * request, it shall raise an OperationProcessingFailed exception as
+	 * described in 7.5." In Table D.2 this exception code is mapped to status
+	 * code 403 for some reason.
 	 * 
 	 * @param binding
 	 *            The ProtocolBinding to use.
 	 *
-	 * @see "ISO 19142:2010, cl. 7.9.3.6: GetFeatureById stored query"
+	 * @see "OGC 09-026r2, cl. 11.3.5: GetFeatureById response"
+	 * @see "OGC 09-026r1, cl. 7.9.3.6: GetFeatureById stored query"
 	 */
 	@Test(description = "See ISO 19142: 7.9.3.6, 11.4", dataProvider = "protocol-binding")
 	public void invokeGetFeatureByIdWithUnknownID(ProtocolBinding binding) {
 		String id = "uuid-" + UUID.randomUUID().toString();
-		WFSRequest.appendStoredQuery(this.reqEntity,
-				WFS2.QRY_GET_FEATURE_BY_ID,
+		WFSRequest.appendStoredQuery(this.reqEntity, this.queryId,
 				Collections.singletonMap("id", (Object) id));
 		URI endpoint = ServiceMetadataUtils.getOperationEndpoint(
 				this.wfsMetadata, WFS2.GET_FEATURE, binding);
@@ -147,11 +152,18 @@ public class StoredQueryTests extends BaseFixture {
 				this.reqEntity), binding, endpoint);
 		this.rspEntity = extractBodyAsDocument(rsp, binding);
 		int statusCode = rsp.getStatus();
-		Assert.assertTrue(
-				statusCode == ClientResponse.Status.NOT_FOUND.getStatusCode()
-						|| statusCode == ClientResponse.Status.FORBIDDEN
-								.getStatusCode(),
-				"Expected status code 403 or 404. Received: " + statusCode);
+		if (this.wfsVersion.equals("2.0.0")) {
+			Assert.assertTrue(
+					statusCode == ClientResponse.Status.NOT_FOUND
+							.getStatusCode()
+							|| statusCode == ClientResponse.Status.FORBIDDEN
+									.getStatusCode(),
+					"Expected status code 404 or 403. Received: " + statusCode);
+		} else {
+			Assert.assertEquals(statusCode,
+					ClientResponse.Status.NOT_FOUND.getStatusCode(),
+					ErrorMessageKeys.UNEXPECTED_STATUS);
+		}
 	}
 
 	/**
@@ -172,8 +184,7 @@ public class StoredQueryTests extends BaseFixture {
 		}
 		Assert.assertFalse(null == this.featureId || this.featureId.isEmpty(),
 				ErrorMessage.get(ErrorMessageKeys.FID_NOT_FOUND));
-		WFSRequest.appendStoredQuery(this.reqEntity,
-				WFS2.QRY_GET_FEATURE_BY_ID,
+		WFSRequest.appendStoredQuery(this.reqEntity, this.queryId,
 				Collections.singletonMap("id", (Object) this.featureId));
 		URI endpoint = ServiceMetadataUtils.getOperationEndpoint(
 				this.wfsMetadata, WFS2.GET_FEATURE, binding);

@@ -84,7 +84,7 @@ public class LockFeatureTests extends LockingFixture {
 	public void resetNonexistentLock() {
 		Map<String, QName> featureId = fetchRandomFeatureIdentifier(this.featureInfo);
 		String gmlId = featureId.keySet().iterator().next();
-		WFSRequest.appendStoredQuery(reqEntity, WFS2.QRY_GET_FEATURE_BY_ID,
+		WFSRequest.appendStoredQuery(reqEntity, this.storedQueryId,
 				Collections.singletonMap("id", (Object) gmlId));
 		reqEntity.getDocumentElement().setAttribute("lockId",
 				"lock-does-not-exist");
@@ -115,7 +115,7 @@ public class LockFeatureTests extends LockingFixture {
 	public void lockFeatureAndAttemptDelete() {
 		Map<String, QName> featureId = fetchRandomFeatureIdentifier(this.featureInfo);
 		String gmlId = featureId.keySet().iterator().next();
-		WFSRequest.appendStoredQuery(reqEntity, WFS2.QRY_GET_FEATURE_BY_ID,
+		WFSRequest.appendStoredQuery(reqEntity, this.storedQueryId,
 				Collections.singletonMap("id", (Object) gmlId));
 		reqEntity.getDocumentElement().setAttribute("expiry", "60");
 		ClientResponse rsp = wfsClient.submitRequest(reqEntity,
@@ -157,7 +157,7 @@ public class LockFeatureTests extends LockingFixture {
 	public void lockFeatureAlreadyLocked() {
 		Map<String, QName> featureId = fetchRandomFeatureIdentifier(this.featureInfo);
 		String gmlId = featureId.keySet().iterator().next();
-		WFSRequest.appendStoredQuery(reqEntity, WFS2.QRY_GET_FEATURE_BY_ID,
+		WFSRequest.appendStoredQuery(reqEntity, this.storedQueryId,
 				Collections.singletonMap("id", (Object) gmlId));
 		reqEntity.getDocumentElement().setAttribute("expiry", "60");
 		ClientResponse rsp = wfsClient.submitRequest(reqEntity,

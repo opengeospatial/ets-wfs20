@@ -7,6 +7,7 @@ import java.util.logging.Level;
 import org.opengis.cite.iso19142.BaseFixture;
 import org.opengis.cite.iso19142.ProtocolBinding;
 import org.opengis.cite.iso19142.SuiteAttribute;
+import org.opengis.cite.iso19142.WFS2;
 import org.opengis.cite.iso19142.util.DataSampler;
 import org.opengis.cite.iso19142.util.TestSuiteLogger;
 import org.opengis.cite.iso19142.util.WFSRequest;
@@ -27,6 +28,8 @@ public class LockingFixture extends BaseFixture {
 	protected List<String> locks = new ArrayList<String>();
 	/** Acquires and saves sample feature data. */
 	protected DataSampler dataSampler;
+	/** Identifier for GetFeatureById stored query */
+	protected String storedQueryId;
 
 	public LockingFixture() {
 		super();
@@ -39,11 +42,13 @@ public class LockingFixture extends BaseFixture {
 	 * @param testContext
 	 *            The test run context.
 	 */
-	@BeforeClass(alwaysRun = true)
+	@BeforeClass
 	public void initLockingFixture(ITestContext testContext) {
 		this.dataSampler = (DataSampler) testContext.getSuite().getAttribute(
 				SuiteAttribute.SAMPLER.getName());
 		this.featureInfo = this.dataSampler.getFeatureTypeInfo();
+		this.storedQueryId = (this.wfsVersion.equals(WFS2.V2_0_0)) ? WFS2.QRY_GET_FEATURE_BY_ID_URN
+				: WFS2.QRY_GET_FEATURE_BY_ID;
 	}
 
 	/**
@@ -51,7 +56,7 @@ public class LockingFixture extends BaseFixture {
 	 * the lockId and releaseAction (="ALL") attributes. An unsuccessful request
 	 * is logged (as a {@link Level#WARNING}).
 	 */
-	@AfterMethod(alwaysRun = true)
+	@AfterMethod
 	public void releaseAllLocks() {
 		if (locks.isEmpty()) {
 			return;
