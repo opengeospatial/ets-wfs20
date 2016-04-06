@@ -1,8 +1,13 @@
 package org.opengis.cite.iso19142;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
+
 import javax.xml.namespace.QName;
+
 import org.geotoolkit.geometry.Envelopes;
 import org.geotoolkit.geometry.ImmutableEnvelope;
 import org.geotoolkit.referencing.CRS;
@@ -15,15 +20,41 @@ import org.opengis.util.FactoryException;
 
 /**
  * Provides information about a feature type managed by a WFS. Much of the
- * information is gleaned from the service description (wfs:WFS_Capabilities).
+ * information is gleaned from the content of the <code>FeatureTypeList</code>
+ * in the service description (wfs:WFS_Capabilities).
  */
 public class FeatureTypeInfo {
 	private QName typeName;
 	private Envelope geoExtent;
 	private boolean instantiated;
-	private String defaultCRSRef;
-	private CoordinateReferenceSystem defaultCRS;
+	private List<String> supportedCRSList;
 	private File sampleData;
+
+	public FeatureTypeInfo() {
+		this.supportedCRSList = new ArrayList<String>();
+	}
+
+	/**
+	 * Returns of list of supported CRS identifiers. The first entry denotes the
+	 * default CRS.
+	 * 
+	 * @return A list of CRS identifiers (absolute URI values).
+	 */
+	public List<String> getSupportedCRSIdentifiers() {
+		return supportedCRSList;
+	}
+
+	/**
+	 * Adds the given sequence of identifiers to the list of supported
+	 * coordinate reference systems.
+	 * 
+	 * @param crsIdentifiers
+	 *            A sequence of CRS identifiers (absolute URI values that comply
+	 *            with OGC 09-048r3, 4.4).
+	 */
+	public void addCRSIdentifiers(String... crsIdentifiers) {
+		this.supportedCRSList.addAll(Arrays.asList(crsIdentifiers));
+	}
 
 	/**
 	 * Get the qualified name of the feature type.
@@ -69,26 +100,10 @@ public class FeatureTypeInfo {
 	/**
 	 * Gets the identifier of the default CRS for this feature type.
 	 * 
-	 * @return A String representing a CRS reference.
+	 * @return A String representing a CRS reference (an absolute URI value).
 	 */
 	public String getDefaultCRS() {
-		return defaultCRSRef;
-	}
-
-	/**
-	 * Sets the identifier of the default CRS for this feature type which shall
-	 * be assumed by a WFS if not otherwise explicitly identified within a
-	 * request.
-	 * 
-	 * @param crsRef
-	 *            A valid CRS reference; this should be an absolute URI (see OGC
-	 *            09-048r3, 4.4).
-	 * @throws FactoryException
-	 *             If the CRS reference is invalid or unrecognized.
-	 */
-	public void setDefaultCRS(String crsRef) throws FactoryException {
-		this.defaultCRS = CRS.decode(crsRef);
-		this.defaultCRSRef = crsRef;
+		return this.supportedCRSList.get(0);
 	}
 
 	/**
@@ -104,18 +119,29 @@ public class FeatureTypeInfo {
 	 */
 	public Envelope getGeoExtent() {
 		if (null == geoExtent) {
-			this.geoExtent = defaultCRSEnvelope(this.defaultCRSRef);
+			this.geoExtent = getValidAreaOfCRS(getDefaultCRS());
 		}
 		return geoExtent;
 	}
 
 	/**
-	 * Sets the geographic extent of the feature instances.
+	 * Sets the geographic extent of the feature instances. The CRS of the given
+	 * envelope will be changed to the default CRS if necessary.
 	 * 
 	 * @param geoExtent
 	 *            An envelope defining a bounding box in some CRS.
 	 */
 	public void setGeoExtent(Envelope geoExtent) {
+		CoordinateReferenceSystem defaultCRS = null;
+		try {
+			// http-based identifier not recognized by Geotk v3
+			String crsId = GeodesyUtils
+					.getAbbreviatedCRSIdentifier(getDefaultCRS());
+			defaultCRS = CRS.decode(crsId);
+		} catch (FactoryException fex) {
+			throw new RuntimeException("Default CRS not recognized. "
+					+ fex.getMessage());
+		}
 		if (!geoExtent.getCoordinateReferenceSystem().equals(defaultCRS)) {
 			Envelope bbox = null;
 			try {
@@ -123,7 +149,7 @@ public class FeatureTypeInfo {
 			} catch (TransformException e) {
 				throw new IllegalArgumentException(
 						"Failed to transform envelope coordinates to CRS "
-								+ defaultCRSRef, e);
+								+ getDefaultCRS(), e);
 			}
 			this.geoExtent = new ImmutableEnvelope(bbox);
 		} else {
@@ -157,7 +183,7 @@ public class FeatureTypeInfo {
 	public String toString() {
 		StringBuilder sb = new StringBuilder("FeatureTypeInfo {");
 		sb.append("\n typeName: '").append(typeName);
-		sb.append("',\n defaultCRS: '").append(defaultCRSRef);
+		sb.append("',\n supportedCRS: '").append(supportedCRSList);
 		sb.append("',\n instantiated: ").append(instantiated);
 		sb.append(",\n envelope: '").append(Envelopes.toWKT(getGeoExtent()));
 		if (sampleData != null && sampleData.exists()) {
@@ -168,24 +194,23 @@ public class FeatureTypeInfo {
 	}
 
 	/**
-	 * Creates an envelope representing the valid area of use for the default
+	 * Creates an envelope representing the valid area of use for the specified
 	 * coordinate reference system (CRS).
 	 * 
 	 * @param crsRef
 	 *            An absolute URI ('http' or 'urn' scheme) that identifies a CRS
 	 *            in accord with OGC 09-048r3.
 	 * 
-	 * @return An ImmutableEnvelope defining the domain of validity for the
-	 *         default CRS, or {@code null} no CRS definition can be found.
+	 * @return An ImmutableEnvelope defining the domain of validity for the CRS,
+	 *         or {@code null} if no CRS definition can be found.
 	 */
-	ImmutableEnvelope defaultCRSEnvelope(String crsRef) {
+	ImmutableEnvelope getValidAreaOfCRS(String crsRef) {
 		ImmutableEnvelope envelope = null;
 		try {
 			envelope = GeodesyUtils.getDomainOfValidity(crsRef);
 		} catch (FactoryException e) {
 			TestSuiteLogger.log(Level.WARNING,
-					"Cannot determine domain of validity for CRS "
-							+ defaultCRSRef, e);
+					"Cannot determine domain of validity for CRS " + crsRef, e);
 		}
 		return envelope;
 	}

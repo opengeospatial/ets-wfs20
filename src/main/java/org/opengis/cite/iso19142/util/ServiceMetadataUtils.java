@@ -189,12 +189,20 @@ public class ServiceMetadataUtils {
 			typeInfo.setTypeName(typeName);
 			Node defaultCRSNode = featureTypeElem.getElementsByTagNameNS(
 					WFS2.NS_URI, "DefaultCRS").item(0);
-			try {
-				if (null != defaultCRSNode) {
-					typeInfo.setDefaultCRS(defaultCRSNode.getTextContent());
+			if (null != defaultCRSNode) {
+				typeInfo.addCRSIdentifiers(defaultCRSNode.getTextContent());
+			}
+			NodeList otherCRSNodes = featureTypeElem.getElementsByTagNameNS(
+					WFS2.NS_URI, "OtherCRS");
+			if (otherCRSNodes.getLength() > 0) {
+				for (int n = 0; n <= otherCRSNodes.getLength(); n++) {
+					typeInfo.addCRSIdentifiers(otherCRSNodes.item(n)
+							.getTextContent());
 				}
-				Node bboxNode = featureTypeElem.getElementsByTagNameNS(
-						Namespaces.OWS, "WGS84BoundingBox").item(0);
+			}
+			Node bboxNode = featureTypeElem.getElementsByTagNameNS(
+					Namespaces.OWS, "WGS84BoundingBox").item(0);
+			try {
 				if (null != bboxNode) {
 					Envelope envelope = Extents.createEnvelope(bboxNode);
 					typeInfo.setGeoExtent(envelope);
