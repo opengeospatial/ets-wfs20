@@ -19,7 +19,7 @@ import org.opengis.util.FactoryException;
  */
 public class FeatureTypeInfo {
 	private QName typeName;
-	private ImmutableEnvelope geoExtent;
+	private Envelope geoExtent;
 	private boolean instantiated;
 	private String defaultCRSRef;
 	private CoordinateReferenceSystem defaultCRS;
@@ -81,7 +81,8 @@ public class FeatureTypeInfo {
 	 * request.
 	 * 
 	 * @param crsRef
-	 *            A valid CRS reference (e.g. "urn:ogc:def:crs:EPSG::4326").
+	 *            A valid CRS reference; this should be an absolute URI (see OGC
+	 *            09-048r3, 4.4).
 	 * @throws FactoryException
 	 *             If the CRS reference is invalid or unrecognized.
 	 */
@@ -91,13 +92,20 @@ public class FeatureTypeInfo {
 	}
 
 	/**
-	 * Gets the geographic extent of the feature instances.
+	 * Gets the geographic extent for the instances of this feature type. The
+	 * spatial extent is typically set as follows:
+	 * <ol>
+	 * <li>using the first ows:WGS84BoundingBox element appearing in the WFS
+	 * capabilities document;</li>
+	 * <li>from the valid area of the default CRS.</li>
+	 * </ol>
 	 * 
-	 * @return An ImmutableEnvelope defining a bounding box in the default CRS.
+	 * @return An Envelope defining a bounding box.
 	 */
-	public ImmutableEnvelope getGeoExtent() {
-		if (null == geoExtent)
-			geoExtent = defaultEnvelope(this.defaultCRSRef);
+	public Envelope getGeoExtent() {
+		if (null == geoExtent) {
+			this.geoExtent = defaultCRSEnvelope(this.defaultCRSRef);
+		}
 		return geoExtent;
 	}
 
@@ -105,9 +113,9 @@ public class FeatureTypeInfo {
 	 * Sets the geographic extent of the feature instances.
 	 * 
 	 * @param geoExtent
-	 *            An immutable envelope defining a bounding box in some CRS.
+	 *            An envelope defining a bounding box in some CRS.
 	 */
-	public void setGeoExtent(ImmutableEnvelope geoExtent) {
+	public void setGeoExtent(Envelope geoExtent) {
 		if (!geoExtent.getCoordinateReferenceSystem().equals(defaultCRS)) {
 			Envelope bbox = null;
 			try {
@@ -160,7 +168,7 @@ public class FeatureTypeInfo {
 	}
 
 	/**
-	 * Creates an envelope representing the area of use for the default
+	 * Creates an envelope representing the valid area of use for the default
 	 * coordinate reference system (CRS).
 	 * 
 	 * @param crsRef
@@ -170,7 +178,7 @@ public class FeatureTypeInfo {
 	 * @return An ImmutableEnvelope defining the domain of validity for the
 	 *         default CRS, or {@code null} no CRS definition can be found.
 	 */
-	ImmutableEnvelope defaultEnvelope(String crsRef) {
+	ImmutableEnvelope defaultCRSEnvelope(String crsRef) {
 		ImmutableEnvelope envelope = null;
 		try {
 			envelope = GeodesyUtils.getDomainOfValidity(crsRef);
@@ -181,4 +189,5 @@ public class FeatureTypeInfo {
 		}
 		return envelope;
 	}
+
 }

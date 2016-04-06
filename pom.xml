@@ -51,11 +51,16 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
+      <artifactId>geomatics-geotk</artifactId>
+      <version>1.11-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
       <artifactId>ets-gml32</artifactId>
       <version>1.23</version>
     </dependency>
-	<dependency>
-      <groupId>org.opengis.cite</groupId>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
       <artifactId>schema-utils</artifactId>
     </dependency>
     <dependency>

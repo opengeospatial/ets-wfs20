@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wfs:FeatureCollection xmlns:wfs="http://www.opengis.net/wfs/2.0"
+	xmlns:tns="http://example.org/ns1" xmlns:gml="http://www.opengis.net/gml/3.2"
+	numberMatched="2" numberReturned="2" timeStamp="2016-04-05T23:49:00Z">
+	<wfs:member>
+		<tns:SimpleFeature gml:id="SF-01">
+			<gml:name>Alpha</gml:name>
+			<tns:curveProperty>
+				<gml:LineString gml:id="SF-01-G1"
+					srsName="http://www.opengis.net/def/crs/EPSG/0/4326">
+					<gml:posList>
+						51.921 5.519
+						49.304 8.541
+					</gml:posList>
+				</gml:LineString>
+			</tns:curveProperty>
+			<tns:decimalProperty>11.74</tns:decimalProperty>
+		</tns:SimpleFeature>
+	</wfs:member>
+	<wfs:member>
+		<tns:SimpleFeature gml:id="SF-02">
+			<gml:name>Beta</gml:name>
+			<tns:curveProperty>
+				<gml:LineString gml:id="SF-02-G1"
+					srsName="http://www.opengis.net/def/crs/EPSG/0/4326">
+					<gml:posList>
+						48.173 7.542
+						47.472 9.695
+					</gml:posList>
+				</gml:LineString>
+			</tns:curveProperty>
+			<tns:decimalProperty>21.05</tns:decimalProperty>
+		</tns:SimpleFeature>
+	</wfs:member>
+</wfs:FeatureCollection>

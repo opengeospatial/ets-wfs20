@@ -135,11 +135,11 @@
 	</OperationsMetadata>
 	<wfs:FeatureTypeList xmlns:tns="http://example.org/ns1">
 		<wfs:FeatureType>
-			<wfs:Name>tns:Alpha</wfs:Name>
-			<wfs:DefaultCRS>urn:ogc:def:crs:EPSG::4326</wfs:DefaultCRS>
+			<wfs:Name>tns:SimpleFeature</wfs:Name>
+			<wfs:DefaultCRS>http://www.opengis.net/def/crs/EPSG/0/4326</wfs:DefaultCRS>
 			<ows:WGS84BoundingBox>
-				<ows:LowerCorner>-5.90 35.00</ows:LowerCorner>
-				<ows:UpperCorner>32.19 71.96</ows:UpperCorner>
+				<ows:LowerCorner>35.00 -5.90</ows:LowerCorner>
+				<ows:UpperCorner>71.96 32.19</ows:UpperCorner>
 			</ows:WGS84BoundingBox>
 		</wfs:FeatureType>
 	</wfs:FeatureTypeList>

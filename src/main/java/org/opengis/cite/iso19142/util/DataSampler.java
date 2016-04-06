@@ -1,11 +1,14 @@
 package org.opengis.cite.iso19142.util;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -13,8 +16,13 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 import javax.xml.transform.stream.StreamSource;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 import net.sf.saxon.dom.ElementOverNodeInfo;
 import net.sf.saxon.s9api.SaxonApiException;
@@ -22,13 +30,18 @@ import net.sf.saxon.s9api.XdmItem;
 import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.s9api.XdmValue;
 
+import org.apache.xerces.xs.XSElementDeclaration;
+import org.apache.xerces.xs.XSModel;
+import org.opengis.cite.geomatics.Extents;
 import org.opengis.cite.iso19142.FeatureTypeInfo;
 import org.opengis.cite.iso19142.Namespaces;
 import org.opengis.cite.iso19142.ProtocolBinding;
 import org.opengis.cite.iso19142.WFS2;
+import org.opengis.geometry.Envelope;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
 /**
  * Obtains samples of the feature data available from the WFS under test.
@@ -342,5 +355,64 @@ public class DataSampler {
 			break;
 		}
 		return featureId;
+	}
+
+	/**
+	 * Determines the spatial extent of the feature instances in the sample
+	 * data. If a feature type defines more than one geometry property, the
+	 * envelope is calculated using the first property for which a value exists.
+	 * 
+	 * @param model
+	 *            A model representing the supported GML application schema.
+	 * @param featureType
+	 *            The name of the feature type.
+	 * @return An Envelope, or <code>null</code> if one cannot be created or the
+	 *         feature type has no geometry properties defined.
+	 */
+	public Envelope getExtentOfSampleData(XSModel model, QName featureType) {
+		List<XSElementDeclaration> geomProps = AppSchemaUtils
+				.getFeaturePropertiesByType(model, featureType, model
+						.getTypeDefinition("AbstractGeometryType",
+								Namespaces.GML));
+		if (geomProps.isEmpty()) {
+			return null;
+		}
+		Iterator<XSElementDeclaration> itr = geomProps.iterator();
+		NamespaceBindings nsBindings = NamespaceBindings.withStandardBindings();
+		XPathFactory factory = XPathFactory.newInstance();
+		NodeList geomNodes = null;
+		do {
+			XSElementDeclaration geomProp = itr.next();
+			nsBindings.addNamespaceBinding(geomProp.getNamespace(), "ns1");
+			String expr = String.format("//ns1:%s/*[1]", geomProp.getName());
+			XPath xpath = factory.newXPath();
+			xpath.setNamespaceContext(nsBindings);
+			File dataFile = this.featureInfo.get(featureType).getSampleData();
+			try {
+				geomNodes = (NodeList) xpath.evaluate(expr, new InputSource(
+						new FileInputStream(dataFile)), XPathConstants.NODESET);
+			} catch (XPathExpressionException | FileNotFoundException e) {
+				LOGR.log(
+						Level.WARNING,
+						String.format(
+								"Failed to evaluate XPath %s against data file at %s.\n %s",
+								expr, dataFile.getAbsolutePath(),
+								e.getMessage()));
+			}
+			if (null != geomNodes && geomNodes.getLength() > 0) {
+				break;
+			}
+		} while (itr.hasNext());
+		Envelope extent = null;
+		if (null != geomNodes && geomNodes.getLength() > 0) {
+			try {
+				extent = Extents.calculateEnvelope(geomNodes);
+			} catch (JAXBException e) {
+				LOGR.log(Level.WARNING, String.format(
+						"Failed to create envelope from geometry nodes.",
+						e.getMessage()));
+			}
+		}
+		return extent;
 	}
 }

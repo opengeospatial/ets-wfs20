@@ -31,6 +31,8 @@ public class WFS2 {
 	public static final String NAMESPACES_PARAM = "namespaces";
 	public static final String STOREDQUERY_ID_PARAM = "storedquery_id";
 	public static final String ID_PARAM = "id";
+	public static final String START_INDEX_PARAM = "startIndex";
+	public static final String COUNT_PARAM = "count";
 	/** Stored query identifier: GetFeatureById */
 	public static final String QRY_GET_FEATURE_BY_ID = "http://www.opengis.net/def/query/OGC-WFS/0/GetFeatureById";
 	/** Stored query identifier: GetFeatureById (deprecated in v2.0.2 */

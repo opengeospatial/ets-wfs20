@@ -216,7 +216,7 @@ dt {
               <li>org.opengis.cite.iso19142.basic.filter.RelationalOperatorTests</li>
               <li>org.opengis.cite.iso19142.basic.filter.PropertyIsLikeOperatorTests</li>
               <li>org.opengis.cite.iso19142.basic.filter.ResourceIdOperatorTests</li>
-              <li>org.opengis.cite.iso19142.basic.filter.BBOXOperatorTests</li>
+              <li>org.opengis.cite.iso19142.basic.filter.spatial.BBOXOperatorTests</li>
             </ul>
           </td>
         </tr>

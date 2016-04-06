@@ -17,11 +17,13 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.opengis.cite.geomatics.Extents;
 import org.opengis.cite.iso19142.ConformanceClass;
 import org.opengis.cite.iso19142.FeatureTypeInfo;
 import org.opengis.cite.iso19142.Namespaces;
 import org.opengis.cite.iso19142.ProtocolBinding;
 import org.opengis.cite.iso19142.WFS2;
+import org.opengis.geometry.Envelope;
 import org.opengis.util.FactoryException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -163,9 +165,9 @@ public class ServiceMetadataUtils {
 	 * type:
 	 * 
 	 * <ul>
-	 * <li>Qualified type name (QName)</li>
-	 * <li>Default CRS reference</li>
-	 * <li>Spatial extent</li>
+	 * <li>Qualified type name (wfs:Name)</li>
+	 * <li>Default CRS reference (wfs:DefaultCRS)</li>
+	 * <li>Spatial extent (ows:WGS84BoundingBox)</li>
 	 * </ul>
 	 * 
 	 * @param wfsCapabilities
@@ -180,25 +182,25 @@ public class ServiceMetadataUtils {
 				Namespaces.WFS, "FeatureType");
 		for (int i = 0; i < featureTypes.getLength(); i++) {
 			FeatureTypeInfo typeInfo = new FeatureTypeInfo();
-			NodeList children = featureTypes.item(i).getChildNodes();
-			for (int j = 0; j < children.getLength(); j++) {
-				Node child = children.item(j);
-				if (child.getNodeType() != Node.ELEMENT_NODE) {
-					continue;
+			Element featureTypeElem = (Element) featureTypes.item(i);
+			Node nameNode = featureTypeElem.getElementsByTagNameNS(WFS2.NS_URI,
+					"Name").item(0);
+			QName typeName = buildQName(nameNode);
+			typeInfo.setTypeName(typeName);
+			Node defaultCRSNode = featureTypeElem.getElementsByTagNameNS(
+					WFS2.NS_URI, "DefaultCRS").item(0);
+			try {
+				if (null != defaultCRSNode) {
+					typeInfo.setDefaultCRS(defaultCRSNode.getTextContent());
 				}
-				if (child.getLocalName().equals("Name")) {
-					QName typeName = buildQName(child);
-					typeInfo.setTypeName(typeName);
+				Node bboxNode = featureTypeElem.getElementsByTagNameNS(
+						Namespaces.OWS, "WGS84BoundingBox").item(0);
+				if (null != bboxNode) {
+					Envelope envelope = Extents.createEnvelope(bboxNode);
+					typeInfo.setGeoExtent(envelope);
 				}
-				if (child.getLocalName().equals("DefaultCRS")) {
-					try {
-						typeInfo.setDefaultCRS(child.getTextContent());
-					} catch (FactoryException e) {
-						TestSuiteLogger.log(Level.WARNING,
-								"Failed to set default CRS.", e);
-					}
-				}
-				// Ignore ows:WGS84BoundingBox as it is rarely accurate
+			} catch (FactoryException e) {
+				TestSuiteLogger.log(Level.WARNING, e.getMessage());
 			}
 			featureInfo.put(typeInfo.getTypeName(), typeInfo);
 		}

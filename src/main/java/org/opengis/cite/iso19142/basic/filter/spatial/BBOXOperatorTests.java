@@ -1,9 +1,10 @@
-package org.opengis.cite.iso19142.basic.filter;
+package org.opengis.cite.iso19142.basic.filter.spatial;
 
 import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
@@ -19,6 +20,7 @@ import org.opengis.cite.iso19142.ErrorMessageKeys;
 import org.opengis.cite.iso19142.Namespaces;
 import org.opengis.cite.iso19142.ProtocolBinding;
 import org.opengis.cite.iso19142.WFS2;
+import org.opengis.cite.iso19142.basic.filter.QueryFilterFixture;
 import org.opengis.cite.iso19142.util.AppSchemaUtils;
 import org.opengis.cite.iso19142.util.ServiceMetadataUtils;
 import org.opengis.cite.iso19142.util.WFSRequest;
@@ -43,8 +45,8 @@ import com.sun.jersey.api.client.ClientResponse;
  * <strong>Sources</strong>
  * </p>
  * <ul>
- * <li>ISO 19142:2010, Table 1: Conformance classes</li>
- * <li>ISO 19143:2010, cl. A.7: Test cases for minimum spatial filter</li>
+ * <li>OGC 09-025r2, Table 1: Conformance classes</li>
+ * <li>OGC 09-026r2, cl. A.7: Test cases for minimum spatial filter</li>
  * </ul>
  */
 public class BBOXOperatorTests extends QueryFilterFixture {
@@ -77,7 +79,7 @@ public class BBOXOperatorTests extends QueryFilterFixture {
 	 * @see "ISO 19143:2010, 7.8.3.2: BBOX operator"
 	 */
 	@Test(description = "See ISO 19143: 7.8.3.2", dataProvider = "protocol-featureType")
-	public void withBroadBBOXFilter(ProtocolBinding binding, QName featureType) {
+	public void nonSpecificBBOX(ProtocolBinding binding, QName featureType) {
 		List<XSElementDeclaration> geomProps = AppSchemaUtils
 				.getFeaturePropertiesByType(model, featureType, gmlGeomBaseType);
 		if (geomProps.isEmpty()) {
@@ -134,7 +136,7 @@ public class BBOXOperatorTests extends QueryFilterFixture {
 	 * 
 	 */
 	@Test(description = "See ISO 19143: 7.8.3.2, A.7", dataProvider = "protocol-featureType")
-	public void withBBOXFilter(ProtocolBinding binding, QName featureType) {
+	public void bboxWithDefaultExtent(ProtocolBinding binding, QName featureType) {
 		List<XSElementDeclaration> geomProps = AppSchemaUtils
 				.getFeaturePropertiesByType(model, featureType, gmlGeomBaseType);
 		if (geomProps.isEmpty()) {
@@ -228,6 +230,10 @@ public class BBOXOperatorTests extends QueryFilterFixture {
 		ETSAssert.assertXPath(xpath, this.rspEntity, null);
 	}
 
+	// bboxCoversSampleData
+	// bboxWithOtherCRS
+	// bboxWithUnsupportedCRS
+
 	/**
 	 * Replaces gml:Surface elements having a single gml:PolygonPatch with a
 	 * gml:Polygon element. Such a simplification facilitates a binding to JTS
@@ -248,7 +254,9 @@ public class BBOXOperatorTests extends QueryFilterFixture {
 	}
 
 	/**
-	 * Adds a BBOX spatial predicate to a GetFeature request entity.
+	 * Adds a BBOX spatial predicate to a GetFeature request entity. If the
+	 * envelope has no spatial reference (srsName) it is assumed to be the
+	 * default CRS specified in the capabilities document.
 	 * 
 	 * @param request
 	 *            The request entity (/wfs:GetFeature).

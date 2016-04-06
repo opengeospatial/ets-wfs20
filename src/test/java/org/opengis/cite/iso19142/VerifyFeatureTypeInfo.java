@@ -3,7 +3,6 @@ package org.opengis.cite.iso19142;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.geotoolkit.geometry.ImmutableEnvelope;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -11,6 +10,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.Envelope;
 import org.opengis.util.FactoryException;
 
 public class VerifyFeatureTypeInfo {
@@ -41,7 +41,7 @@ public class VerifyFeatureTypeInfo {
 	public void getDefaultGeoExtent_epsg4326() throws FactoryException {
 		FeatureTypeInfo iut = new FeatureTypeInfo();
 		iut.setDefaultCRS("urn:ogc:def:crs:EPSG::4326");
-		ImmutableEnvelope envelope = iut.getGeoExtent();
+		Envelope envelope = iut.getGeoExtent();
 		Assert.assertNotNull("Default extent is null.", envelope);
 		String lowerCoordAsWKT = envelope.getLowerCorner().toString();
 		String lowerCoord = lowerCoordAsWKT.substring(
@@ -55,7 +55,7 @@ public class VerifyFeatureTypeInfo {
 		FeatureTypeInfo iut = new FeatureTypeInfo();
 		// NAD83 / UTM zone 10N
 		iut.setDefaultCRS("urn:ogc:def:crs:EPSG::26910");
-		ImmutableEnvelope envelope = iut.getGeoExtent();
+		Envelope envelope = iut.getGeoExtent();
 		Assert.assertNotNull("Default extent is null.", envelope);
 		DirectPosition pos = envelope.getLowerCorner();
 		Assert.assertTrue("Expected easting of lower corner > 200000 ",
