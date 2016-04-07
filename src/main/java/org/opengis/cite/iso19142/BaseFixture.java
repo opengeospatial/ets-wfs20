@@ -290,23 +290,24 @@ public class BaseFixture {
 	 * @param rsp
 	 *            A ClientResponse representing an HTTP response message.
 	 * @param binding
-	 *            The protocol binding used in the request.
+	 *            The protocol binding used in the request; this is ignored
+	 *            (obsolete).
 	 * @return A Document representing the response entity, or {@code null} if
 	 *         it could not be parsed.
 	 */
 	protected Document extractBodyAsDocument(ClientResponse rsp,
 			ProtocolBinding binding) {
 		Document entity = rsp.getEntity(Document.class);
-		if (binding.equals(ProtocolBinding.SOAP)) {
-			Element contentNode;
-			try {
-				contentNode = (Element) XMLUtils.evaluateXPath(entity,
-						"//soap11:Body/*[1] | //soap:Body/*[1]", null,
-						XPathConstants.NODE);
-			} catch (XPathExpressionException xpe) {
-				throw new RuntimeException(xpe);
-			}
-			entity.replaceChild(contentNode, entity.getDocumentElement());
+		Element soapBody;
+		try {
+			soapBody = (Element) XMLUtils.evaluateXPath(entity,
+					"//soap11:Body/*[1] | //soap:Body/*[1]", null,
+					XPathConstants.NODE);
+		} catch (XPathExpressionException xpe) {
+			throw new RuntimeException(xpe);
+		}
+		if (null != soapBody) {
+			entity.replaceChild(soapBody, entity.getDocumentElement());
 		}
 		return entity;
 	}

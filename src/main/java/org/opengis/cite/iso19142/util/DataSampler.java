@@ -71,7 +71,6 @@ public class DataSampler {
 					"Did not supply a WFS capabilities document");
 		}
 		this.serviceDescription = wfsCapabilities;
-		// NOTE: Also set in test suite context by SuiteFixtureListener
 		this.featureInfo = ServiceMetadataUtils
 				.extractFeatureInfo(wfsCapabilities);
 	}

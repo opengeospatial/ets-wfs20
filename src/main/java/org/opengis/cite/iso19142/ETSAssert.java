@@ -31,6 +31,7 @@ import org.opengis.cite.iso19142.util.XMLUtils;
 import org.opengis.cite.validation.SchematronValidator;
 import org.opengis.cite.validation.ValidationErrorHandler;
 import org.testng.Assert;
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -344,13 +345,10 @@ public class ETSAssert {
 	 * "Simple WFS" implementation.
 	 * 
 	 * @param doc
-	 *            A Document node having {http://www.opengis.net/wfs/2.0}
-	 *            {@value org.opengis.cite.iso19142.WFS2#WFS_CAPABILITIES} as
-	 *            the root element.
+	 *            A Document node representing a WFS capabilities document
+	 *            (wfs:WFS_Capabilities}.
 	 */
 	public static void assertSimpleWFSCapabilities(Document doc) {
-		ETSAssert.assertQualifiedName(doc.getDocumentElement(), new QName(
-				Namespaces.WFS, WFS2.WFS_CAPABILITIES));
 		SchematronValidator validator = ValidationUtils
 				.buildSchematronValidator("wfs-capabilities-2.0.sch",
 						"SimpleWFSPhase");
@@ -436,6 +434,33 @@ public class ETSAssert {
 					String.format(
 							"Expected locator attribute to contain '%s']",
 							locator));
+		}
+	}
+
+	/**
+	 * Asserts that the specified spatial reference occurs in the given XML
+	 * entity. In general the reference is conveyed by the srsName attribute
+	 * that may appear on any geometry element or gml:Envelope. All occurrences
+	 * must match.
+	 * 
+	 * @param entity
+	 *            A Document representing an XML entity such as a GML document
+	 *            or a WFS GetFeature response.
+	 * @param crsId
+	 *            A CRS identifier (an absolute URI value).
+	 */
+	public static void assertSpatialReference(Document entity, String crsId) {
+		NodeList srsNameNodes = null;
+		try {
+			srsNameNodes = XMLUtils.evaluateXPath(entity, "//*/@srsName", null);
+		} catch (XPathExpressionException e) {
+			throw new AssertionError(e.getMessage());
+		}
+		for (int i = 0; i < srsNameNodes.getLength(); i++) {
+			Attr attr = (Attr) srsNameNodes.item(i);
+			Assert.assertEquals(attr.getValue(), crsId, String.format(
+					"Unexpected @srsName value on element %s",
+					new QName(attr.getNamespaceURI(), attr.getLocalName())));
 		}
 	}
 }

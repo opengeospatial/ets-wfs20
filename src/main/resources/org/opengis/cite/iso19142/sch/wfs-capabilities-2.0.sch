@@ -115,6 +115,11 @@
       The mandatory GetFeature operation is missing.
       </iso:assert>
     </iso:rule>
+    <iso:rule context="ows:Operation[@name='GetFeature']">
+      <iso:assert test="exists(index-of(ows:Parameter[@name='resolve']//ows:Value, 'local'))">
+        GetFeature: the 'resolve' parameter must contain 'local' as an allowed value.
+      </iso:assert>
+    </iso:rule>
     <iso:rule context="//fes:Filter_Capabilities/fes:Conformance">
       <iso:assert test="lower-case(fes:Constraint[@name='ImplementsQuery']/ows:DefaultValue) = 'true'">
       The filter constraint 'ImplementsQuery' must be 'true' for all conforming WFS implementations.

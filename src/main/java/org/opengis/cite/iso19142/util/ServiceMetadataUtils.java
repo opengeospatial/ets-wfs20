@@ -166,7 +166,7 @@ public class ServiceMetadataUtils {
 	 * 
 	 * <ul>
 	 * <li>Qualified type name (wfs:Name)</li>
-	 * <li>Default CRS reference (wfs:DefaultCRS)</li>
+	 * <li>Supported CRS identifiers (wfs:DefaultCRS, wfs:OtherCRS)</li>
 	 * <li>Spatial extent (ows:WGS84BoundingBox)</li>
 	 * </ul>
 	 * 
@@ -195,7 +195,7 @@ public class ServiceMetadataUtils {
 			NodeList otherCRSNodes = featureTypeElem.getElementsByTagNameNS(
 					WFS2.NS_URI, "OtherCRS");
 			if (otherCRSNodes.getLength() > 0) {
-				for (int n = 0; n <= otherCRSNodes.getLength(); n++) {
+				for (int n = 0; n < otherCRSNodes.getLength(); n++) {
 					typeInfo.addCRSIdentifiers(otherCRSNodes.item(n)
 							.getTextContent());
 				}

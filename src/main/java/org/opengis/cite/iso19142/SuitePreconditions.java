@@ -9,9 +9,9 @@ import javax.xml.namespace.QName;
 import org.opengis.cite.iso19142.util.DataSampler;
 import org.opengis.cite.iso19142.util.WFSClient;
 import org.testng.Assert;
+import org.testng.ISuite;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
-import org.testng.Reporter;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
@@ -52,18 +52,19 @@ public class SuitePreconditions {
 	}
 
 	/**
-	 * [{@literal @Test}] Verifies that the service capabilities description
-	 * contains all required elements in accord with the "Simple WFS"
-	 * conformance class.
+	 * [{@literal @Test}] Verifies that the test subject is a WFS 2.0 service.
+	 * The document element in the supplied metadata resource must be
+	 * "{http://www.opengis.net/wfs/2.0}WFS_Capabilities".
 	 * 
 	 * @param testContext
 	 *            The test run context (ITestContext).
 	 */
-	@Test(description = "Capabilities doc indicates at least 'Simple WFS' conformance")
+	@Test(description = "Test subject is WFS 2.0 service")
 	public void verifyServiceDescription(ITestContext testContext) {
 		Document wfsMetadata = (Document) testContext.getSuite().getAttribute(
 				SuiteAttribute.TEST_SUBJECT.getName());
-		ETSAssert.assertSimpleWFSCapabilities(wfsMetadata);
+		ETSAssert.assertQualifiedName(wfsMetadata.getDocumentElement(),
+				new QName(Namespaces.WFS, WFS2.WFS_CAPABILITIES));
 	}
 
 	/**
@@ -102,8 +103,9 @@ public class SuitePreconditions {
 	 */
 	@Test(description = "SUT has data for at least one advertised feature type", dependsOnMethods = { "verifyServiceDescription" })
 	public void dataAreAvailable(ITestContext testContext) {
-		Document wfsMetadata = (Document) testContext.getSuite().getAttribute(
-				SuiteAttribute.TEST_SUBJECT.getName());
+		ISuite suite = testContext.getSuite();
+		Document wfsMetadata = (Document) suite
+				.getAttribute(SuiteAttribute.TEST_SUBJECT.getName());
 		DataSampler sampler = new DataSampler(wfsMetadata);
 		sampler.acquireFeatureData();
 		Map<QName, FeatureTypeInfo> featureTypeInfo = sampler
@@ -118,8 +120,10 @@ public class SuitePreconditions {
 		if (!sutHasData) {
 			String msg = ErrorMessage.get(ErrorMessageKeys.DATA_UNAVAILABLE);
 			LOGR.warning(msg + featureTypeInfo.toString());
-			Reporter.getOutput().add(msg);
 			throw new AssertionError(msg);
 		}
+		suite.setAttribute(SuiteAttribute.FEATURE_INFO.getName(),
+				featureTypeInfo);
+		suite.setAttribute(SuiteAttribute.SAMPLER.getName(), sampler);
 	}
 }

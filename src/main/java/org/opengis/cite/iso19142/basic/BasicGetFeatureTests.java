@@ -1,6 +1,7 @@
 package org.opengis.cite.iso19142.basic;
 
 import java.net.URI;
+import java.util.Iterator;
 import java.util.logging.Level;
 
 import javax.xml.XMLConstants;
@@ -23,11 +24,13 @@ import org.opengis.cite.iso19142.util.TestSuiteLogger;
 import org.opengis.cite.iso19142.util.ValidationUtils;
 import org.opengis.cite.iso19142.util.WFSRequest;
 import org.testng.Assert;
+import org.testng.SkipException;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.ls.LSResourceResolver;
 import org.xml.sax.SAXException;
@@ -58,7 +61,7 @@ public class BasicGetFeatureTests extends BaseFixture {
 	 * Creates a special XML Schema validator that uses schema location hints
 	 * specified in an XML instance document. Beware that this can introduce a
 	 * vulnerability to denial-of-service attacks, even though local copies of
-	 * standard schemas will be used.
+	 * standard schemas will be used if possible.
 	 */
 	@BeforeClass
 	public void buildValidator() {
@@ -88,6 +91,7 @@ public class BasicGetFeatureTests extends BaseFixture {
 	public void buildRequestEntity() {
 		this.reqEntity = WFSRequest.createRequestEntity("GetFeature-Minimal",
 				this.wfsVersion);
+		this.rspEntity = null;
 	}
 
 	/**
@@ -99,11 +103,11 @@ public class BasicGetFeatureTests extends BaseFixture {
 	}
 
 	/**
-	 * Submits a minimal GetFeature request (without a filter predicate) for
-	 * feature types listed in the WFS the capabilities document. The test is
-	 * run for all supported protocol bindings and feature types. The response
-	 * entity (wfs:FeatureCollection) must be schema-valid and contain only
-	 * instances of the requested type as members.
+	 * [{@code Test}] Submits a minimal GetFeature request (without a filter
+	 * predicate) for feature types listed in the WFS the capabilities document.
+	 * The test is run for all supported protocol bindings and feature types.
+	 * The response entity (wfs:FeatureCollection) must be schema-valid and
+	 * contain only instances of the requested type as members.
 	 * 
 	 * @param binding
 	 *            A supported message binding.
@@ -120,13 +124,80 @@ public class BasicGetFeatureTests extends BaseFixture {
 		Assert.assertEquals(rsp.getStatus(),
 				ClientResponse.Status.OK.getStatusCode(),
 				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
-		Document entity = extractBodyAsDocument(rsp, binding);
-		ETSAssert
-				.assertQualifiedName(entity.getDocumentElement(), FEATURE_COLL);
-		ETSAssert.assertSchemaValid(
-				this.hintsValidator,
-				new DOMSource(entity.getDocumentElement(), entity
-						.getDocumentURI()));
+		this.rspEntity = extractBodyAsDocument(rsp, binding);
+		ETSAssert.assertQualifiedName(rspEntity.getDocumentElement(),
+				FEATURE_COLL);
+		ETSAssert.assertSchemaValid(this.hintsValidator, new DOMSource(
+				rspEntity.getDocumentElement(), rspEntity.getDocumentURI()));
+	}
+
+	/**
+	 * [{@code Test}] Submits a request for geometry representations in some
+	 * other (non-default) CRS that is supported by the IUT, as indicated by the
+	 * value of the {@literal wfs:Query/@srsName} attribute or srsName query
+	 * parameter. The test is skipped if no alternatives are offered for any
+	 * available feature type.
+	 * 
+	 * @see "OGC 09-025r2, 7.9.2.4.4: srsName parameter"
+	 */
+	@Test(description = "See OGC 09-025r2: 7.9.2.4.4")
+	public void getFeatureInOtherCRS() {
+		String otherCRSId = null;
+		Iterator<QName> itr = this.featureTypes.iterator();
+		QName featureType;
+		do {
+			featureType = itr.next();
+			FeatureTypeInfo typeInfo = this.featureInfo.get(featureType);
+			if (typeInfo.isInstantiated()
+					&& typeInfo.getSupportedCRSIdentifiers().size() > 1) {
+				// skip first (default) CRS
+				otherCRSId = typeInfo.getSupportedCRSIdentifiers().get(1);
+				break;
+			}
+		} while (itr.hasNext());
+		if (null == otherCRSId) {
+			throw new SkipException(
+					"No alternative (non-default) CRS supported for any feature type with data.");
+		}
+		WFSRequest.appendSimpleQuery(this.reqEntity, featureType);
+		Element qry = (Element) this.reqEntity.getElementsByTagNameNS(
+				WFS2.NS_URI, WFS2.QUERY_ELEM).item(0);
+		qry.setAttribute(WFS2.SRSNAME_PARAM, otherCRSId);
+		ClientResponse rsp = wfsClient.submitRequest(this.reqEntity,
+				ProtocolBinding.ANY);
+		Assert.assertEquals(rsp.getStatus(),
+				ClientResponse.Status.OK.getStatusCode(),
+				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
+		this.rspEntity = extractBodyAsDocument(rsp, ProtocolBinding.ANY);
+		ETSAssert.assertSpatialReference(this.rspEntity, otherCRSId);
+	}
+
+	/**
+	 * [{@code Test}] Submits a request for geometry representations in a
+	 * non-existent CRS, as indicated by the value of the
+	 * {@literal wfs:Query/@srsName} attribute or srsName parameter. An
+	 * exception is expected in response, with status code 400 and OGC exception
+	 * code "InvalidParameterValue".
+	 * 
+	 * @see "OGC 09-025r2, A.2.22.1.4: srsName parameter"
+	 */
+	@Test(description = "See OGC 09-025r2: A.2.22.1.4")
+	public void getFeatureInUnsupportedCRS() {
+		String crsId = (this.wfsVersion.equals(WFS2.V2_0_0)) ? "urn:ogc:def:crs:EPSG::32690"
+				: "http://www.opengis.net/def/crs/EPSG/0/32690";
+		QName featureType = getFeatureTypeWithInstanceData();
+		WFSRequest.appendSimpleQuery(this.reqEntity, featureType);
+		Element qry = (Element) this.reqEntity.getElementsByTagNameNS(
+				WFS2.NS_URI, WFS2.QUERY_ELEM).item(0);
+		qry.setAttribute(WFS2.SRSNAME_PARAM, crsId);
+		ClientResponse rsp = wfsClient.submitRequest(this.reqEntity,
+				ProtocolBinding.ANY);
+		Assert.assertEquals(rsp.getStatus(),
+				ClientResponse.Status.BAD_REQUEST.getStatusCode(),
+				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
+		this.rspEntity = extractBodyAsDocument(rsp, ProtocolBinding.ANY);
+		ETSAssert.assertExceptionReport(this.rspEntity,
+				"InvalidParameterValue", "SRSNAME");
 	}
 
 	/**
@@ -146,5 +217,24 @@ public class BasicGetFeatureTests extends BaseFixture {
 		NodeList features = entity.getElementsByTagNameNS(
 				typeName.getNamespaceURI(), typeName.getLocalPart());
 		featureInfo.setInstantiated(features.getLength() > 0);
+	}
+
+	/**
+	 * Gets the name of a feature type for which instances exist.
+	 * 
+	 * @return The qualified name of a feature type, or <code>null</code> if no
+	 *         data are available.
+	 */
+	QName getFeatureTypeWithInstanceData() {
+		Iterator<QName> itr = this.featureTypes.iterator();
+		QName featureType = null;
+		do {
+			featureType = itr.next();
+			FeatureTypeInfo typeInfo = this.featureInfo.get(featureType);
+			if (typeInfo.isInstantiated()) {
+				break;
+			}
+		} while (itr.hasNext());
+		return featureType;
 	}
 }

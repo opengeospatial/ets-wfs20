@@ -33,6 +33,7 @@ public class WFS2 {
 	public static final String ID_PARAM = "id";
 	public static final String START_INDEX_PARAM = "startIndex";
 	public static final String COUNT_PARAM = "count";
+	public static final String SRSNAME_PARAM = "srsName";
 	/** Stored query identifier: GetFeatureById */
 	public static final String QRY_GET_FEATURE_BY_ID = "http://www.opengis.net/def/query/OGC-WFS/0/GetFeatureById";
 	/** Stored query identifier: GetFeatureById (deprecated in v2.0.2 */

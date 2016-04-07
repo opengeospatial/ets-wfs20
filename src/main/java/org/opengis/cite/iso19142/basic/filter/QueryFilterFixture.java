@@ -42,14 +42,9 @@ public class QueryFilterFixture extends BaseFixture {
 	 * @param testContext
 	 *            The test (set) context.
 	 */
-	@BeforeClass(alwaysRun = true)
+	@BeforeClass()
 	public void initQueryFilterFixture(ITestContext testContext) {
 		ISuite suite = testContext.getSuite();
-		if (null == suite.getAttribute(SuiteAttribute.SAMPLER.getName())) {
-			DataSampler sampler = new DataSampler(this.wfsMetadata);
-			sampler.acquireFeatureData();
-			suite.setAttribute(SuiteAttribute.SAMPLER.getName(), sampler);
-		}
 		this.dataSampler = (DataSampler) suite
 				.getAttribute(SuiteAttribute.SAMPLER.getName());
 		this.model = (XSModel) suite
