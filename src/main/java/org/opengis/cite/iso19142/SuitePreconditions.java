@@ -107,7 +107,11 @@ public class SuitePreconditions {
 		Document wfsMetadata = (Document) suite
 				.getAttribute(SuiteAttribute.TEST_SUBJECT.getName());
 		DataSampler sampler = new DataSampler(wfsMetadata);
-		sampler.acquireFeatureData();
+		try {
+			sampler.acquireFeatureData();
+		} catch (RuntimeException rx) {
+			throw new AssertionError(rx.getMessage());
+		}
 		Map<QName, FeatureTypeInfo> featureTypeInfo = sampler
 				.getFeatureTypeInfo();
 		boolean sutHasData = false;
