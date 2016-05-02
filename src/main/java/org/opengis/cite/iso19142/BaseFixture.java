@@ -142,10 +142,7 @@ public class BaseFixture {
 		if (null != this.reqEntity) {
 			String request = null;
 			Object[] params = result.getParameters();
-			if ((params.length > 0)
-					&& ProtocolBinding.class.cast(params[0]).equals(
-							ProtocolBinding.GET)) {
-				// Note: first parameter is always a ProtocolBinding object
+			if (WFSRequest.containsGetProtocolBinding(params)) {
 				request = WFSRequest.transformEntityToKVP(new DOMSource(
 						this.reqEntity));
 			} else {

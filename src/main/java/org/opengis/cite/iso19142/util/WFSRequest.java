@@ -22,6 +22,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.apache.xerces.xs.XSElementDeclaration;
 import org.opengis.cite.iso19142.Namespaces;
+import org.opengis.cite.iso19142.ProtocolBinding;
 import org.opengis.cite.iso19142.WFS2;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -469,6 +470,31 @@ public class WFSRequest {
 			resourceId.setAttribute("rid", id);
 			filter.appendChild(resourceId);
 		}
+	}
+
+	/**
+	 * Checks the given list of objects for the presence of a
+	 * {@link ProtocolBinding#GET} object.
+	 * 
+	 * @param testParams
+	 *            A list of objects representing test method parameters.
+	 * @return true if a {@literal ProtocolBinding#GET} object was found; false
+	 *         otherwise.
+	 */
+	public static boolean containsGetProtocolBinding(Object[] testParams) {
+		if (null == testParams || testParams.length == 0) {
+			return false;
+		}
+		boolean foundGetBinding = false;
+		for (Object param : testParams) {
+			if (ProtocolBinding.class.isInstance(param)
+					&& ProtocolBinding.class.cast(param).equals(
+							ProtocolBinding.GET)) {
+				foundGetBinding = true;
+				break;
+			}
+		}
+		return foundGetBinding;
 	}
 
 }
