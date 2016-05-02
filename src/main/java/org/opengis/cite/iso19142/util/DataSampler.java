@@ -246,12 +246,13 @@ public class DataSampler {
 						break;
 					}
 				} catch (RuntimeException re) {
-					LOGR.log(
-							Level.WARNING,
-							String.format(
-									"Failed to parse response entity using %s binding for feature type %s",
-									binding, typeName), re);
-					continue;
+          StringBuilder err = new StringBuilder();
+          err.append(String.format(
+                  "Failed to read XML response entity using %s method for feature type %s.", 
+                  binding, typeName));
+          err.append(" \n").append(re.getMessage());
+          LOGR.log(Level.WARNING, err.toString(), re);
+          throw new RuntimeException(err.toString(), re);
 				}
 			}
 		}

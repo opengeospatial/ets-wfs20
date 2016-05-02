@@ -109,6 +109,7 @@ public class PropertyIsNilOperatorTests extends QueryFilterFixture {
 									"No feature type for which instances exist has nillable properties"));
 		}
 		for (QName typeName : this.nillableProperties.keySet()) {
+      buildRequestEntity();
 			List<XSElementDeclaration> nillables = this.nillableProperties
 					.get(typeName);
 			WFSRequest.appendSimpleQuery(this.reqEntity, typeName);
