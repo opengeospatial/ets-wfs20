@@ -81,13 +81,15 @@ public class PropertyIsNilOperatorTests extends QueryFilterFixture {
 				this.nillableProperties.put(typeName, nillableProps);
 			}
 		}
+		TestSuiteLogger.log(Level.FINE, "Nillable properties:\n"
+				+ this.nillableProperties);
 	}
 
 	/**
 	 * [{@code Test}] Submits a GetFeature request containing a
 	 * {@code PropertyIsNil} predicate designating a nillable feature property
-	 * (the last one in document order). The response entity must include only
-	 * feature instances that include the specified property with
+	 * (one per feature type). The response entity must include only feature
+	 * instances that include the specified property with
 	 * {@literal @xsi:nil="true"}.
 	 * 
 	 * <p>
@@ -109,10 +111,12 @@ public class PropertyIsNilOperatorTests extends QueryFilterFixture {
 									"No feature type for which instances exist has nillable properties"));
 		}
 		for (QName typeName : this.nillableProperties.keySet()) {
+			this.reqEntity = WFSRequest.createRequestEntity(
+					GET_FEATURE_MINIMAL, this.wfsVersion);
 			List<XSElementDeclaration> nillables = this.nillableProperties
 					.get(typeName);
 			WFSRequest.appendSimpleQuery(this.reqEntity, typeName);
-			// get last nillable property in document order
+			// get last nillable property for this feature type
 			XSElementDeclaration prop = nillables.get(nillables.size() - 1);
 			QName propName = new QName(prop.getNamespace(), prop.getName());
 			addPropertyIsNilPredicate(this.reqEntity, propName, null, false);

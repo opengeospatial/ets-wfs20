@@ -64,10 +64,10 @@ public class QueryFilterFixture extends BaseFixture {
 	}
 
 	/**
-	 * Eliminate obsolete reference to previous response entity.
+	 * Discard previous response entity.
 	 */
 	@BeforeMethod
-	public void clearResponseEntity() {
+	public void discardResponseEntity() {
 		this.rspEntity = null;
 	}
 
