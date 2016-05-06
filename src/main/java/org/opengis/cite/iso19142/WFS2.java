@@ -95,11 +95,8 @@ public class WFS2 {
 	public static final String LOCK_FEATURE_RSP = "LockFeatureResponse";
 	/** GetFeatureWithLock request element. */
 	public static final String GET_FEATURE_WITH_LOCK = "GetFeatureWithLock";
-	/**
-	 * Service constraint corresponding to the 'Transactional WFS' conformance
-	 * class.
-	 */
-	public static final String TRX_WFS = "ImplementsTransactionalWFS";
 	/** CRS: EPSG 4326 (see cl. 7.9.2.4.4) */
 	public static final String EPSG_4326 = "urn:ogc:def:crs:EPSG::4326";
+	/** Service constraint for 'Transactional WFS' conformance class. */
+	public static final String TRX_WFS = "ImplementsTransactionalWFS";
 }

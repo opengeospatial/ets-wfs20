@@ -79,7 +79,7 @@ public class VerifyAppSchemaUtils {
 						gmlCurveType);
 		Assert.assertEquals("Unexpected number of curve properties.", 1,
 				props.size());
-		Assert.assertEquals("Unexpected property name.", "curveProperty", props
+		Assert.assertEquals("Unexpected property name.", "lineProperty", props
 				.get(0).getName());
 	}
 

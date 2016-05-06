@@ -32,7 +32,9 @@ public enum ConformanceClass {
 	/** XML requests (A.1.6) */
 	HTTP_POST("XMLEncoding"),
 	/** SOAP requests (A.1.7) */
-	SOAP("SOAPEncoding");
+	SOAP("SOAPEncoding"),
+	/** Spatial joins (A.1.12) */
+	SPATIAL_JOINS("ImplementsSpatialJoins");
 
 	private final String constraintName;
 

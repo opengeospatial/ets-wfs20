@@ -363,4 +363,75 @@ public class ServiceMetadataUtils {
 		return conformanceSet;
 	}
 
+	/**
+	 * Indicates whether or not the specified spatial operator is supported. The
+	 * standard operators are listed below.
+	 * <ul>
+	 * <li>BBOX (mandatory)</li>
+	 * <li>Equals</li>
+	 * <li>Disjoint</li>
+	 * <li>Intersects</li>
+	 * <li>Touches</li>
+	 * <li>Crosses</li>
+	 * <li>Within</li>
+	 * <li>Contains</li>
+	 * <li>Overlaps</li>
+	 * <li>Beyond</li>
+	 * <li>DWithin</li>
+	 * </ul>
+	 * 
+	 * @param wfsMetadata
+	 *            A WFS capabilities document.
+	 * @param operatorName
+	 *            The name of a spatial operator.
+	 * @return true if the operator is supported; false if not.
+	 */
+	public static boolean implementsSpatialOperator(final Document wfsMetadata,
+			String operatorName) {
+		String expr = String.format("//fes:SpatialOperator[@name='%s']",
+				operatorName);
+		NodeList results = null;
+		try {
+			results = XMLUtils.evaluateXPath(wfsMetadata, expr, null);
+		} catch (XPathExpressionException e) { // expr ok
+		}
+		return results.getLength() > 0;
+	}
+
+	/**
+	 * Indicates whether or not the specified temporal operator is supported.
+	 * The standard operators are listed below.
+	 * <ul>
+	 * <li>During (mandatory)</li>
+	 * <li>After</li>
+	 * <li>Before</li>
+	 * <li>Begins</li>
+	 * <li>BegunBy</li>
+	 * <li>TContains</li>
+	 * <li>TEquals</li>
+	 * <li>TOverlaps</li>
+	 * <li>Meets</li>
+	 * <li>OverlappedBy</li>
+	 * <li>MetBy</li>
+	 * <li>Ends</li>
+	 * <li>EndedBy</li>
+	 * </ul>
+	 * 
+	 * @param wfsMetadata
+	 *            A WFS capabilities document.
+	 * @param operatorName
+	 *            The name of a temporal operator.
+	 * @return true if the operator is supported; false if not.
+	 */
+	public static boolean implementsTemporalOperator(
+			final Document wfsMetadata, String operatorName) {
+		String expr = String.format("//fes:TemporalOperator[@name='%s']",
+				operatorName);
+		NodeList results = null;
+		try {
+			results = XMLUtils.evaluateXPath(wfsMetadata, expr, null);
+		} catch (XPathExpressionException e) { // expr ok
+		}
+		return results.getLength() > 0;
+	}
 }
