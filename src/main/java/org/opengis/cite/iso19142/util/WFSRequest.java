@@ -138,8 +138,8 @@ public class WFSRequest {
 			String nsPrefix = docElement.lookupPrefix(qName.getNamespaceURI());
 			if (null == nsPrefix) {
 				nsPrefix = "ns" + Integer.toString((int) (Math.random() * 100));
-				newQuery.setAttribute(XMLConstants.XMLNS_ATTRIBUTE + ":"
-						+ nsPrefix, qName.getNamespaceURI());
+				newQuery.setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI,
+						"xmlns:" + nsPrefix, qName.getNamespaceURI());
 			}
 			typeNames.append(nsPrefix).append(':').append(qName.getLocalPart())
 					.append(' ');
@@ -182,8 +182,8 @@ public class WFSRequest {
 				QName qName = QName.class.cast(value);
 				String prefix = (qName.getPrefix().isEmpty()) ? "tns" : qName
 						.getPrefix();
-				param.setAttribute(XMLConstants.XMLNS_ATTRIBUTE + ":" + prefix,
-						qName.getNamespaceURI());
+				param.setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI,
+						"xmlns:" + prefix, qName.getNamespaceURI());
 				param.setTextContent(prefix + ":" + qName.getLocalPart());
 			} else {
 				param.setTextContent(value.toString());
@@ -244,8 +244,8 @@ public class WFSRequest {
 		}
 		if (null == nsPrefix) {
 			nsPrefix = "ns" + Integer.toString((int) (Math.random() * 100));
-			elem.setAttribute(XMLConstants.XMLNS_ATTRIBUTE + ":" + nsPrefix,
-					qName.getNamespaceURI());
+			elem.setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, "xmlns:"
+					+ nsPrefix, qName.getNamespaceURI());
 		}
 		typeNames.append(nsPrefix).append(':').append(qName.getLocalPart());
 		elem.setAttribute("typeName", typeNames.toString());
@@ -340,8 +340,8 @@ public class WFSRequest {
 	public static Element createValueReference(XSElementDeclaration propertyElem) {
 		Element valueRef = XMLUtils.createElement(new QName(Namespaces.FES,
 				"ValueReference", "fes"));
-		valueRef.setAttribute(XMLConstants.XMLNS_ATTRIBUTE + ":" + TNS_PREFIX,
-				propertyElem.getNamespace());
+		valueRef.setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, "xmlns:"
+				+ TNS_PREFIX, propertyElem.getNamespace());
 		valueRef.setTextContent(TNS_PREFIX + ":" + propertyElem.getName());
 		return valueRef;
 	}
@@ -374,9 +374,8 @@ public class WFSRequest {
 	 */
 	public static void addNamespaceBinding(Document doc, QName qName) {
 		Element docElem = doc.getDocumentElement();
-		docElem.setAttribute(
-				XMLConstants.XMLNS_ATTRIBUTE + ":" + qName.getPrefix(),
-				qName.getNamespaceURI());
+		docElem.setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, "xmlns:"
+				+ qName.getPrefix(), qName.getNamespaceURI());
 	}
 
 	/**
