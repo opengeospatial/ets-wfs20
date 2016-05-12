@@ -22,7 +22,8 @@ public class FeatureProperty {
 	}
 
 	/**
-	 * Constructor specifying the feature type and property declaration.
+	 * Constructor specifying the feature type and property declaration. The
+	 * property name and value type are derived from the element declaration.
 	 * 
 	 * @param featureType
 	 *            A QName specifying the feature type to which the property
@@ -38,6 +39,11 @@ public class FeatureProperty {
 		setValueType(getTypeName(declaration));
 	}
 
+	/**
+	 * Gets the qualified name of the feature property.
+	 * 
+	 * @return A QName object.
+	 */
 	public QName getName() {
 		return name;
 	}
@@ -46,6 +52,12 @@ public class FeatureProperty {
 		this.name = name;
 	}
 
+	/**
+	 * Gets the qualified name of the feature type to which this property
+	 * belongs.
+	 * 
+	 * @return A QName object.
+	 */
 	public QName getFeatureType() {
 		return featureType;
 	}
@@ -54,6 +66,13 @@ public class FeatureProperty {
 		this.featureType = featureType;
 	}
 
+	/**
+	 * Gets the qualified name of the property value type. This is either the
+	 * name of a simple datatype (e.g. xsd:decimal) or the name of an acceptable
+	 * child element (e.g. gml:Point).
+	 * 
+	 * @return A QName object.
+	 */
 	public QName getValueType() {
 		return valueType;
 	}
@@ -62,6 +81,12 @@ public class FeatureProperty {
 		this.valueType = valueType;
 	}
 
+	/**
+	 * Gets the element declaration for this feature property.
+	 * 
+	 * @return A schema component representing an element declaration from an
+	 *         XML Schema.
+	 */
 	public XSElementDeclaration getDeclaration() {
 		return declaration;
 	}
@@ -95,6 +120,15 @@ public class FeatureProperty {
 			typeName = new QName(elemDecl.getNamespace(), elemDecl.getName());
 		}
 		return typeName;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder str = new StringBuilder();
+		str.append(getFeatureType()).append('/');
+		str.append(getName()).append('/');
+		str.append(getValueType());
+		return str.toString();
 	}
 
 }
