@@ -1,4 +1,4 @@
-package org.opengis.cite.iso19142.basic.filter.joins;
+package org.opengis.cite.iso19142.joins;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
+import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.xerces.xs.XSElementDeclaration;
 import org.apache.xerces.xs.XSTypeDefinition;
@@ -17,14 +18,20 @@ import org.opengis.cite.iso19142.ErrorMessage;
 import org.opengis.cite.iso19142.ErrorMessageKeys;
 import org.opengis.cite.iso19142.Namespaces;
 import org.opengis.cite.iso19142.ProtocolBinding;
+import org.opengis.cite.iso19142.SuiteAttribute;
 import org.opengis.cite.iso19142.basic.filter.QueryFilterFixture;
 import org.opengis.cite.iso19142.util.AppSchemaUtils;
 import org.opengis.cite.iso19142.util.FeatureProperty;
 import org.opengis.cite.iso19142.util.ServiceMetadataUtils;
+import org.opengis.cite.iso19142.util.XMLUtils;
 import org.testng.Assert;
+import org.testng.ITestContext;
 import org.testng.SkipException;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
 
 import com.sun.jersey.api.client.ClientResponse;
 
@@ -76,6 +83,7 @@ import com.sun.jersey.api.client.ClientResponse;
  */
 public class SpatialJoinTests extends QueryFilterFixture {
 
+	public final static String IMPL_SPATIAL_JOINS = "ImplementsSpatialJoins";
 	private static final Logger LOGR = Logger.getLogger(SpatialJoinTests.class
 			.getPackage().getName());
 	private Map<QName, List<XSElementDeclaration>> surfaceProps;
@@ -108,18 +116,40 @@ public class SpatialJoinTests extends QueryFilterFixture {
 	}
 
 	/**
+	 * Checks the value of the service constraint {@value #IMPL_SPATIAL_JOINS}
+	 * in the capabilities document. All tests are skipped if this is not
+	 * "TRUE".
+	 * 
+	 * @param testContext
+	 *            Information about the test run environment.
+	 */
+	@BeforeTest
+	public void implementsSpatialJoins(ITestContext testContext) {
+		this.wfsMetadata = (Document) testContext.getSuite().getAttribute(
+				SuiteAttribute.TEST_SUBJECT.getName());
+		String xpath = String.format(
+				"//ows:Constraint[@name='%s' and (ows:DefaultValue = 'TRUE')]",
+				IMPL_SPATIAL_JOINS);
+		NodeList result;
+		try {
+			result = XMLUtils.evaluateXPath(this.wfsMetadata, xpath, null);
+		} catch (XPathExpressionException e) {
+			throw new AssertionError(e.getMessage());
+		}
+		if (result.getLength() == 0) {
+			throw new SkipException(ErrorMessage.format(
+					ErrorMessageKeys.NOT_IMPLEMENTED,
+					ConformanceClass.SPATIAL_JOINS.getConstraintName()));
+		}
+	}
+
+	/**
 	 * Finds surface, curve, and point properties defined in the application
 	 * schema. Properties that use primitive types are preferred, but if none
 	 * are defined then aggregate geometry types (Multi*) will be used instead.
 	 */
 	@BeforeClass
 	public void findGeometryPropertiesToJoin() {
-		if (!ServiceMetadataUtils.getConformanceClaims(this.wfsMetadata)
-				.contains(ConformanceClass.SPATIAL_JOINS)) {
-			throw new SkipException(ErrorMessage.format(
-					ErrorMessageKeys.NOT_IMPLEMENTED,
-					ConformanceClass.SPATIAL_JOINS.getConstraintName()));
-		}
 		this.surfaceProps = findGeometryProperties("AbstractSurfaceType");
 		if (this.surfaceProps.isEmpty()) {
 			this.surfaceProps = findGeometryProperties("MultiSurfaceType");

@@ -1,4 +1,4 @@
-package org.opengis.cite.iso19142.basic.filter.joins;
+package org.opengis.cite.iso19142.joins;
 
 import static org.junit.Assert.assertEquals;
 
@@ -16,6 +16,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opengis.cite.iso19142.CommonTestFixture;
 import org.opengis.cite.iso19142.Namespaces;
+import org.opengis.cite.iso19142.joins.JoinQueryUtils;
 import org.opengis.cite.iso19142.util.FeatureProperty;
 import org.opengis.cite.iso19142.util.VerifyAppSchemaUtils;
 import org.opengis.cite.iso19142.util.WFSRequest;

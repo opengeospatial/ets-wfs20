@@ -35,10 +35,13 @@
   <test name="Basic WFS">
     <packages>
       <package name="org.opengis.cite.iso19142.basic" />
-      <package name="org.opengis.cite.iso19142.basic.filter" />
-      <package name="org.opengis.cite.iso19142.basic.filter.spatial" />
-      <package name="org.opengis.cite.iso19142.basic.filter.joins" />
+      <package name="org.opengis.cite.iso19142.basic.filter.*" />
     </packages>
+  </test>
+  <test name="Spatial joins">
+    <classes>
+      <class name="org.opengis.cite.iso19142.joins.SpatialJoinTests" />
+    </classes>
   </test>
   <test name="Transactional WFS">
     <classes>

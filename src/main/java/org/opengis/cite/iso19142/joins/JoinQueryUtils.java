@@ -1,4 +1,4 @@
-package org.opengis.cite.iso19142.basic.filter.joins;
+package org.opengis.cite.iso19142.joins;
 
 import java.util.List;
 

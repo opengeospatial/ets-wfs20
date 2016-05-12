@@ -1,7 +1,7 @@
 /**
  * This package includes tests for join queries. Servers that implement join 
  * queries shall implement an inner join; that is, only features that satisfy 
- * the join predicates shall be included in the result set.
+ * the join condition(s) shall be included in the result set.
  * 
  * <p>Three conformance classes are distinguished; the corresponding service 
  * constraints are shown in parentheses:</p>
@@ -17,4 +17,4 @@
  * <li>OGC 09-025r2, Table 13: Service constraints</li>
  * </ul>
  */
-package org.opengis.cite.iso19142.basic.filter.joins;
+package org.opengis.cite.iso19142.joins;
