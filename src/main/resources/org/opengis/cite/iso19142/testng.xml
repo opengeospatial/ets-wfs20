@@ -34,7 +34,10 @@
   </test>
   <test name="Basic WFS">
     <packages>
-      <package name="org.opengis.cite.iso19142.basic.*" />
+      <package name="org.opengis.cite.iso19142.basic" />
+      <package name="org.opengis.cite.iso19142.basic.filter" />
+      <package name="org.opengis.cite.iso19142.basic.filter.spatial" />
+      <package name="org.opengis.cite.iso19142.basic.filter.joins" />
     </packages>
   </test>
   <test name="Transactional WFS">

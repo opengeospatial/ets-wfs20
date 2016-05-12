@@ -210,7 +210,7 @@ public class LockFeatureTests extends LockingFixture {
 				this.wfsMetadata, WFS2.LOCK_FEATURE, binding);
 		ClientResponse rsp = wfsClient.submitRequest(new DOMSource(reqEntity),
 				binding, endpoint);
-		this.rspEntity = extractBodyAsDocument(rsp, binding);
+		this.rspEntity = extractBodyAsDocument(rsp);
 		Assert.assertEquals(rsp.getStatus(),
 				ClientResponse.Status.OK.getStatusCode(),
 				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));

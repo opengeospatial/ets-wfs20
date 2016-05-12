@@ -124,7 +124,7 @@ public class BasicGetFeatureTests extends BaseFixture {
 		Assert.assertEquals(rsp.getStatus(),
 				ClientResponse.Status.OK.getStatusCode(),
 				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
-		this.rspEntity = extractBodyAsDocument(rsp, binding);
+		this.rspEntity = extractBodyAsDocument(rsp);
 		ETSAssert.assertQualifiedName(rspEntity.getDocumentElement(),
 				FEATURE_COLL);
 		ETSAssert.assertSchemaValid(this.hintsValidator, new DOMSource(
@@ -168,7 +168,7 @@ public class BasicGetFeatureTests extends BaseFixture {
 		Assert.assertEquals(rsp.getStatus(),
 				ClientResponse.Status.OK.getStatusCode(),
 				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
-		this.rspEntity = extractBodyAsDocument(rsp, ProtocolBinding.ANY);
+		this.rspEntity = extractBodyAsDocument(rsp);
 		ETSAssert.assertSpatialReference(this.rspEntity, otherCRSId);
 	}
 
@@ -195,7 +195,7 @@ public class BasicGetFeatureTests extends BaseFixture {
 		Assert.assertEquals(rsp.getStatus(),
 				ClientResponse.Status.BAD_REQUEST.getStatusCode(),
 				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
-		this.rspEntity = extractBodyAsDocument(rsp, ProtocolBinding.ANY);
+		this.rspEntity = extractBodyAsDocument(rsp);
 		ETSAssert.assertExceptionReport(this.rspEntity,
 				"InvalidParameterValue", "SRSNAME");
 	}

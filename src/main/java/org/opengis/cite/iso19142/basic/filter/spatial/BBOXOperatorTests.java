@@ -94,7 +94,7 @@ public class BBOXOperatorTests extends QueryFilterFixture {
 				this.wfsMetadata, WFS2.GET_FEATURE, binding);
 		ClientResponse rsp = wfsClient.submitRequest(new DOMSource(reqEntity),
 				binding, endpoint);
-		this.rspEntity = extractBodyAsDocument(rsp, binding);
+		this.rspEntity = extractBodyAsDocument(rsp);
 		Assert.assertEquals(rsp.getStatus(),
 				ClientResponse.Status.OK.getStatusCode(),
 				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
@@ -150,7 +150,7 @@ public class BBOXOperatorTests extends QueryFilterFixture {
 				.getGeoExtent());
 		addBBOXPredicate(this.reqEntity, gmlEnv.getDocumentElement(), valueRef);
 		ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
-		this.rspEntity = extractBodyAsDocument(rsp, binding);
+		this.rspEntity = extractBodyAsDocument(rsp);
 		Assert.assertEquals(rsp.getStatus(),
 				ClientResponse.Status.OK.getStatusCode(),
 				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));

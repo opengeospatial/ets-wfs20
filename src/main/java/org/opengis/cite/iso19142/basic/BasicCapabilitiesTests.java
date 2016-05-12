@@ -109,7 +109,7 @@ public class BasicCapabilitiesTests extends BaseFixture {
 				binding, endpoint);
 		Assert.assertTrue(rsp.hasEntity(),
 				ErrorMessage.get(ErrorMessageKeys.MISSING_XML_ENTITY));
-		Document entity = extractBodyAsDocument(rsp, binding);
+		Document entity = extractBodyAsDocument(rsp);
 		SchematronValidator validator = ValidationUtils
 				.buildSchematronValidator(SCHEMATRON_METADATA, BASIC_WFS_PHASE);
 		DOMResult result = validator.validate(new DOMSource(entity, entity

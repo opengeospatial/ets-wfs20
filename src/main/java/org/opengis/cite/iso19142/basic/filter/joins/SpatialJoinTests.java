@@ -1,9 +1,11 @@
 package org.opengis.cite.iso19142.basic.filter.joins;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
@@ -14,12 +16,17 @@ import org.opengis.cite.iso19142.ConformanceClass;
 import org.opengis.cite.iso19142.ErrorMessage;
 import org.opengis.cite.iso19142.ErrorMessageKeys;
 import org.opengis.cite.iso19142.Namespaces;
+import org.opengis.cite.iso19142.ProtocolBinding;
 import org.opengis.cite.iso19142.basic.filter.QueryFilterFixture;
 import org.opengis.cite.iso19142.util.AppSchemaUtils;
+import org.opengis.cite.iso19142.util.FeatureProperty;
 import org.opengis.cite.iso19142.util.ServiceMetadataUtils;
+import org.testng.Assert;
 import org.testng.SkipException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import com.sun.jersey.api.client.ClientResponse;
 
 /**
  * A spatial join includes a spatial predicate. One or more of the following
@@ -58,6 +65,14 @@ import org.testng.annotations.Test;
  * &lt;/wfs:GetFeature&gt;
  * </pre>
  *
+ * <p style="margin-bottom: 0.5em">
+ * <strong>Sources</strong>
+ * </p>
+ * <ul>
+ * <li>OGC 09-025r2, 7.9.2.5.3: Join processing</li>
+ * <li>OGC 09-025r2, A.1.12: Spatial joins</li>
+ * <li>OGC 09-026r2, A.8: Test cases for spatial filter</li>
+ * </ul>
  */
 public class SpatialJoinTests extends QueryFilterFixture {
 
@@ -69,7 +84,7 @@ public class SpatialJoinTests extends QueryFilterFixture {
 
 	/**
 	 * Searches the application schema for geometry properties where the value
-	 * is consistent with the given type.
+	 * is an instance of the given type.
 	 * 
 	 * @param gmlTypeName
 	 *            The name of a GML geometry type (may be abstract).
@@ -92,6 +107,11 @@ public class SpatialJoinTests extends QueryFilterFixture {
 		return geomProps;
 	}
 
+	/**
+	 * Finds surface, curve, and point properties defined in the application
+	 * schema. Properties that use primitive types are preferred, but if none
+	 * are defined then aggregate geometry types (Multi*) will be used instead.
+	 */
 	@BeforeClass
 	public void findGeometryPropertiesToJoin() {
 		if (!ServiceMetadataUtils.getConformanceClaims(this.wfsMetadata)
@@ -117,19 +137,29 @@ public class SpatialJoinTests extends QueryFilterFixture {
 		LOGR.info(this.pointProps.toString());
 	}
 
-	@Test(description = "")
+	/**
+	 * [{@code Test}] Submits a basic join query that includes the
+	 * <code>Intersects</code> operator. A projection clause (wfs:PropertyName)
+	 * is omitted, so the response entity is expected to contain instances of
+	 * both feature types.
+	 */
+	@Test(description = "See OGC 09-025r2: 7.9.2.5.3, A.1.12")
 	public void joinWithIntersects() {
 		if (!ServiceMetadataUtils.implementsSpatialOperator(this.wfsMetadata,
 				"Intersects")) {
 			throw new SkipException(ErrorMessage.format(
 					ErrorMessageKeys.NOT_IMPLEMENTED, "Intersects operator"));
 		}
+		List<FeatureProperty> joinProperties = new ArrayList<FeatureProperty>();
 		if (this.surfaceProps.size() > 1) {
-			// Two surface properties
 			Iterator<Map.Entry<QName, List<XSElementDeclaration>>> itr = this.surfaceProps
 					.entrySet().iterator();
-			JoinQueryUtils.appendSpatialJoinQuery(this.reqEntity, "Intersects",
-					itr.next(), itr.next());
+			Entry<QName, List<XSElementDeclaration>> entry = itr.next();
+			joinProperties.add(new FeatureProperty(entry.getKey(), entry
+					.getValue().get(0)));
+			entry = itr.next();
+			joinProperties.add(new FeatureProperty(entry.getKey(), entry
+					.getValue().get(0)));
 		} else if (!this.surfaceProps.isEmpty() && !this.curveProps.isEmpty()) {
 			// Surface propertry and curve prop
 		} else if (!this.surfaceProps.isEmpty() && !this.pointProps.isEmpty()) {
@@ -137,6 +167,15 @@ public class SpatialJoinTests extends QueryFilterFixture {
 		} else if (this.curveProps.size() > 1) {
 			// Two curve properties
 		}
+		JoinQueryUtils.appendSpatialJoinQuery(this.reqEntity, "Intersects",
+				joinProperties);
+		ClientResponse rsp = wfsClient.submitRequest(this.reqEntity,
+				ProtocolBinding.ANY);
+		this.rspEntity = extractBodyAsDocument(rsp);
+		Assert.assertEquals(rsp.getStatus(),
+				ClientResponse.Status.OK.getStatusCode(),
+				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
+		// TODO check entity body: F1 intersects F2
 	}
 
 	public void selfJoinWithIntersects() {

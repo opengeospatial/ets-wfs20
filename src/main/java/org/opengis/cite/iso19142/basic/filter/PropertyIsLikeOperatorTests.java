@@ -70,7 +70,7 @@ public class PropertyIsLikeOperatorTests extends QueryFilterFixture {
 		addPropertyIsLikePredicate(this.reqEntity, propPattern.getKey(),
 				propPattern.getValue(), true);
 		ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
-		this.rspEntity = extractBodyAsDocument(rsp, binding);
+		this.rspEntity = extractBodyAsDocument(rsp);
 		Assert.assertEquals(rsp.getStatus(),
 				ClientResponse.Status.OK.getStatusCode(),
 				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
@@ -113,7 +113,7 @@ public class PropertyIsLikeOperatorTests extends QueryFilterFixture {
 		addPropertyIsLikePredicate(this.reqEntity, propPattern.getKey(),
 				propPattern.getValue(), false);
 		ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
-		this.rspEntity = extractBodyAsDocument(rsp, binding);
+		this.rspEntity = extractBodyAsDocument(rsp);
 		Assert.assertEquals(rsp.getStatus(),
 				ClientResponse.Status.OK.getStatusCode(),
 				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));

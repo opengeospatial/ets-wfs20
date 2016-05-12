@@ -85,7 +85,7 @@ public class GetPropertyValueTests extends BaseFixture {
 				binding, endpoint);
 		Assert.assertTrue(rsp.hasEntity(),
 				ErrorMessage.get(ErrorMessageKeys.MISSING_XML_ENTITY));
-		Document entity = extractBodyAsDocument(rsp, binding);
+		Document entity = extractBodyAsDocument(rsp);
 		ETSAssert.assertQualifiedName(entity.getDocumentElement(), new QName(
 				Namespaces.WFS, WFS2.VALUE_COLLECTION));
 		NodeList members = entity.getElementsByTagNameNS(Namespaces.WFS,
@@ -116,7 +116,7 @@ public class GetPropertyValueTests extends BaseFixture {
 				binding, endpoint);
 		Assert.assertTrue(rsp.hasEntity(),
 				ErrorMessage.get(ErrorMessageKeys.MISSING_XML_ENTITY));
-		Document entity = extractBodyAsDocument(rsp, binding);
+		Document entity = extractBodyAsDocument(rsp);
 		ETSAssert.assertXPath(
 				"//ows:Exception/@exceptionCode = 'InvalidParameterValue'",
 				entity.getDocumentElement(), null);

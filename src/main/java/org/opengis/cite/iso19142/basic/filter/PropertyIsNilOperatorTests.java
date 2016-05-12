@@ -121,7 +121,7 @@ public class PropertyIsNilOperatorTests extends QueryFilterFixture {
 			QName propName = new QName(prop.getNamespace(), prop.getName());
 			addPropertyIsNilPredicate(this.reqEntity, propName, null, false);
 			ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
-			this.rspEntity = extractBodyAsDocument(rsp, binding);
+			this.rspEntity = extractBodyAsDocument(rsp);
 			Assert.assertEquals(rsp.getStatus(),
 					ClientResponse.Status.OK.getStatusCode(),
 					ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));

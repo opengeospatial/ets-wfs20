@@ -87,7 +87,7 @@ public class DescribeStoredQueriesTests extends BaseFixture {
 				binding, endpoint);
 		Assert.assertTrue(rsp.hasEntity(),
 				ErrorMessage.get(ErrorMessageKeys.MISSING_XML_ENTITY));
-		this.rspEntity = extractBodyAsDocument(rsp, binding);
+		this.rspEntity = extractBodyAsDocument(rsp);
 		Validator validator = this.wfsSchema.newValidator();
 		ValidationErrorHandler errHandler = new ValidationErrorHandler();
 		validator.setErrorHandler(errHandler);
@@ -132,7 +132,7 @@ public class DescribeStoredQueriesTests extends BaseFixture {
 				binding, endpoint);
 		Assert.assertTrue(rsp.hasEntity(),
 				ErrorMessage.get(ErrorMessageKeys.MISSING_XML_ENTITY));
-		this.rspEntity = extractBodyAsDocument(rsp, binding);
+		this.rspEntity = extractBodyAsDocument(rsp);
 		String xpath = String.format("//wfs:StoredQueryDescription[@id='%s']",
 				queryId);
 		ETSAssert.assertXPath(xpath, this.rspEntity.getDocumentElement(), null);

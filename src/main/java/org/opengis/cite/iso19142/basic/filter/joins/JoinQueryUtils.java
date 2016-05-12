@@ -1,7 +1,6 @@
 package org.opengis.cite.iso19142.basic.filter.joins;
 
 import java.util.List;
-import java.util.Map.Entry;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
@@ -9,6 +8,7 @@ import javax.xml.namespace.QName;
 import org.apache.xerces.xs.XSElementDeclaration;
 import org.opengis.cite.iso19142.Namespaces;
 import org.opengis.cite.iso19142.WFS2;
+import org.opengis.cite.iso19142.util.FeatureProperty;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -25,14 +25,11 @@ public class JoinQueryUtils {
 	 * @param operator
 	 *            The name of a spatial operator.
 	 * @param properties
-	 *            A sequence of (2) map entries specifying the feature
-	 *            properties in the join condition; the QName key identifies the
-	 *            feature type for which a property is defined (the first
-	 *            property is used if there is more than one in the list).
+	 *            A sequence of (2) FeatureProperty descriptors that identify
+	 *            the feature properties in the join condition.
 	 */
-	@SafeVarargs
 	public static void appendSpatialJoinQuery(Document req, String operator,
-			Entry<QName, List<XSElementDeclaration>>... properties) {
+			List<FeatureProperty> properties) {
 		if (!req.getDocumentElement().getLocalName().equals(WFS2.GET_FEATURE)) {
 			throw new IllegalArgumentException("Not a GetFeature request: "
 					+ req.getDocumentElement().getNodeName());
@@ -40,17 +37,17 @@ public class JoinQueryUtils {
 		if (null == properties) {
 			throw new NullPointerException("Feature properties are required.");
 		}
-		if (properties.length != 2) {
+		if (properties.size() != 2) {
 			throw new IllegalArgumentException(
 					"Two feature properties are required, but received "
-							+ properties.length);
+							+ properties.size());
 		}
 		Element docElem = req.getDocumentElement();
 		Element qryElem = req.createElementNS(Namespaces.WFS, "wfs:Query");
 		docElem.appendChild(qryElem);
 		StringBuilder typeNames = new StringBuilder();
-		for (Entry<QName, List<XSElementDeclaration>> entry : properties) {
-			QName featureType = entry.getKey();
+		for (FeatureProperty property : properties) {
+			QName featureType = property.getFeatureType();
 			// look for prefix already bound to this namespace URI
 			String nsPrefix = qryElem.lookupPrefix(featureType
 					.getNamespaceURI());
@@ -67,8 +64,8 @@ public class JoinQueryUtils {
 		qryElem.appendChild(filter);
 		Element predicateElem = req.createElementNS(Namespaces.FES, operator);
 		filter.appendChild(predicateElem);
-		appendValueRefToPredicate(predicateElem, properties[0]);
-		appendValueRefToPredicate(predicateElem, properties[1]);
+		appendValueRefToPredicate(predicateElem, properties.get(0));
+		appendValueRefToPredicate(predicateElem, properties.get(1));
 	}
 
 	/**
@@ -77,16 +74,14 @@ public class JoinQueryUtils {
 	 * @param predicateElem
 	 *            An Element representing a predicate (operator).
 	 * @param featureProperty
-	 *            A map entry (key-value pair), where the key identifies the
-	 *            feature type and the value is a list of properties; the first
-	 *            property is used if there is more than one.
+	 *            A FeatureProperty descriptor.
 	 */
 	public static void appendValueRefToPredicate(Element predicateElem,
-			Entry<QName, List<XSElementDeclaration>> featureProperty) {
+			FeatureProperty featureProperty) {
 		Element valueRef = predicateElem.getOwnerDocument().createElementNS(
 				Namespaces.FES, "ValueReference");
 		predicateElem.appendChild(valueRef);
-		XSElementDeclaration propDecl = featureProperty.getValue().get(0);
+		XSElementDeclaration propDecl = featureProperty.getDeclaration();
 		String nsURI = propDecl.getNamespace();
 		String propPrefix = predicateElem.lookupPrefix(nsURI);
 		if (null == propPrefix) {
@@ -94,7 +89,7 @@ public class JoinQueryUtils {
 			valueRef.setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI,
 					"xmlns:" + propPrefix, nsURI);
 		}
-		QName featureType = featureProperty.getKey();
+		QName featureType = featureProperty.getFeatureType();
 		String typePrefix = predicateElem.lookupPrefix(featureType
 				.getNamespaceURI());
 		StringBuilder xpath = new StringBuilder();
@@ -103,4 +98,5 @@ public class JoinQueryUtils {
 		xpath.append(propDecl.getName());
 		valueRef.setTextContent(xpath.toString());
 	}
+
 }

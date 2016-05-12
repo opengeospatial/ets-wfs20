@@ -110,7 +110,7 @@ public class StoredQueryTests extends BaseFixture {
 				this.wfsMetadata, WFS2.GET_FEATURE, binding);
 		ClientResponse rsp = wfsClient.submitRequest(new DOMSource(
 				this.reqEntity), binding, endpoint);
-		this.rspEntity = extractBodyAsDocument(rsp, binding);
+		this.rspEntity = extractBodyAsDocument(rsp);
 		Assert.assertTrue(rsp.hasEntity(),
 				ErrorMessage.get(ErrorMessageKeys.MISSING_XML_ENTITY));
 		SchematronValidator validator = ValidationUtils
@@ -150,7 +150,7 @@ public class StoredQueryTests extends BaseFixture {
 				this.wfsMetadata, WFS2.GET_FEATURE, binding);
 		ClientResponse rsp = wfsClient.submitRequest(new DOMSource(
 				this.reqEntity), binding, endpoint);
-		this.rspEntity = extractBodyAsDocument(rsp, binding);
+		this.rspEntity = extractBodyAsDocument(rsp);
 		int statusCode = rsp.getStatus();
 		if (this.wfsVersion.equals("2.0.0")) {
 			Assert.assertTrue(
@@ -190,7 +190,7 @@ public class StoredQueryTests extends BaseFixture {
 				this.wfsMetadata, WFS2.GET_FEATURE, binding);
 		ClientResponse rsp = wfsClient.submitRequest(new DOMSource(
 				this.reqEntity), binding, endpoint);
-		this.rspEntity = extractBodyAsDocument(rsp, binding);
+		this.rspEntity = extractBodyAsDocument(rsp);
 		Assert.assertTrue(rsp.hasEntity(),
 				ErrorMessage.get(ErrorMessageKeys.MISSING_XML_ENTITY));
 		Element feature = this.rspEntity.getDocumentElement();
@@ -263,7 +263,7 @@ public class StoredQueryTests extends BaseFixture {
 				this.wfsMetadata, WFS2.GET_FEATURE, binding);
 		ClientResponse rsp = wfsClient.submitRequest(new DOMSource(
 				this.reqEntity), binding, endpoint);
-		Document entity = extractBodyAsDocument(rsp, binding);
+		Document entity = extractBodyAsDocument(rsp);
 		String xpath = "/wfs:FeatureCollection/wfs:member/*";
 		Map<String, String> bindings = new HashMap<String, String>();
 		bindings.put(Namespaces.WFS, "wfs");

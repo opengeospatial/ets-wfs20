@@ -79,7 +79,7 @@ public class ListStoredQueriesTests extends BaseFixture {
 				this.reqEntity), binding, endpoint);
 		Assert.assertTrue(rsp.hasEntity(),
 				ErrorMessage.get(ErrorMessageKeys.MISSING_XML_ENTITY));
-		this.rspEntity = extractBodyAsDocument(rsp, binding);
+		this.rspEntity = extractBodyAsDocument(rsp);
 		Validator validator = this.wfsSchema.newValidator();
 		ValidationErrorHandler errHandler = new ValidationErrorHandler();
 		validator.setErrorHandler(errHandler);

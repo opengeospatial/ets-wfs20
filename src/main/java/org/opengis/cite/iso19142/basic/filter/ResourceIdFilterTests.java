@@ -58,7 +58,7 @@ public class ResourceIdFilterTests extends QueryFilterFixture {
 				featureType, 2);
 		WFSRequest.addResourceIdPredicate(this.reqEntity, idSet);
 		ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
-		this.rspEntity = extractBodyAsDocument(rsp, binding);
+		this.rspEntity = extractBodyAsDocument(rsp);
 		Assert.assertEquals(rsp.getStatus(),
 				ClientResponse.Status.OK.getStatusCode(),
 				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
@@ -86,7 +86,7 @@ public class ResourceIdFilterTests extends QueryFilterFixture {
 		idSet.add("test-" + UUID.randomUUID());
 		WFSRequest.addResourceIdPredicate(this.reqEntity, idSet);
 		ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
-		this.rspEntity = extractBodyAsDocument(rsp, binding);
+		this.rspEntity = extractBodyAsDocument(rsp);
 		Assert.assertEquals(rsp.getStatus(),
 				ClientResponse.Status.OK.getStatusCode(),
 				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
@@ -122,7 +122,7 @@ public class ResourceIdFilterTests extends QueryFilterFixture {
 		idSet.add(featureId);
 		WFSRequest.addResourceIdPredicate(this.reqEntity, idSet);
 		ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
-		this.rspEntity = extractBodyAsDocument(rsp, binding);
+		this.rspEntity = extractBodyAsDocument(rsp);
 		Assert.assertEquals(rsp.getStatus(),
 				ClientResponse.Status.BAD_REQUEST.getStatusCode(),
 				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));

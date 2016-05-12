@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
 import javax.xml.xpath.XPath;
@@ -34,6 +35,9 @@ import org.w3c.dom.NodeList;
  * Provides various utility methods for accessing service metadata.
  */
 public class ServiceMetadataUtils {
+
+	private static final Logger LOGR = Logger
+			.getLogger(ServiceMetadataUtils.class.getPackage().getName());
 
 	/**
 	 * Extracts a request endpoint from a WFS capabilities document. If the
@@ -156,6 +160,7 @@ public class ServiceMetadataUtils {
 			Node typeName = typeNames.item(i);
 			featureTypes.add(buildQName(typeName));
 		}
+		LOGR.fine(featureTypes.toString());
 		return featureTypes;
 	}
 

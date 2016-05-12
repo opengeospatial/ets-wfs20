@@ -107,7 +107,7 @@ public class ComparisonOperatorTests extends QueryFilterFixture {
 		addComparisonPredicate(this.reqEntity, FES2.LESS_THAN, propName,
 				propValue, true, MATCH_ANY);
 		ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
-		this.rspEntity = extractBodyAsDocument(rsp, binding);
+		this.rspEntity = extractBodyAsDocument(rsp);
 		Assert.assertEquals(rsp.getStatus(),
 				ClientResponse.Status.OK.getStatusCode(),
 				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
@@ -159,7 +159,7 @@ public class ComparisonOperatorTests extends QueryFilterFixture {
 		addComparisonPredicate(this.reqEntity, FES2.LESS_THAN, propName,
 				propValue, true, MATCH_ALL);
 		ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
-		this.rspEntity = extractBodyAsDocument(rsp, binding);
+		this.rspEntity = extractBodyAsDocument(rsp);
 		Assert.assertEquals(rsp.getStatus(),
 				ClientResponse.Status.OK.getStatusCode(),
 				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
@@ -211,7 +211,7 @@ public class ComparisonOperatorTests extends QueryFilterFixture {
 		addComparisonPredicate(this.reqEntity, FES2.GREATER_THAN, propName,
 				propValue, true, MATCH_ANY);
 		ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
-		this.rspEntity = extractBodyAsDocument(rsp, binding);
+		this.rspEntity = extractBodyAsDocument(rsp);
 		Assert.assertEquals(rsp.getStatus(),
 				ClientResponse.Status.OK.getStatusCode(),
 				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
@@ -263,7 +263,7 @@ public class ComparisonOperatorTests extends QueryFilterFixture {
 		addComparisonPredicate(this.reqEntity, FES2.GREATER_THAN_OR_EQUAL,
 				propName, propValue, true, MATCH_ANY);
 		ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
-		this.rspEntity = extractBodyAsDocument(rsp, binding);
+		this.rspEntity = extractBodyAsDocument(rsp);
 		Assert.assertEquals(rsp.getStatus(),
 				ClientResponse.Status.OK.getStatusCode(),
 				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
@@ -316,7 +316,7 @@ public class ComparisonOperatorTests extends QueryFilterFixture {
 		addComparisonPredicate(this.reqEntity, FES2.LESS_THAN_OR_EQUAL,
 				propName, propValue, true, MATCH_ANY);
 		ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
-		this.rspEntity = extractBodyAsDocument(rsp, binding);
+		this.rspEntity = extractBodyAsDocument(rsp);
 		Assert.assertEquals(rsp.getStatus(),
 				ClientResponse.Status.OK.getStatusCode(),
 				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));

@@ -156,7 +156,7 @@ public class SimpleCapabilitiesTests extends BaseFixture {
 				entityStream), binding, endpoint);
 		Assert.assertTrue(rsp.hasEntity(),
 				ErrorMessage.get(ErrorMessageKeys.MISSING_XML_ENTITY));
-		this.rspEntity = extractBodyAsDocument(rsp, binding);
+		this.rspEntity = extractBodyAsDocument(rsp);
 		String xpath = "/wfs:WFS_Capabilities/@version = '2.0.0'";
 		ETSAssert.assertXPath(xpath, this.rspEntity.getDocumentElement(), null);
 	}

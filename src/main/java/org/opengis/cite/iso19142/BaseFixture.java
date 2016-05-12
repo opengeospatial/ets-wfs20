@@ -85,7 +85,6 @@ public class BaseFixture {
 	 * @param testContext
 	 *            The test (set) context.
 	 */
-
 	@BeforeClass(alwaysRun = true)
 	@SuppressWarnings("unchecked")
 	public void initBaseFixture(ITestContext testContext) {
@@ -193,8 +192,8 @@ public class BaseFixture {
 	 */
 	@DataProvider(name = "feature-types")
 	public Object[][] getFeatureTypes() {
-		Object[][] typeNames = new Object[featureTypes.size()][];
-		Iterator<QName> itr = featureTypes.iterator();
+		Object[][] typeNames = new Object[this.featureTypes.size()][];
+		Iterator<QName> itr = this.featureTypes.iterator();
 		for (int i = 0; i < typeNames.length; i++) {
 			typeNames[i] = new Object[] { itr.next() };
 		}
@@ -281,30 +280,24 @@ public class BaseFixture {
 
 	/**
 	 * Extracts the body of the response message as a DOM Document node. For a
-	 * SOAP response this will contain the content of the first child of the
-	 * SOAP body element.
+	 * SOAP response this will contain the content of the SOAP body element.
 	 * 
 	 * @param rsp
 	 *            A ClientResponse representing an HTTP response message.
-	 * @param binding
-	 *            The protocol binding used in the request; this is ignored
-	 *            (obsolete).
 	 * @return A Document representing the response entity, or {@code null} if
 	 *         it could not be parsed.
 	 */
-	protected Document extractBodyAsDocument(ClientResponse rsp,
-			ProtocolBinding binding) {
+	protected Document extractBodyAsDocument(ClientResponse rsp) {
 		Document entity = rsp.getEntity(Document.class);
-		Element soapBody;
 		try {
-			soapBody = (Element) XMLUtils.evaluateXPath(entity,
+			Element soapBody = (Element) XMLUtils.evaluateXPath(entity,
 					"//soap11:Body/*[1] | //soap:Body/*[1]", null,
 					XPathConstants.NODE);
+			if (null != soapBody) {
+				entity.replaceChild(soapBody, entity.getDocumentElement());
+			}
 		} catch (XPathExpressionException xpe) {
 			throw new RuntimeException(xpe);
-		}
-		if (null != soapBody) {
-			entity.replaceChild(soapBody, entity.getDocumentElement());
 		}
 		return entity;
 	}

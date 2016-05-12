@@ -106,7 +106,7 @@ public class ETSAssert {
 			// An implementation for the W3C DOM is always available
 		}
 		XPath xpath = factory.newXPath();
-		LOGR.log(Level.FINE, "Using XPath implementation: "
+		LOGR.log(Level.FINER, "Using XPath implementation: "
 				+ xpath.getClass().getName());
 		xpath.setNamespaceContext(bindings);
 		Boolean result;

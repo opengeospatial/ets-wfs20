@@ -4,23 +4,19 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.InputStream;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.xml.namespace.QName;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 
-import org.apache.xerces.xs.XSElementDeclaration;
 import org.apache.xerces.xs.XSModel;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opengis.cite.iso19142.CommonTestFixture;
 import org.opengis.cite.iso19142.Namespaces;
+import org.opengis.cite.iso19142.util.FeatureProperty;
 import org.opengis.cite.iso19142.util.VerifyAppSchemaUtils;
 import org.opengis.cite.iso19142.util.WFSRequest;
 import org.opengis.cite.validation.XSModelBuilder;
@@ -54,7 +50,7 @@ public class VerifyJoinQueryUtils extends CommonTestFixture {
 		thrown.expectMessage("Feature properties are required");
 		Document reqEntity = WFSRequest.createRequestEntity(
 				"GetFeature-Minimal", "2.0.0");
-		Entry<QName, List<XSElementDeclaration>>[] geomProps = null;
+		List<FeatureProperty> geomProps = null;
 		JoinQueryUtils.appendSpatialJoinQuery(reqEntity, "Intersects",
 				geomProps);
 	}
@@ -63,17 +59,13 @@ public class VerifyJoinQueryUtils extends CommonTestFixture {
 	public void buildIntersectsQuery() {
 		Document reqEntity = WFSRequest.createRequestEntity(
 				"GetFeature-Minimal", "2.0.0");
-		Map<QName, List<XSElementDeclaration>> geomProps = new HashMap<QName, List<XSElementDeclaration>>();
-		geomProps.put(new QName(NS1, "SimpleFeature"), Arrays
-				.asList(new XSElementDeclaration[] { model
-						.getElementDeclaration("lineProperty", NS1) }));
-		geomProps.put(new QName(NS1, "ComplexFeature"), Arrays
-				.asList(new XSElementDeclaration[] { model
-						.getElementDeclaration("multiGeomProperty", NS1) }));
-		Iterator<Map.Entry<QName, List<XSElementDeclaration>>> itr = geomProps
-				.entrySet().iterator();
+		List<FeatureProperty> geomProps = new ArrayList<FeatureProperty>();
+		geomProps.add(new FeatureProperty(new QName(NS1, "SimpleFeature"),
+				model.getElementDeclaration("lineProperty", NS1)));
+		geomProps.add(new FeatureProperty(new QName(NS1, "ComplexFeature"),
+				model.getElementDeclaration("multiGeomProperty", NS1)));
 		JoinQueryUtils.appendSpatialJoinQuery(reqEntity, "Intersects",
-				itr.next(), itr.next());
+				geomProps);
 		NodeList valueRefs = reqEntity.getElementsByTagNameNS(FES,
 				"ValueReference");
 		assertEquals("Unexpected number of fes:ValueReference elements.", 2,
