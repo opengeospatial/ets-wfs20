@@ -12,7 +12,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opengis.cite.iso19142.CommonTestFixture;
 import org.opengis.cite.iso19142.Namespaces;
-import org.opengis.cite.iso19142.basic.filter.spatial.BBOXOperatorTests;
+import org.opengis.cite.iso19142.basic.filter.spatial.BBOXTests;
 import org.opengis.cite.iso19142.util.WFSRequest;
 import org.opengis.cite.iso19142.util.XMLUtils;
 import org.testng.ISuite;
@@ -24,15 +24,15 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
- * Verifies the behavior of the BBOXOperatorTests class.
+ * Verifies the behavior of the BBOXTests class.
  */
-public class VerifyBBOXOperatorTests extends CommonTestFixture {
+public class VerifyBBOXTests extends CommonTestFixture {
 
 	private static final String NS1 = "http://example.org/ns1";
 	private static ITestContext testContext;
 	private static ISuite suite;
 
-	public VerifyBBOXOperatorTests() {
+	public VerifyBBOXTests() {
 	}
 
 	@BeforeClass
@@ -49,7 +49,7 @@ public class VerifyBBOXOperatorTests extends CommonTestFixture {
 		WFSRequest.appendSimpleQuery(req, new QName(NS1, "Type1"));
 		Document env = docBuilder.parse(this.getClass().getResourceAsStream(
 				"/Envelope.xml"));
-		BBOXOperatorTests iut = new BBOXOperatorTests();
+		BBOXTests iut = new BBOXTests();
 		iut.addBBOXPredicate(req, env.getDocumentElement(), null);
 		NodeList envElems = req.getElementsByTagNameNS(Namespaces.GML,
 				"Envelope");
@@ -64,7 +64,7 @@ public class VerifyBBOXOperatorTests extends CommonTestFixture {
 		WFSRequest.appendSimpleQuery(req, new QName(NS1, "Type1"));
 		Document env = docBuilder.parse(this.getClass().getResourceAsStream(
 				"/Envelope.xml"));
-		BBOXOperatorTests iut = new BBOXOperatorTests();
+		BBOXTests iut = new BBOXTests();
 		Element valueRef = XMLUtils.createElement(new QName(Namespaces.FES,
 				"ValueReference", "fes"));
 		valueRef.setTextContent("tns:geom");

@@ -49,7 +49,7 @@ import com.sun.jersey.api.client.ClientResponse;
  * <li>OGC 09-026r2, cl. A.7: Test cases for minimum spatial filter</li>
  * </ul>
  */
-public class BBOXOperatorTests extends QueryFilterFixture {
+public class BBOXTests extends QueryFilterFixture {
 
 	private static final String XSLT_ENV2POLYGON = "/org/opengis/cite/iso19142/util/bbox2polygon.xsl";
 	private XSTypeDefinition gmlGeomBaseType;
