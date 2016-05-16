@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.xerces.xs.XSElementDeclaration;
@@ -46,6 +47,7 @@ public class IntersectsTests extends QueryFilterFixture {
 
 	private static final String INTERSECTS_OP = "Intersects";
 	private XSTypeDefinition gmlGeomBaseType;
+	private static final String XSLT_ENV2POLYGON = "/org/opengis/cite/iso19142/util/bbox2polygon.xsl";
 
 	/**
 	 * Creates an XSTypeDefinition object representing the
@@ -58,11 +60,23 @@ public class IntersectsTests extends QueryFilterFixture {
 	}
 
 	/**
-	 * [{@code Test}] Submits a GetFeature request with a non-specific BBOX
-	 * predicate. If no value reference is specified the predicate is applied to
-	 * all spatial properties. The response entity (wfs:FeatureCollection) must
-	 * be schema-valid and contain only instances of the requested type that
-	 * satisfy the spatial predicate.
+	 * Checks if the spatial operator "Intersects" is supported. If not, all
+	 * tests for this operator are skipped.
+	 */
+	@BeforeClass
+	public void implementsIntersectsOp() {
+		if (!ServiceMetadataUtils.implementsSpatialOperator(this.wfsMetadata,
+				"Intersects")) {
+			throw new SkipException(ErrorMessage.format(
+					ErrorMessageKeys.NOT_IMPLEMENTED, "Intersects operator"));
+		}
+	}
+
+	/**
+	 * [{@code Test}] Submits a GetFeature request containing an Intersects
+	 * predicate with a gml:Polygon operand. The response entity must be
+	 * schema-valid and contain only instances of the requested type that
+	 * intersect the given polygon.
 	 * 
 	 * @param binding
 	 *            The ProtocolBinding to use for this request.
@@ -72,7 +86,7 @@ public class IntersectsTests extends QueryFilterFixture {
 	 * @see "ISO 19143:2010, 7.8.3.2: BBOX operator"
 	 */
 	@Test(description = "See ISO 19143: 7.8.3.2", dataProvider = "protocol-featureType")
-	public void curveInDefaultCRS(ProtocolBinding binding, QName featureType) {
+	public void intersectsPolygon(ProtocolBinding binding, QName featureType) {
 		List<XSElementDeclaration> geomProps = AppSchemaUtils
 				.getFeaturePropertiesByType(model, featureType, gmlGeomBaseType);
 		if (geomProps.isEmpty()) {
@@ -80,10 +94,13 @@ public class IntersectsTests extends QueryFilterFixture {
 					+ featureType);
 		}
 		WFSRequest.appendSimpleQuery(this.reqEntity, featureType);
-		Document gmlGeom = Extents.envelopeAsGML(featureInfo.get(featureType)
+		Document gmlEnv = Extents.envelopeAsGML(featureInfo.get(featureType)
 				.getGeoExtent());
+		Document gmlPolygon = XMLUtils.transform(new StreamSource(getClass()
+				.getResourceAsStream(XSLT_ENV2POLYGON)), gmlEnv);
+		Element valueRef = WFSRequest.createValueReference(geomProps.get(0));
 		addSpatialPredicate(this.reqEntity, INTERSECTS_OP,
-				gmlGeom.getDocumentElement(), null);
+				gmlPolygon.getDocumentElement(), valueRef);
 		URI endpoint = ServiceMetadataUtils.getOperationEndpoint(
 				this.wfsMetadata, WFS2.GET_FEATURE, binding);
 		ClientResponse rsp = wfsClient.submitRequest(new DOMSource(reqEntity),
@@ -107,13 +124,6 @@ public class IntersectsTests extends QueryFilterFixture {
 		for (int i = 0; i < members.getLength(); i++) {
 			ETSAssert.assertQualifiedName(members.item(i), featureType);
 		}
-	}
-
-	public void surfaceInOtherCRS(ProtocolBinding binding, QName featureType) {
-	}
-
-	public void geometryInUnsuppportedCRS(QName featureType) {
-		// exception
 	}
 
 	/**
