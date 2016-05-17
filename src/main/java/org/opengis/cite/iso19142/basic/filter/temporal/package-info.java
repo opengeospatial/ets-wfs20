@@ -4,7 +4,7 @@
  * specification:
  * 
  * <ul>
- * <li>During</li>
+ * <li>During (required for "Minimum Temporal Filter" conformance)</li>
  * <li>After</li>
  * <li>Before</li>
  * <li>Begins</li>
@@ -20,9 +20,9 @@
  * <li>AnyInteracts</li>
  * </ul>
  *
- * <p>The conformance class <em>Minimum Temporal Filter</em> only requires support for 
+ * <p>The conformance class "Minimum Temporal Filter" only requires support for 
  * the <strong>During</strong> operator. At least one other operator must be implemented 
- * to satisfy the requirements for <em>Temporal Filter</em> conformance.</p>
+ * to satisfy the requirements for "Temporal Filter" conformance.</p>
  * 
  * <p style="margin-bottom: 0.5em"><strong>Sources</strong></p>
  * <ul>

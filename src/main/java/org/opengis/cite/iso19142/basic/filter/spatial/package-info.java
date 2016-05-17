@@ -5,7 +5,7 @@
  * requirements of the <strong>Spatial Filter</strong> conformance class.
  * 
  * <ul>
- * <li>BBOX (mandatory)</li>
+ * <li>BBOX (required for "Basic WFS" conformance)</li>
  * <li>Equals</li>
  * <li>Disjoint</li>
  * <li>Intersects</li>

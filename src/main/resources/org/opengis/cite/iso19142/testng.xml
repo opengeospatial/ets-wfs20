@@ -35,7 +35,17 @@
   <test name="Basic WFS">
     <packages>
       <package name="org.opengis.cite.iso19142.basic" />
-      <package name="org.opengis.cite.iso19142.basic.filter.*" />
+      <package name="org.opengis.cite.iso19142.basic.filter" />
+    </packages>
+  </test>
+  <test name="Temporal filter">
+    <packages>
+      <package name="org.opengis.cite.iso19142.basic.filter.temporal" />
+    </packages>
+  </test>
+  <test name="Spatial filter">
+    <packages>
+      <package name="org.opengis.cite.iso19142.basic.filter.spatial" />
     </packages>
   </test>
   <test name="Spatial joins">

@@ -1,4 +1,4 @@
-package org.opengis.cite.iso19142.basic.filter.spatial;
+package org.opengis.cite.iso19142.basic.filter;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -20,7 +20,6 @@ import org.opengis.cite.iso19142.ErrorMessageKeys;
 import org.opengis.cite.iso19142.Namespaces;
 import org.opengis.cite.iso19142.ProtocolBinding;
 import org.opengis.cite.iso19142.WFS2;
-import org.opengis.cite.iso19142.basic.filter.QueryFilterFixture;
 import org.opengis.cite.iso19142.util.AppSchemaUtils;
 import org.opengis.cite.iso19142.util.ServiceMetadataUtils;
 import org.opengis.cite.iso19142.util.WFSRequest;

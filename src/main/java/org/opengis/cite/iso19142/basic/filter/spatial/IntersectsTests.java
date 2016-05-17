@@ -18,6 +18,7 @@ import org.opengis.cite.iso19142.ErrorMessage;
 import org.opengis.cite.iso19142.ErrorMessageKeys;
 import org.opengis.cite.iso19142.Namespaces;
 import org.opengis.cite.iso19142.ProtocolBinding;
+import org.opengis.cite.iso19142.SuiteAttribute;
 import org.opengis.cite.iso19142.WFS2;
 import org.opengis.cite.iso19142.basic.filter.QueryFilterFixture;
 import org.opengis.cite.iso19142.util.AppSchemaUtils;
@@ -25,8 +26,10 @@ import org.opengis.cite.iso19142.util.ServiceMetadataUtils;
 import org.opengis.cite.iso19142.util.WFSRequest;
 import org.opengis.cite.iso19142.util.XMLUtils;
 import org.testng.Assert;
+import org.testng.ITestContext;
 import org.testng.SkipException;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -45,9 +48,37 @@ import com.sun.jersey.api.client.ClientResponse;
  */
 public class IntersectsTests extends QueryFilterFixture {
 
+	public final static String IMPL_SPATIAL_FILTER = "ImplementsSpatialFilter";
 	private static final String INTERSECTS_OP = "Intersects";
 	private XSTypeDefinition gmlGeomBaseType;
 	private static final String XSLT_ENV2POLYGON = "/org/opengis/cite/iso19142/util/bbox2polygon.xsl";
+
+	/**
+	 * Checks the value of the filter constraint {@value #IMPL_SPATIAL_FILTER}
+	 * in the capabilities document. All tests are skipped if this is not
+	 * "TRUE".
+	 * 
+	 * @param testContext
+	 *            Information about the test run environment.
+	 */
+	@BeforeTest
+	public void implementsSpatialFilter(ITestContext testContext) {
+		this.wfsMetadata = (Document) testContext.getSuite().getAttribute(
+				SuiteAttribute.TEST_SUBJECT.getName());
+		String xpath = String.format(
+				"//fes:Constraint[@name='%s' and (ows:DefaultValue = 'TRUE')]",
+				IMPL_SPATIAL_FILTER);
+		NodeList result;
+		try {
+			result = XMLUtils.evaluateXPath(this.wfsMetadata, xpath, null);
+		} catch (XPathExpressionException e) {
+			throw new AssertionError(e.getMessage());
+		}
+		if (result.getLength() == 0) {
+			throw new SkipException(ErrorMessage.format(
+					ErrorMessageKeys.NOT_IMPLEMENTED, IMPL_SPATIAL_FILTER));
+		}
+	}
 
 	/**
 	 * Creates an XSTypeDefinition object representing the
