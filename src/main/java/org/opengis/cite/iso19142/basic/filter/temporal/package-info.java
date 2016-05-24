@@ -28,6 +28,7 @@
  * <ul>
  * <li>OGC 09-026r2, Table 1: FE conformance classes</li>
  * <li>OGC 09-026r2, 7.9: Temporal operators</li>
+ * <li>ISO 19108, Geographic information -- Temporal schema</li>
  * </ul>
  */
 package org.opengis.cite.iso19142.basic.filter.temporal;
