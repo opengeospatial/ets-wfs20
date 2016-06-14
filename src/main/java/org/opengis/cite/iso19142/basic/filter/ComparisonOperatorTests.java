@@ -1,5 +1,7 @@
 package org.opengis.cite.iso19142.basic.filter;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
@@ -8,11 +10,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
-import java.util.logging.Level;
 import java.util.Set;
+import java.util.logging.Level;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.DatatypeConverter;
@@ -70,7 +73,9 @@ import com.sun.jersey.api.client.ClientResponse;
  * </ul>
  */
 public class ComparisonOperatorTests extends QueryFilterFixture {
-
+    
+    private static final DecimalFormat FORMATTER = new DecimalFormat("##0.######", DecimalFormatSymbols.getInstance( Locale.ENGLISH ));
+    
 	private static String MATCH_ALL = "All";
 	private static String MATCH_ANY = "Any";
 
@@ -618,7 +623,7 @@ public class ComparisonOperatorTests extends QueryFilterFixture {
 				values[i] = dtFactory.newXMLGregorianCalendar(gCal).normalize()
 						.toString();
 			} else {
-				values[i] = objValues[i].toString();
+				values[i] = FORMATTER.format( (Double )objValues[i] );
 			}
 		}
 	}
