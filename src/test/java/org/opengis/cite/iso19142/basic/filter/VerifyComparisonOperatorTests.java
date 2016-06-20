@@ -133,6 +133,14 @@ public class VerifyComparisonOperatorTests {
     }
 
     @Test
+    public void sortNumericValuesWithENotation() {
+        String[] values = new String[] { "0.8", "1.20528E9", "1.20528E10" };
+        ComparisonOperatorTests iut = new ComparisonOperatorTests();
+        iut.sortValues(values);
+        assertEquals("Unexpected values[1].", "1205280000", values[1]);
+    }
+    
+    @Test
     public void sortDateTimeValues() {
         String[] values = new String[] { "2012-12-12T17:00:00+04:00",
                 "2012-12-12T10:00:00-08:00", "2012-12-12T17:00:00Z" };
