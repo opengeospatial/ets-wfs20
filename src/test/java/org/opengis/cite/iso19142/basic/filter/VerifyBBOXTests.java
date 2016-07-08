@@ -12,7 +12,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opengis.cite.iso19142.CommonTestFixture;
 import org.opengis.cite.iso19142.Namespaces;
-import org.opengis.cite.iso19142.util.WFSRequest;
+import org.opengis.cite.iso19142.util.WFSMessage;
 import org.opengis.cite.iso19142.util.XMLUtils;
 import org.testng.ISuite;
 import org.testng.ITestContext;
@@ -45,7 +45,7 @@ public class VerifyBBOXTests extends CommonTestFixture {
 	public void addBBOX() throws SAXException, IOException {
 		Document req = docBuilder.parse(this.getClass().getResourceAsStream(
 				"/GetFeature/GetFeature-Minimal.xml"));
-		WFSRequest.appendSimpleQuery(req, new QName(NS1, "Type1"));
+		WFSMessage.appendSimpleQuery(req, new QName(NS1, "Type1"));
 		Document env = docBuilder.parse(this.getClass().getResourceAsStream(
 				"/Envelope.xml"));
 		BBOXTests iut = new BBOXTests();
@@ -60,7 +60,7 @@ public class VerifyBBOXTests extends CommonTestFixture {
 	public void addBBOXWithValueReference() throws SAXException, IOException {
 		Document req = docBuilder.parse(this.getClass().getResourceAsStream(
 				"/GetFeature/GetFeature-Minimal.xml"));
-		WFSRequest.appendSimpleQuery(req, new QName(NS1, "Type1"));
+		WFSMessage.appendSimpleQuery(req, new QName(NS1, "Type1"));
 		Document env = docBuilder.parse(this.getClass().getResourceAsStream(
 				"/Envelope.xml"));
 		BBOXTests iut = new BBOXTests();

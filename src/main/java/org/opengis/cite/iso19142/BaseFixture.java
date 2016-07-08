@@ -19,7 +19,7 @@ import org.opengis.cite.iso19142.util.DataSampler;
 import org.opengis.cite.iso19142.util.ServiceMetadataUtils;
 import org.opengis.cite.iso19142.util.WFSClient;
 import org.opengis.cite.iso19142.util.TestSuiteLogger;
-import org.opengis.cite.iso19142.util.WFSRequest;
+import org.opengis.cite.iso19142.util.WFSMessage;
 import org.opengis.cite.iso19142.util.XMLUtils;
 import org.testng.ISuite;
 import org.testng.ITestContext;
@@ -141,8 +141,8 @@ public class BaseFixture {
 		if (null != this.reqEntity) {
 			String request = null;
 			Object[] params = result.getParameters();
-			if (WFSRequest.containsGetProtocolBinding(params)) {
-				request = WFSRequest.transformEntityToKVP(new DOMSource(
+			if (WFSMessage.containsGetProtocolBinding(params)) {
+				request = WFSMessage.transformEntityToKVP(new DOMSource(
 						this.reqEntity));
 			} else {
 				request = XMLUtils.writeNodeToString(this.reqEntity);

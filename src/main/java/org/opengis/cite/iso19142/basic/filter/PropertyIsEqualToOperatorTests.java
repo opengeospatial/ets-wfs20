@@ -17,7 +17,7 @@ import org.opengis.cite.iso19142.Namespaces;
 import org.opengis.cite.iso19142.ProtocolBinding;
 import org.opengis.cite.iso19142.WFS2;
 import org.opengis.cite.iso19142.util.AppSchemaUtils;
-import org.opengis.cite.iso19142.util.WFSRequest;
+import org.opengis.cite.iso19142.util.WFSMessage;
 import org.testng.Assert;
 import org.testng.SkipException;
 import org.testng.annotations.Test;
@@ -62,7 +62,7 @@ public class PropertyIsEqualToOperatorTests extends QueryFilterFixture {
     @Test(description = "See ISO 19143: 7.7.3.2", dataProvider = "protocol-featureType")
     public void propertyIsEqualTo_caseSensitive(ProtocolBinding binding,
             QName featureType) {
-        WFSRequest.appendSimpleQuery(this.reqEntity, featureType);
+        WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
         Map<XSElementDeclaration, String> propValueMap = findMatchingPropertyValue(featureType);
         if (propValueMap.isEmpty()) {
             throw new SkipException(
@@ -111,7 +111,7 @@ public class PropertyIsEqualToOperatorTests extends QueryFilterFixture {
     @Test(description = "See ISO 19143: 7.7.3.2", dataProvider = "protocol-featureType")
     public void propertyIsNotEqualTo_caseSensitive(ProtocolBinding binding,
             QName featureType) {
-        WFSRequest.appendSimpleQuery(this.reqEntity, featureType);
+        WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
         Map<XSElementDeclaration, String> propValueMap = findMatchingPropertyValue(featureType);
         if (propValueMap.isEmpty()) {
             throw new SkipException(

@@ -14,7 +14,7 @@ import org.opengis.cite.iso19142.Namespaces;
 import org.opengis.cite.iso19142.ProtocolBinding;
 import org.opengis.cite.iso19142.WFS2;
 import org.opengis.cite.iso19142.util.AppSchemaUtils;
-import org.opengis.cite.iso19142.util.WFSRequest;
+import org.opengis.cite.iso19142.util.WFSMessage;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
@@ -50,7 +50,7 @@ public class PropertyIsNullOperatorTests extends QueryFilterFixture {
 	 */
 	@Test(description = "See ISO 19143: 7.7.3.5", dataProvider = "protocol-featureType")
 	public void gmlNameIsNull(ProtocolBinding binding, QName featureType) {
-		WFSRequest.appendSimpleQuery(this.reqEntity, featureType);
+		WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
 		QName gmlName = new QName(Namespaces.GML, "name", "gml");
 		addPropertyIsNullPredicate(this.reqEntity, gmlName, false);
 		ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
@@ -78,7 +78,7 @@ public class PropertyIsNullOperatorTests extends QueryFilterFixture {
 	 */
 	@Test(description = "See ISO 19143: 7.7.3.5, 7.10", dataProvider = "protocol-featureType")
 	public void propertyIsNotNull(ProtocolBinding binding, QName featureType) {
-		WFSRequest.appendSimpleQuery(this.reqEntity, featureType);
+		WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
 		List<XSElementDeclaration> props = AppSchemaUtils
 				.getAllFeatureProperties(model, featureType);
 		// get last property in document order

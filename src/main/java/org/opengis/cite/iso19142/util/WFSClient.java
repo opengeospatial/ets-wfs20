@@ -137,9 +137,9 @@ public class WFSClient {
 			// use deprecated URN identifier in WFS 2.0.0
 			queryId = WFS2.QRY_GET_FEATURE_BY_ID_URN;
 		}
-		Document req = WFSRequest.createRequestEntity("GetFeature",
+		Document req = WFSMessage.createRequestEntity("GetFeature",
 				this.wfsVersion);
-		WFSRequest.appendStoredQuery(req, queryId, params);
+		WFSMessage.appendStoredQuery(req, queryId, params);
 		ProtocolBinding binding = globalBindings.iterator().next();
 		return retrieveXMLResponseEntity(req, binding);
 	}
@@ -163,13 +163,13 @@ public class WFSClient {
 		if (null == binding) {
 			binding = globalBindings.iterator().next();
 		}
-		Document req = WFSRequest.createRequestEntity("GetFeature",
+		Document req = WFSMessage.createRequestEntity("GetFeature",
 				this.wfsVersion);
 		if (count > 0) {
 			req.getDocumentElement().setAttribute("count",
 					Integer.toString(count));
 		}
-		WFSRequest.appendSimpleQuery(req, typeName);
+		WFSMessage.appendSimpleQuery(req, typeName);
 		return retrieveXMLResponseEntity(req, binding);
 	}
 
@@ -186,7 +186,7 @@ public class WFSClient {
 	 *         if the response doesn't contain one.
 	 */
 	public Document delete(Map<String, QName> features, ProtocolBinding binding) {
-		Document req = WFSRequest.createRequestEntity(WFS2.TRANSACTION,
+		Document req = WFSMessage.createRequestEntity(WFS2.TRANSACTION,
 				this.wfsVersion);
 		for (Map.Entry<String, QName> entry : features.entrySet()) {
 			QName typeName = entry.getValue();
@@ -225,7 +225,7 @@ public class WFSClient {
 			throw new IllegalArgumentException(
 					"No features instances to insert.");
 		}
-		Document req = WFSRequest.createRequestEntity(WFS2.TRANSACTION,
+		Document req = WFSMessage.createRequestEntity(WFS2.TRANSACTION,
 				this.wfsVersion);
 		Element insert = req.createElementNS(Namespaces.WFS, "Insert");
 		insert.setPrefix("wfs");
@@ -254,7 +254,7 @@ public class WFSClient {
 	 */
 	public Document updateFeature(String id, QName featureType,
 			Map<String, Object> properties) {
-		Document req = WFSRequest.createRequestEntity(WFS2.TRANSACTION,
+		Document req = WFSMessage.createRequestEntity(WFS2.TRANSACTION,
 				this.wfsVersion);
 		return updateFeature(req, id, featureType, properties,
 				ProtocolBinding.POST);
@@ -286,7 +286,7 @@ public class WFSClient {
 		Element update = req.createElementNS(Namespaces.WFS, "Update");
 		update.setPrefix("wfs");
 		req.getDocumentElement().appendChild(update);
-		WFSRequest.setTypeName(update, featureType);
+		WFSMessage.setTypeName(update, featureType);
 		for (Map.Entry<String, Object> property : properties.entrySet()) {
 			Element prop = req.createElementNS(Namespaces.WFS, "Property");
 			prop.setPrefix("wfs");
@@ -305,7 +305,7 @@ public class WFSClient {
 			prop.appendChild(value);
 			update.appendChild(prop);
 		}
-		Element filter = WFSRequest.newResourceIdFilter(id);
+		Element filter = WFSMessage.newResourceIdFilter(id);
 		update.appendChild(req.adoptNode(filter));
 		if (TestSuiteLogger.isLoggable(Level.FINE)) {
 			TestSuiteLogger.log(Level.FINE, XMLUtils.writeNodeToString(req));
@@ -339,7 +339,7 @@ public class WFSClient {
 		ClientResponse response = null;
 		switch (binding) {
 		case GET:
-			String queryString = WFSRequest.transformEntityToKVP(entity);
+			String queryString = WFSMessage.transformEntityToKVP(entity);
 			URI requestURI = UriBuilder.fromUri(resource.getURI())
 					.replaceQuery(queryString).build();
 			LOGR.log(Level.FINE, String.format("Request URI: %s", requestURI));
@@ -351,7 +351,7 @@ public class WFSClient {
 					ClientResponse.class, entity);
 			break;
 		case SOAP:
-			Document soapEnv = WFSRequest.wrapEntityInSOAPEnvelope(entity,
+			Document soapEnv = WFSMessage.wrapEntityInSOAPEnvelope(entity,
 					WFS2.SOAP_VERSION);
 			response = builder.type(MediaType.valueOf(WFS2.APPLICATION_SOAP))
 					.post(ClientResponse.class, new DOMSource(soapEnv));

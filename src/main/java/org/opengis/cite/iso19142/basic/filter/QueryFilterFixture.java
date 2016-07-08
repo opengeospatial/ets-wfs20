@@ -4,7 +4,7 @@ import org.apache.xerces.xs.XSModel;
 import org.opengis.cite.iso19142.BaseFixture;
 import org.opengis.cite.iso19142.SuiteAttribute;
 import org.opengis.cite.iso19142.util.DataSampler;
-import org.opengis.cite.iso19142.util.WFSRequest;
+import org.opengis.cite.iso19142.util.WFSMessage;
 import org.testng.ISuite;
 import org.testng.ITestContext;
 import org.testng.annotations.BeforeClass;
@@ -59,7 +59,7 @@ public class QueryFilterFixture extends BaseFixture {
 	 */
 	@BeforeMethod
 	public void buildRequestEntity() {
-		this.reqEntity = WFSRequest.createRequestEntity(GET_FEATURE_MINIMAL,
+		this.reqEntity = WFSMessage.createRequestEntity(GET_FEATURE_MINIMAL,
 				this.wfsVersion);
 	}
 

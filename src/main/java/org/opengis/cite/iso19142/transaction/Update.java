@@ -31,7 +31,7 @@ import org.opengis.cite.iso19142.WFS2;
 import org.opengis.cite.iso19142.util.AppSchemaUtils;
 import org.opengis.cite.iso19142.util.ServiceMetadataUtils;
 import org.opengis.cite.iso19142.util.TestSuiteLogger;
-import org.opengis.cite.iso19142.util.WFSRequest;
+import org.opengis.cite.iso19142.util.WFSMessage;
 import org.opengis.cite.iso19142.util.XMLUtils;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -65,9 +65,9 @@ public class Update extends TransactionFixture {
 		if (modifiedFeatures.isEmpty()) {
 			return;
 		}
-		Document req = WFSRequest.createRequestEntity(WFS2.TRANSACTION,
+		Document req = WFSMessage.createRequestEntity(WFS2.TRANSACTION,
 				this.wfsVersion);
-		WFSRequest.addReplaceStatements(req, modifiedFeatures);
+		WFSMessage.addReplaceStatements(req, modifiedFeatures);
 		ClientResponse rsp = wfsClient.submitRequest(req, ProtocolBinding.ANY);
 		Document rspEntity = rsp.getEntity(Document.class);
 		String expr = String.format("//wfs:totalReplaced = '%d'",
@@ -152,7 +152,7 @@ public class Update extends TransactionFixture {
 		}
 		Element update = (Element) this.reqEntity.getElementsByTagNameNS(
 				Namespaces.WFS, WFS2.UPDATE).item(0);
-		WFSRequest.setTypeName(update, featureTypes.get(0));
+		WFSMessage.setTypeName(update, featureTypes.get(0));
 		ProtocolBinding binding = wfsClient.getAnyTransactionBinding();
 		URI endpoint = ServiceMetadataUtils.getOperationEndpoint(
 				this.wfsMetadata, WFS2.TRANSACTION, binding);
@@ -202,7 +202,7 @@ public class Update extends TransactionFixture {
 		List<String> propValues = this.dataSampler.getSimplePropertyValues(
 				featureType, propName, featureId);
 		String newVal = newPropertyValue(prop, propValues);
-		WFSRequest.addNamespaceBinding(this.reqEntity, propName);
+		WFSMessage.addNamespaceBinding(this.reqEntity, propName);
 		Map<String, Object> properties = new HashMap<String, Object>();
 		properties.put(propName.getPrefix() + ":" + propName.getLocalPart()
 				+ "[1]", newVal);

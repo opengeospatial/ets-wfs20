@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gml:Polygon xmlns:gml="http://www.opengis.net/gml/3.2"
+	gml:id="Polygon-01" srsName="urn:ogc:def:crs:EPSG::4326">
+	<gml:exterior>
+		<gml:LinearRing>
+			<gml:posList>49.1947 -123.1839 
+			49.2210 -122.7710 
+			49.2740 -122.9086 
+			49.3269 -122.9487 
+			49.3304 -123.2646 
+			49.1947 -123.1839</gml:posList>
+		</gml:LinearRing>
+	</gml:exterior>
+</gml:Polygon>

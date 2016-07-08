@@ -22,7 +22,7 @@ import org.opengis.cite.iso19142.WFS2;
 import org.opengis.cite.iso19142.util.ServiceMetadataUtils;
 import org.opengis.cite.iso19142.util.TestSuiteLogger;
 import org.opengis.cite.iso19142.util.ValidationUtils;
-import org.opengis.cite.iso19142.util.WFSRequest;
+import org.opengis.cite.iso19142.util.WFSMessage;
 import org.testng.Assert;
 import org.testng.SkipException;
 import org.testng.annotations.AfterMethod;
@@ -89,7 +89,7 @@ public class BasicGetFeatureTests extends BaseFixture {
 	 */
 	@BeforeMethod
 	public void buildRequestEntity() {
-		this.reqEntity = WFSRequest.createRequestEntity("GetFeature-Minimal",
+		this.reqEntity = WFSMessage.createRequestEntity("GetFeature-Minimal",
 				this.wfsVersion);
 		this.rspEntity = null;
 	}
@@ -116,7 +116,7 @@ public class BasicGetFeatureTests extends BaseFixture {
 	 */
 	@Test(description = "See ISO 19142: 11.2.2, 11.2.3", dataProvider = "all-protocols-featureTypes")
 	public void getFeaturesByType(ProtocolBinding binding, QName featureType) {
-		WFSRequest.appendSimpleQuery(this.reqEntity, featureType);
+		WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
 		URI endpoint = ServiceMetadataUtils.getOperationEndpoint(
 				this.wfsMetadata, WFS2.GET_FEATURE, binding);
 		ClientResponse rsp = wfsClient.submitRequest(new DOMSource(reqEntity),
@@ -159,7 +159,7 @@ public class BasicGetFeatureTests extends BaseFixture {
 			throw new SkipException(
 					"No alternative (non-default) CRS supported for any feature type with data.");
 		}
-		WFSRequest.appendSimpleQuery(this.reqEntity, featureType);
+		WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
 		Element qry = (Element) this.reqEntity.getElementsByTagNameNS(
 				WFS2.NS_URI, WFS2.QUERY_ELEM).item(0);
 		qry.setAttribute(WFS2.SRSNAME_PARAM, otherCRSId);
@@ -186,7 +186,7 @@ public class BasicGetFeatureTests extends BaseFixture {
 		String crsId = (this.wfsVersion.equals(WFS2.V2_0_0)) ? "urn:ogc:def:crs:EPSG::32690"
 				: "http://www.opengis.net/def/crs/EPSG/0/32690";
 		QName featureType = getFeatureTypeWithInstanceData();
-		WFSRequest.appendSimpleQuery(this.reqEntity, featureType);
+		WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
 		Element qry = (Element) this.reqEntity.getElementsByTagNameNS(
 				WFS2.NS_URI, WFS2.QUERY_ELEM).item(0);
 		qry.setAttribute(WFS2.SRSNAME_PARAM, crsId);

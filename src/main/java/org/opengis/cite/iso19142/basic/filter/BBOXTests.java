@@ -22,7 +22,7 @@ import org.opengis.cite.iso19142.ProtocolBinding;
 import org.opengis.cite.iso19142.WFS2;
 import org.opengis.cite.iso19142.util.AppSchemaUtils;
 import org.opengis.cite.iso19142.util.ServiceMetadataUtils;
-import org.opengis.cite.iso19142.util.WFSRequest;
+import org.opengis.cite.iso19142.util.WFSMessage;
 import org.opengis.cite.iso19142.util.XMLUtils;
 import org.opengis.referencing.operation.TransformException;
 import org.testng.Assert;
@@ -85,7 +85,7 @@ public class BBOXTests extends QueryFilterFixture {
 			throw new SkipException("Feature type has no geometry properties: "
 					+ featureType);
 		}
-		WFSRequest.appendSimpleQuery(this.reqEntity, featureType);
+		WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
 		Document gmlEnv = Extents.envelopeAsGML(featureInfo.get(featureType)
 				.getGeoExtent());
 		addBBOXPredicate(this.reqEntity, gmlEnv.getDocumentElement(), null);
@@ -143,8 +143,8 @@ public class BBOXTests extends QueryFilterFixture {
 					+ featureType);
 		}
 		XSElementDeclaration geomProp = geomProps.get(0);
-		Element valueRef = WFSRequest.createValueReference(geomProp);
-		WFSRequest.appendSimpleQuery(this.reqEntity, featureType);
+		Element valueRef = WFSMessage.createValueReference(geomProp);
+		WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
 		Document gmlEnv = Extents.envelopeAsGML(featureInfo.get(featureType)
 				.getGeoExtent());
 		addBBOXPredicate(this.reqEntity, gmlEnv.getDocumentElement(), valueRef);
@@ -214,8 +214,8 @@ public class BBOXTests extends QueryFilterFixture {
 	public void invalidGeometryOperand(QName featureType) {
 		XSElementDeclaration gmlDesc = this.model.getElementDeclaration(
 				"description", Namespaces.GML);
-		Element valueRef = WFSRequest.createValueReference(gmlDesc);
-		WFSRequest.appendSimpleQuery(this.reqEntity, featureType);
+		Element valueRef = WFSMessage.createValueReference(gmlDesc);
+		WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
 		Document gmlEnv = Extents.envelopeAsGML(featureInfo.get(featureType)
 				.getGeoExtent());
 		addBBOXPredicate(this.reqEntity, gmlEnv.getDocumentElement(), valueRef);

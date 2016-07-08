@@ -27,7 +27,7 @@ import org.opengis.cite.iso19142.WFS2;
 import org.opengis.cite.iso19142.util.XMLUtils;
 import org.opengis.cite.iso19142.util.ServiceMetadataUtils;
 import org.opengis.cite.iso19142.util.ValidationUtils;
-import org.opengis.cite.iso19142.util.WFSRequest;
+import org.opengis.cite.iso19142.util.WFSMessage;
 import org.opengis.cite.validation.SchematronValidator;
 import org.testng.Assert;
 import org.testng.ITestContext;
@@ -88,7 +88,7 @@ public class StoredQueryTests extends BaseFixture {
 	 */
 	@BeforeMethod
 	public void buildGetFeatureRequestEntity() {
-		this.reqEntity = WFSRequest.createRequestEntity("GetFeature",
+		this.reqEntity = WFSMessage.createRequestEntity("GetFeature",
 				this.wfsVersion);
 	}
 
@@ -103,7 +103,7 @@ public class StoredQueryTests extends BaseFixture {
 	 */
 	@Test(description = "See ISO 19142: 7.9.3.4", dataProvider = "protocol-binding")
 	public void unknownStoredQuery(ProtocolBinding binding) {
-		WFSRequest.appendStoredQuery(this.reqEntity,
+		WFSMessage.appendStoredQuery(this.reqEntity,
 				"http://docbook.org/ns/docbook",
 				Collections.<String, Object> emptyMap());
 		URI endpoint = ServiceMetadataUtils.getOperationEndpoint(
@@ -144,7 +144,7 @@ public class StoredQueryTests extends BaseFixture {
 	@Test(description = "See ISO 19142: 7.9.3.6, 11.4", dataProvider = "protocol-binding")
 	public void invokeGetFeatureByIdWithUnknownID(ProtocolBinding binding) {
 		String id = "uuid-" + UUID.randomUUID().toString();
-		WFSRequest.appendStoredQuery(this.reqEntity, this.queryId,
+		WFSMessage.appendStoredQuery(this.reqEntity, this.queryId,
 				Collections.singletonMap("id", (Object) id));
 		URI endpoint = ServiceMetadataUtils.getOperationEndpoint(
 				this.wfsMetadata, WFS2.GET_FEATURE, binding);
@@ -184,7 +184,7 @@ public class StoredQueryTests extends BaseFixture {
 		}
 		Assert.assertFalse(null == this.featureId || this.featureId.isEmpty(),
 				ErrorMessage.get(ErrorMessageKeys.FID_NOT_FOUND));
-		WFSRequest.appendStoredQuery(this.reqEntity, this.queryId,
+		WFSMessage.appendStoredQuery(this.reqEntity, this.queryId,
 				Collections.singletonMap("id", (Object) this.featureId));
 		URI endpoint = ServiceMetadataUtils.getOperationEndpoint(
 				this.wfsMetadata, WFS2.GET_FEATURE, binding);
@@ -256,7 +256,7 @@ public class StoredQueryTests extends BaseFixture {
 					.getOperationBindings(wfsMetadata, WFS2.GET_FEATURE)
 					.iterator().next();
 		}
-		WFSRequest.appendStoredQuery(this.reqEntity,
+		WFSMessage.appendStoredQuery(this.reqEntity,
 				WFS2.QRY_GET_FEATURE_BY_TYPE,
 				Collections.singletonMap("typeName", (Object) featureType));
 		URI endpoint = ServiceMetadataUtils.getOperationEndpoint(

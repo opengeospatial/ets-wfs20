@@ -46,7 +46,7 @@ public class VerifyWFSRequest {
 	public void transformGetCapabilitiesToKVP() {
 		InputStream inStream = getClass().getResourceAsStream(
 				"/GetCapabilities-AcceptSections.xml");
-		String kvp = WFSRequest
+		String kvp = WFSMessage
 				.transformEntityToKVP(new StreamSource(inStream));
 		assertTrue("Expected result to contain 'acceptversions=2.0.0,1.1.0'",
 				kvp.contains("acceptversions=2.0.0,1.1.0"));
@@ -59,7 +59,7 @@ public class VerifyWFSRequest {
 	public void transformGetFeatureBBOXToKVP() {
 		InputStream inStream = getClass().getResourceAsStream(
 				"/GetFeature/GetFeature-BBOX.xml");
-		String kvp = WFSRequest
+		String kvp = WFSMessage
 				.transformEntityToKVP(new StreamSource(inStream));
 		// expect <fes:BBOX> to be percent-encoded
 		assertTrue("Expected result to contain '%3Cfes%3ABBOX%3E'",
@@ -70,7 +70,7 @@ public class VerifyWFSRequest {
 	public void transformStoredQueryToKVP() {
 		InputStream inStream = getClass().getResourceAsStream(
 				"/GetFeature/GetFeatureById.xml");
-		String kvp = WFSRequest
+		String kvp = WFSMessage
 				.transformEntityToKVP(new StreamSource(inStream));
 		assertTrue(
 				"Expected result to contain 'storedquery_id=urn:ogc:def:query:OGC-WFS::GetFeatureById'",
@@ -85,7 +85,7 @@ public class VerifyWFSRequest {
 	public void transformGetFeatureQuery2TypesToKVP() {
 		InputStream inStream = getClass().getResourceAsStream(
 				"/GetFeature/GetFeature-Query2Types.xml");
-		String kvp = WFSRequest
+		String kvp = WFSMessage
 				.transformEntityToKVP(new StreamSource(inStream));
 		assertTrue(
 				"Expected result to contain 'typenames=tns:PrimitiveGeoFeature,tns:AggregateGeoFeature'",
@@ -99,7 +99,7 @@ public class VerifyWFSRequest {
 	public void transformDescribeFeatureTypeToKVP() {
 		InputStream inStream = getClass().getResourceAsStream(
 				"/DescribeFeatureType.xml");
-		String kvp = WFSRequest
+		String kvp = WFSMessage
 				.transformEntityToKVP(new StreamSource(inStream));
 		assertTrue("Expected result to contain 'version=2.0.0'",
 				kvp.contains("version=2.0.0"));
@@ -115,7 +115,7 @@ public class VerifyWFSRequest {
 	public void transformDescribeStoredQueriesToKVP() {
 		InputStream inStream = getClass().getResourceAsStream(
 				"/DescribeStoredQueries.xml");
-		String kvp = WFSRequest
+		String kvp = WFSMessage
 				.transformEntityToKVP(new StreamSource(inStream));
 		assertTrue(
 				"Expected result to contain 'request=DescribeStoredQueries'",
@@ -129,7 +129,7 @@ public class VerifyWFSRequest {
 	public void wrapGetFeatureRequestInSOAP11Envelope() {
 		InputStream inStream = getClass().getResourceAsStream(
 				"/GetFeature/GetFeature-Query2Types.xml");
-		Document soapDoc = WFSRequest.wrapEntityInSOAPEnvelope(
+		Document soapDoc = WFSMessage.wrapEntityInSOAPEnvelope(
 				new StreamSource(inStream), WFS2.SOAP_VERSION);
 		assertEquals("Document element has unexpected namespace.",
 				Namespaces.SOAP11, soapDoc.getDocumentElement()
@@ -144,7 +144,7 @@ public class VerifyWFSRequest {
 	public void wrapRequestInSOAP12Envelope() {
 		InputStream inStream = getClass().getResourceAsStream(
 				"/GetFeature/GetFeature-Query2Types.xml");
-		Document soapDoc = WFSRequest.wrapEntityInSOAPEnvelope(
+		Document soapDoc = WFSMessage.wrapEntityInSOAPEnvelope(
 				new StreamSource(inStream), null);
 		assertEquals("Document element has unexpected namespace.",
 				Namespaces.SOAP_ENV, soapDoc.getDocumentElement()
@@ -153,9 +153,9 @@ public class VerifyWFSRequest {
 
 	@Test
 	public void setStoredQueryParameterAsQName() {
-		Document doc = WFSRequest.createRequestEntity("GetFeature", null);
+		Document doc = WFSMessage.createRequestEntity("GetFeature", null);
 		QName qName = new QName("http://example.org/ns1", "Alpha");
-		WFSRequest.appendStoredQuery(doc, WFS2.QRY_GET_FEATURE_BY_TYPE,
+		WFSMessage.appendStoredQuery(doc, WFS2.QRY_GET_FEATURE_BY_TYPE,
 				Collections.singletonMap("typeName", (Object) qName));
 		Element param = (Element) doc.getElementsByTagNameNS(Namespaces.WFS,
 				WFS2.PARAM_ELEM).item(0);
@@ -166,8 +166,8 @@ public class VerifyWFSRequest {
 	@Test
 	public void setStoredQueryParameterAsString() throws SAXException,
 			IOException {
-		Document doc = WFSRequest.createRequestEntity("GetFeature", null);
-		WFSRequest.appendStoredQuery(doc, "q1",
+		Document doc = WFSMessage.createRequestEntity("GetFeature", null);
+		WFSMessage.appendStoredQuery(doc, "q1",
 				Collections.singletonMap("p1", (Object) "v1"));
 		Element param = (Element) doc.getElementsByTagNameNS(Namespaces.WFS,
 				WFS2.PARAM_ELEM).item(0);
@@ -180,7 +180,7 @@ public class VerifyWFSRequest {
 	@Test
 	public void createResourceIdFilter() {
 		String identifier = "alpha";
-		Element result = WFSRequest.newResourceIdFilter(identifier);
+		Element result = WFSMessage.newResourceIdFilter(identifier);
 		assertEquals("Unexpected element name.", "Filter",
 				result.getLocalName());
 		Element resourceId = (Element) result.getElementsByTagNameNS(
@@ -199,7 +199,7 @@ public class VerifyWFSRequest {
 		identifier.setAttribute("codeSpace", "http://cite.opengeospatial.org/");
 		String uuid = UUID.randomUUID().toString();
 		identifier.setTextContent(uuid);
-		WFSRequest.insertGMLProperty(doc.getDocumentElement(), identifier);
+		WFSMessage.insertGMLProperty(doc.getDocumentElement(), identifier);
 		Element gmlIdentifier = (Element) doc.getElementsByTagNameNS(
 				Namespaces.GML, "identifier").item(0);
 		assertEquals("Unexpected gml:identifier value.", uuid,
@@ -216,7 +216,7 @@ public class VerifyWFSRequest {
 		identifier.setAttribute("codeSpace", "http://cite.opengeospatial.org/");
 		String uuid = UUID.randomUUID().toString();
 		identifier.setTextContent(uuid);
-		WFSRequest.insertGMLProperty(doc.getDocumentElement(), identifier);
+		WFSMessage.insertGMLProperty(doc.getDocumentElement(), identifier);
 		Element gmlIdentifier = (Element) doc.getElementsByTagNameNS(
 				Namespaces.GML, "identifier").item(0);
 		assertEquals("Unexpected gml:identifier value.", uuid,
@@ -234,7 +234,7 @@ public class VerifyWFSRequest {
 		name.setAttribute("codeSpace", "http://cite.opengeospatial.org/");
 		String newName = "New name";
 		name.setTextContent(newName);
-		WFSRequest.insertGMLProperty(doc.getDocumentElement(), name);
+		WFSMessage.insertGMLProperty(doc.getDocumentElement(), name);
 		Element gmlName = (Element) doc.getElementsByTagNameNS(Namespaces.GML,
 				"name").item(0);
 		assertEquals("Unexpected gml:name value.", newName,
@@ -247,9 +247,9 @@ public class VerifyWFSRequest {
 		Document doc = docBuilder.parse(this.getClass().getResourceAsStream(
 				"/GetFeature/GetFeature-Minimal.xml"));
 		QName typeName1 = new QName(NS1, "Type1");
-		WFSRequest.appendSimpleQuery(doc, typeName1);
+		WFSMessage.appendSimpleQuery(doc, typeName1);
 		QName typeName2 = new QName(NS2, "Type2");
-		WFSRequest.appendSimpleQuery(doc, typeName2);
+		WFSMessage.appendSimpleQuery(doc, typeName2);
 		NodeList queries = doc.getElementsByTagNameNS(Namespaces.WFS,
 				WFS2.QUERY_ELEM);
 		assertEquals("Unexpected number of wfs:Query elements.", 2,
@@ -267,7 +267,7 @@ public class VerifyWFSRequest {
 		Document doc = docBuilder.parse(this.getClass().getResourceAsStream(
 				"/GetFeature/GetFeature-Minimal.xml"));
 		QName typeName1 = new QName(NS1, "Type1");
-		WFSRequest.appendStoredQuery(doc, WFS2.QRY_GET_FEATURE_BY_TYPE,
+		WFSMessage.appendStoredQuery(doc, WFS2.QRY_GET_FEATURE_BY_TYPE,
 				Collections.singletonMap("typeName", (Object) typeName1));
 		NodeList queries = doc.getElementsByTagNameNS(Namespaces.WFS,
 				WFS2.STORED_QRY_ELEM);
@@ -284,7 +284,7 @@ public class VerifyWFSRequest {
 		Document req = docBuilder.parse(this.getClass().getResourceAsStream(
 				"/LockFeature-Empty.xml"));
 		QName typeName = new QName(NS1, "River");
-		WFSRequest.appendSimpleQuery(req, typeName);
+		WFSMessage.appendSimpleQuery(req, typeName);
 		NodeList queries = req.getElementsByTagNameNS(Namespaces.WFS,
 				WFS2.QUERY_ELEM);
 		assertEquals("Unexpected number of wfs:Query elements.", 1,
@@ -304,7 +304,7 @@ public class VerifyWFSRequest {
 				"/GetFeature/GetFeatureWithLock.xml"));
 		String id = "id001";
 		Set<String> idSet = Collections.singleton(id);
-		WFSRequest.addResourceIdPredicate(doc, idSet);
+		WFSMessage.addResourceIdPredicate(doc, idSet);
 		NodeList filters = doc.getElementsByTagNameNS(Namespaces.FES, "Filter");
 		assertEquals("Unexpected number of filters.", 1, filters.getLength());
 		Element predicate = (Element) filters.item(0).getChildNodes().item(0);

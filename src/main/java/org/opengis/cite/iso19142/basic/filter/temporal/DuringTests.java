@@ -1,14 +1,22 @@
 package org.opengis.cite.iso19142.basic.filter.temporal;
 
+import java.util.List;
+
+import javax.xml.namespace.QName;
 import javax.xml.xpath.XPathExpressionException;
 
+import org.apache.xerces.xs.XSElementDeclaration;
+import org.apache.xerces.xs.XSTypeDefinition;
 import org.opengis.cite.iso19142.ErrorMessage;
 import org.opengis.cite.iso19142.ErrorMessageKeys;
+import org.opengis.cite.iso19142.Namespaces;
 import org.opengis.cite.iso19142.SuiteAttribute;
 import org.opengis.cite.iso19142.basic.filter.QueryFilterFixture;
+import org.opengis.cite.iso19142.util.AppSchemaUtils;
 import org.opengis.cite.iso19142.util.XMLUtils;
 import org.testng.ITestContext;
 import org.testng.SkipException;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeTest;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -18,13 +26,9 @@ import org.w3c.dom.NodeList;
  * predicate <em>During</em>. The relation can be expressed as follows when
  * comparing a temporal instant to a temporal period:
  * 
- * <p>
- * 
  * <pre>
  * self.position &gt; other.begin.position AND self.position &lt; other.end.position
  * </pre>
- * 
- * </p>
  * 
  * <p>
  * If both operands are periods then the following must hold:
@@ -52,8 +56,7 @@ import org.w3c.dom.NodeList;
 public class DuringTests extends QueryFilterFixture {
 
 	public final static String IMPL_TEMPORAL_FILTER = "ImplementsTemporalFilter";
-
-	// TODO: Extract implementsFilterCapability
+	private XSTypeDefinition gmlTimeBaseType;
 
 	/**
 	 * Checks the value of the filter constraint {@value #IMPL_TEMPORAL_FILTER}
@@ -79,6 +82,29 @@ public class DuringTests extends QueryFilterFixture {
 		if (result.getLength() == 0) {
 			throw new SkipException(ErrorMessage.format(
 					ErrorMessageKeys.NOT_IMPLEMENTED, IMPL_TEMPORAL_FILTER));
+		}
+	}
+
+	/**
+	 * Creates an XSTypeDefinition object representing the
+	 * gml:AbstractTimeGeometricPrimitiveType definition. This is the base type
+	 * for <code>TimeInstantType</code> and <code>TimePeriodType</code>.
+	 */
+	@BeforeClass
+	public void createTemporalPrimitiveBaseType() {
+		this.gmlTimeBaseType = this.model.getTypeDefinition(
+				"AbstractTimeGeometricPrimitiveType", Namespaces.GML);
+	}
+
+	public void during() {
+		QName featureType = null;
+		List<XSElementDeclaration> timeProps = AppSchemaUtils
+				.getFeaturePropertiesByType(this.model, featureType,
+						this.gmlTimeBaseType);
+		// iterate over AppSchemaUtils.getSimpleTemporalDataTypes(model)
+		if (timeProps.isEmpty()) {
+			throw new SkipException("Feature type has no temporal properties: "
+					+ featureType);
 		}
 	}
 }

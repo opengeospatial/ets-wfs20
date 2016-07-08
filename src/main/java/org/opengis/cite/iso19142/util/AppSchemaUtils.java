@@ -1,8 +1,10 @@
 package org.opengis.cite.iso19142.util;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 
 import javax.xml.XMLConstants;
@@ -39,20 +41,17 @@ public class AppSchemaUtils {
      * @return A {@literal List<XSElementDeclaration>} containing matching
      *         feature properties; the list may be empty.
      */
-    public static List<XSElementDeclaration> getFeaturePropertiesByType(
-            XSModel model, QName featureTypeName, XSTypeDefinition typeDef) {
-        XSElementDeclaration elemDecl = model.getElementDeclaration(
-                featureTypeName.getLocalPart(),
+    public static List<XSElementDeclaration> getFeaturePropertiesByType(XSModel model, QName featureTypeName,
+            XSTypeDefinition typeDef) {
+        XSElementDeclaration elemDecl = model.getElementDeclaration(featureTypeName.getLocalPart(),
                 featureTypeName.getNamespaceURI());
-        XSComplexTypeDefinition featureTypeDef = (XSComplexTypeDefinition) elemDecl
-                .getTypeDefinition();
+        XSComplexTypeDefinition featureTypeDef = (XSComplexTypeDefinition) elemDecl.getTypeDefinition();
         List<XSElementDeclaration> featureProps = XMLSchemaModelUtils
                 .getAllElementsInParticle(featureTypeDef.getParticle());
         removeDeprecatedGMLElements(featureProps, model);
         List<XSElementDeclaration> props = new ArrayList<XSElementDeclaration>();
         // set bit mask to indicate acceptable derivation mechanisms
-        short extendOrRestrict = XSConstants.DERIVATION_EXTENSION
-                | XSConstants.DERIVATION_RESTRICTION;
+        short extendOrRestrict = XSConstants.DERIVATION_EXTENSION | XSConstants.DERIVATION_RESTRICTION;
         for (XSElementDeclaration featureProp : featureProps) {
             XSTypeDefinition propType = featureProp.getTypeDefinition();
             switch (propType.getTypeCategory()) {
@@ -67,11 +66,9 @@ public class AppSchemaUtils {
                     // check type of child element(s)
                     XSComplexTypeDefinition complexPropType = (XSComplexTypeDefinition) propType;
                     List<XSElementDeclaration> propValues = XMLSchemaModelUtils
-                            .getAllElementsInParticle(complexPropType
-                                    .getParticle());
+                            .getAllElementsInParticle(complexPropType.getParticle());
                     for (XSElementDeclaration propValue : propValues) {
-                        if (propValue.getTypeDefinition().derivedFromType(
-                                typeDef, extendOrRestrict)) {
+                        if (propValue.getTypeDefinition().derivedFromType(typeDef, extendOrRestrict)) {
                             props.add(featureProp);
                         }
                     }
@@ -85,12 +82,9 @@ public class AppSchemaUtils {
             }
         }
         if (TestSuiteLogger.isLoggable(Level.FINER)) {
-            TestSuiteLogger.log(
-                    Level.FINER,
-                    new StringBuilder("In feature type defn ")
-                            .append(featureTypeDef.getName())
-                            .append(", found properties with value of type ")
-                            .append(typeDef.getName()).append("\n")
+            TestSuiteLogger.log(Level.FINER,
+                    new StringBuilder("In feature type defn ").append(featureTypeDef.getName())
+                            .append(", found properties with value of type ").append(typeDef.getName()).append("\n")
                             .append(props).toString());
         }
         return props;
@@ -108,10 +102,8 @@ public class AppSchemaUtils {
      * @return A {@literal List<XSElementDeclaration>} containing elements that
      *         may have nil values.
      */
-    public static List<XSElementDeclaration> getNillableProperties(
-            XSModel model, QName featureTypeName) {
-        List<XSElementDeclaration> featureProps = getAllFeatureProperties(
-                model, featureTypeName);
+    public static List<XSElementDeclaration> getNillableProperties(XSModel model, QName featureTypeName) {
+        List<XSElementDeclaration> featureProps = getAllFeatureProperties(model, featureTypeName);
         Iterator<XSElementDeclaration> itr = featureProps.iterator();
         while (itr.hasNext()) {
             XSElementDeclaration prop = itr.next();
@@ -132,15 +124,11 @@ public class AppSchemaUtils {
      * @return A {@literal List<XSElementDeclaration>} containing one or more
      *         element declarations defining feature properties.
      */
-    public static List<XSElementDeclaration> getAllFeatureProperties(
-            XSModel model, QName featureTypeName) {
-        XSElementDeclaration elemDecl = model.getElementDeclaration(
-                featureTypeName.getLocalPart(),
+    public static List<XSElementDeclaration> getAllFeatureProperties(XSModel model, QName featureTypeName) {
+        XSElementDeclaration elemDecl = model.getElementDeclaration(featureTypeName.getLocalPart(),
                 featureTypeName.getNamespaceURI());
-        XSComplexTypeDefinition featureTypeDef = (XSComplexTypeDefinition) elemDecl
-                .getTypeDefinition();
-        return XMLSchemaModelUtils.getAllElementsInParticle(featureTypeDef
-                .getParticle());
+        XSComplexTypeDefinition featureTypeDef = (XSComplexTypeDefinition) elemDecl.getTypeDefinition();
+        return XMLSchemaModelUtils.getAllElementsInParticle(featureTypeDef.getParticle());
     }
 
     /**
@@ -156,15 +144,11 @@ public class AppSchemaUtils {
      *         element declarations defining properties with a simple content
      *         model.
      */
-    public static List<XSElementDeclaration> getSimpleFeatureProperties(
-            XSModel model, QName featureTypeName) {
-        XSElementDeclaration elemDecl = model.getElementDeclaration(
-                featureTypeName.getLocalPart(),
+    public static List<XSElementDeclaration> getSimpleFeatureProperties(XSModel model, QName featureTypeName) {
+        XSElementDeclaration elemDecl = model.getElementDeclaration(featureTypeName.getLocalPart(),
                 featureTypeName.getNamespaceURI());
-        XSComplexTypeDefinition featureTypeDef = (XSComplexTypeDefinition) elemDecl
-                .getTypeDefinition();
-        List<XSElementDeclaration> props = XMLSchemaModelUtils
-                .getAllElementsInParticle(featureTypeDef.getParticle());
+        XSComplexTypeDefinition featureTypeDef = (XSComplexTypeDefinition) elemDecl.getTypeDefinition();
+        List<XSElementDeclaration> props = XMLSchemaModelUtils.getAllElementsInParticle(featureTypeDef.getParticle());
         Iterator<XSElementDeclaration> propsItr = props.iterator();
         while (propsItr.hasNext()) {
             XSElementDeclaration prop = propsItr.next();
@@ -173,8 +157,7 @@ public class AppSchemaUtils {
                 continue;
             }
             if (prop.getTypeDefinition().getTypeCategory() == XSTypeDefinition.COMPLEX_TYPE) {
-                XSComplexTypeDefinition typeDef = (XSComplexTypeDefinition) prop
-                        .getTypeDefinition();
+                XSComplexTypeDefinition typeDef = (XSComplexTypeDefinition) prop.getTypeDefinition();
                 if (null == typeDef.getSimpleType()) {
                     propsItr.remove();
                 }
@@ -193,20 +176,15 @@ public class AppSchemaUtils {
      * @return A {@literal List<XSElementDeclaration>} defining zero or more
      *         elements which must occur in a valid instance.
      */
-    public static List<XSElementDeclaration> getRequiredProperties(
-            XSModel model, QName featureTypeName) {
-        XSElementDeclaration elemDecl = model.getElementDeclaration(
-                featureTypeName.getLocalPart(),
+    public static List<XSElementDeclaration> getRequiredProperties(XSModel model, QName featureTypeName) {
+        XSElementDeclaration elemDecl = model.getElementDeclaration(featureTypeName.getLocalPart(),
                 featureTypeName.getNamespaceURI());
-        XSComplexTypeDefinition typeDef = (XSComplexTypeDefinition) elemDecl
-                .getTypeDefinition();
-        List<XSParticle> particles = XMLSchemaModelUtils
-                .getAllElementParticles(typeDef.getParticle());
+        XSComplexTypeDefinition typeDef = (XSComplexTypeDefinition) elemDecl.getTypeDefinition();
+        List<XSParticle> particles = XMLSchemaModelUtils.getAllElementParticles(typeDef.getParticle());
         List<XSElementDeclaration> requiredElems = new ArrayList<XSElementDeclaration>();
         for (XSParticle particle : particles) {
             if (particle.getMinOccurs() > 0) {
-                XSElementDeclaration elem = (XSElementDeclaration) particle
-                        .getTerm();
+                XSElementDeclaration elem = (XSElementDeclaration) particle.getTerm();
                 requiredElems.add(elem);
             }
         }
@@ -227,13 +205,10 @@ public class AppSchemaUtils {
      * @param model
      *            An XSModel object representing a GML application schema.
      */
-    public static void removeDeprecatedGMLElements(
-            List<XSElementDeclaration> elemDecls, XSModel model) {
-        XSElementDeclaration elemDecl = model.getElementDeclaration("location",
-                Namespaces.GML);
+    public static void removeDeprecatedGMLElements(List<XSElementDeclaration> elemDecls, XSModel model) {
+        XSElementDeclaration elemDecl = model.getElementDeclaration("location", Namespaces.GML);
         elemDecls.remove(elemDecl);
-        elemDecl = model.getElementDeclaration("metaDataProperty",
-                Namespaces.GML);
+        elemDecl = model.getElementDeclaration("metaDataProperty", Namespaces.GML);
         elemDecls.remove(elemDecl);
     }
 
@@ -283,9 +258,54 @@ public class AppSchemaUtils {
             datatype = new QName(XMLConstants.W3C_XML_SCHEMA_NS_URI, "boolean");
             break;
         default:
-            datatype = new QName(XMLConstants.W3C_XML_SCHEMA_NS_URI,
-                    "anySimpleType");
+            datatype = new QName(XMLConstants.W3C_XML_SCHEMA_NS_URI, "anySimpleType");
         }
         return datatype;
+    }
+
+    /**
+     * Returns a set of primitive, non-recurring temporal data type definitions,
+     * including:
+     * 
+     * <ul>
+     * <li>xsd:dateTime ("yyyy-MM-dd'T'HH:mm:ssZ")</li>
+     * <li>xsd:date ("yyyy-MM-ddZ")</li>
+     * <li>xsd:gYearMonth ("yyyy-MM")</li>
+     * <li>xsd:gYear ("yyyy")</li>
+     * </ul>
+     * 
+     * @param model
+     *            An XSModel object representing an application schema.
+     * @return A Set of simple type definitions corresponding to temporal data
+     *         types.
+     */
+    public static Set<XSTypeDefinition> getSimpleTemporalDataTypes(XSModel model) {
+        Set<XSTypeDefinition> dataTypes = new HashSet<XSTypeDefinition>();
+        dataTypes.add(model.getTypeDefinition("dateTime", XMLConstants.W3C_XML_SCHEMA_NS_URI));
+        dataTypes.add(model.getTypeDefinition("date", XMLConstants.W3C_XML_SCHEMA_NS_URI));
+        dataTypes.add(model.getTypeDefinition("gYearMonth", XMLConstants.W3C_XML_SCHEMA_NS_URI));
+        dataTypes.add(model.getTypeDefinition("gYear", XMLConstants.W3C_XML_SCHEMA_NS_URI));
+        return dataTypes;
+    }
+
+    /**
+     * Returns the expected value of the given (complex) property declaration.
+     * 
+     * @param propertyDecl
+     *            An element declaration for some feature property.
+     * @return An element declaration corresponding to the expected child
+     *         element, or null if the property has a simple content model.
+     */
+    public static XSElementDeclaration getComplexPropertyValue(XSElementDeclaration propertyDecl) {
+        XSTypeDefinition typeDef = propertyDecl.getTypeDefinition();
+        XSElementDeclaration value = null;
+        if (typeDef.getTypeCategory() == XSTypeDefinition.COMPLEX_TYPE) {
+            XSComplexTypeDefinition complexTypeDef = (XSComplexTypeDefinition) typeDef;
+            List<XSElementDeclaration> values = XMLSchemaModelUtils
+                    .getAllElementsInParticle(complexTypeDef.getParticle());
+            // should be only one in accord with GML object-property model
+            value = values.get(0);
+        }
+        return value;
     }
 }

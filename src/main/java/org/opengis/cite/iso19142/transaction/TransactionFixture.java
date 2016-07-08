@@ -16,7 +16,7 @@ import org.opengis.cite.iso19142.SuiteAttribute;
 import org.opengis.cite.iso19142.WFS2;
 import org.opengis.cite.iso19142.util.DataSampler;
 import org.opengis.cite.iso19142.util.ServiceMetadataUtils;
-import org.opengis.cite.iso19142.util.WFSRequest;
+import org.opengis.cite.iso19142.util.WFSMessage;
 import org.testng.ISuite;
 import org.testng.ITestContext;
 import org.testng.annotations.BeforeClass;
@@ -66,7 +66,7 @@ public class TransactionFixture extends BaseFixture {
 	 */
 	@BeforeMethod
 	public void buildTransactionRequest() {
-		this.reqEntity = WFSRequest.createRequestEntity(WFS2.TRANSACTION,
+		this.reqEntity = WFSMessage.createRequestEntity(WFS2.TRANSACTION,
 				this.wfsVersion);
 	}
 

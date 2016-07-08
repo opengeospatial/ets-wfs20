@@ -21,7 +21,7 @@ import org.opengis.cite.iso19142.WFS2;
 import org.opengis.cite.iso19142.util.XMLUtils;
 import org.opengis.cite.iso19142.util.ServiceMetadataUtils;
 import org.opengis.cite.iso19142.util.TestSuiteLogger;
-import org.opengis.cite.iso19142.util.WFSRequest;
+import org.opengis.cite.iso19142.util.WFSMessage;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
@@ -88,7 +88,7 @@ public class InsertTests extends TransactionFixture {
     public void insertSupportedFeature(ProtocolBinding binding,
             QName featureType) {
         Node feature = createFeatureInstance(featureType);
-        WFSRequest.addInsertStatement(this.reqEntity, feature);
+        WFSMessage.addInsertStatement(this.reqEntity, feature);
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(
                 this.wfsMetadata, WFS2.TRANSACTION, binding);
         ClientResponse rsp = this.wfsClient.submitRequest(new DOMSource(
@@ -204,6 +204,6 @@ public class InsertTests extends TransactionFixture {
         Element identifier = XMLUtils.createElement(propName);
         identifier.setAttribute("codeSpace", "http://cite.opengeospatial.org/");
         identifier.setTextContent(UUID.randomUUID().toString());
-        WFSRequest.insertGMLProperty(feature, identifier);
+        WFSMessage.insertGMLProperty(feature, identifier);
     }
 }

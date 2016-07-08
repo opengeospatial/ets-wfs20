@@ -21,7 +21,7 @@ import org.opengis.cite.iso19142.ProtocolBinding;
 import org.opengis.cite.iso19142.WFS2;
 import org.opengis.cite.iso19142.util.ServiceMetadataUtils;
 import org.opengis.cite.iso19142.util.TestSuiteLogger;
-import org.opengis.cite.iso19142.util.WFSRequest;
+import org.opengis.cite.iso19142.util.WFSMessage;
 import org.testng.Assert;
 import org.testng.SkipException;
 import org.testng.annotations.BeforeMethod;
@@ -56,7 +56,7 @@ public class LockFeatureTests extends LockingFixture {
 	 */
 	@BeforeMethod
 	public void buildSimpleLockFeatureRequest() {
-		this.reqEntity = WFSRequest.createRequestEntity("LockFeature",
+		this.reqEntity = WFSMessage.createRequestEntity("LockFeature",
 				this.wfsVersion);
 	}
 
@@ -84,7 +84,7 @@ public class LockFeatureTests extends LockingFixture {
 	public void resetNonexistentLock() {
 		Map<String, QName> featureId = fetchRandomFeatureIdentifier(this.featureInfo);
 		String gmlId = featureId.keySet().iterator().next();
-		WFSRequest.appendStoredQuery(reqEntity, this.storedQueryId,
+		WFSMessage.appendStoredQuery(reqEntity, this.storedQueryId,
 				Collections.singletonMap("id", (Object) gmlId));
 		reqEntity.getDocumentElement().setAttribute("lockId",
 				"lock-does-not-exist");
@@ -115,7 +115,7 @@ public class LockFeatureTests extends LockingFixture {
 	public void lockFeatureAndAttemptDelete() {
 		Map<String, QName> featureId = fetchRandomFeatureIdentifier(this.featureInfo);
 		String gmlId = featureId.keySet().iterator().next();
-		WFSRequest.appendStoredQuery(reqEntity, this.storedQueryId,
+		WFSMessage.appendStoredQuery(reqEntity, this.storedQueryId,
 				Collections.singletonMap("id", (Object) gmlId));
 		reqEntity.getDocumentElement().setAttribute("expiry", "60");
 		ClientResponse rsp = wfsClient.submitRequest(reqEntity,
@@ -157,7 +157,7 @@ public class LockFeatureTests extends LockingFixture {
 	public void lockFeatureAlreadyLocked() {
 		Map<String, QName> featureId = fetchRandomFeatureIdentifier(this.featureInfo);
 		String gmlId = featureId.keySet().iterator().next();
-		WFSRequest.appendStoredQuery(reqEntity, this.storedQueryId,
+		WFSMessage.appendStoredQuery(reqEntity, this.storedQueryId,
 				Collections.singletonMap("id", (Object) gmlId));
 		reqEntity.getDocumentElement().setAttribute("expiry", "60");
 		ClientResponse rsp = wfsClient.submitRequest(reqEntity,
@@ -205,7 +205,7 @@ public class LockFeatureTests extends LockingFixture {
 			throw new SkipException("No data available for feature type "
 					+ featureType);
 		}
-		WFSRequest.appendSimpleQuery(this.reqEntity, featureType);
+		WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
 		URI endpoint = ServiceMetadataUtils.getOperationEndpoint(
 				this.wfsMetadata, WFS2.LOCK_FEATURE, binding);
 		ClientResponse rsp = wfsClient.submitRequest(new DOMSource(reqEntity),

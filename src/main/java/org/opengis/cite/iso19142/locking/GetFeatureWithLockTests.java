@@ -11,7 +11,7 @@ import org.opengis.cite.iso19142.ErrorMessageKeys;
 import org.opengis.cite.iso19142.Namespaces;
 import org.opengis.cite.iso19142.ProtocolBinding;
 import org.opengis.cite.iso19142.WFS2;
-import org.opengis.cite.iso19142.util.WFSRequest;
+import org.opengis.cite.iso19142.util.WFSMessage;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.BeforeClass;
@@ -59,7 +59,7 @@ public class GetFeatureWithLockTests extends LockingFixture {
 	 */
 	@BeforeMethod
 	public void buildGetFeatureWithLockRequest() {
-		this.reqEntity = WFSRequest.createRequestEntity("GetFeatureWithLock",
+		this.reqEntity = WFSMessage.createRequestEntity("GetFeatureWithLock",
 				this.wfsVersion);
 	}
 
@@ -74,7 +74,7 @@ public class GetFeatureWithLockTests extends LockingFixture {
 	public void lockQueryResults_hits() {
 		QName featureType = LockFeatureTests
 				.selectRandomFeatureType(this.featureInfo);
-		WFSRequest.appendSimpleQuery(this.reqEntity, featureType);
+		WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
 		this.reqEntity.getDocumentElement().setAttribute("resultType", "hits");
 		ClientResponse rsp = wfsClient.submitRequest(this.reqEntity,
 				ProtocolBinding.ANY);
@@ -104,7 +104,7 @@ public class GetFeatureWithLockTests extends LockingFixture {
 	public void lockAllQueryResults_20Seconds() {
 		QName featureType = LockFeatureTests
 				.selectRandomFeatureType(this.featureInfo);
-		WFSRequest.appendSimpleQuery(this.reqEntity, featureType);
+		WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
 		this.reqEntity.getDocumentElement().setAttribute("expiry", "20");
 		ClientResponse rsp = wfsClient.submitRequest(this.reqEntity,
 				ProtocolBinding.ANY);
@@ -124,9 +124,9 @@ public class GetFeatureWithLockTests extends LockingFixture {
 			// ignore interrupt should one occur
 		}
 		// try to reset expired lock with LockFeature request
-		this.reqEntity = WFSRequest.createRequestEntity("LockFeature",
+		this.reqEntity = WFSMessage.createRequestEntity("LockFeature",
 				this.wfsVersion);
-		WFSRequest.appendSimpleQuery(this.reqEntity, featureType);
+		WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
 		reqEntity.getDocumentElement().setAttribute("lockId", lockId);
 		rsp = wfsClient.submitRequest(reqEntity, ProtocolBinding.ANY);
 		this.rspEntity = rsp.getEntity(Document.class);
@@ -163,8 +163,8 @@ public class GetFeatureWithLockTests extends LockingFixture {
 		// Submit Q1 to lock one feature
 		Set<String> singleton = Collections.singleton(featureIdSet.iterator()
 				.next());
-		WFSRequest.appendSimpleQuery(this.reqEntity, featureType);
-		WFSRequest.addResourceIdPredicate(this.reqEntity, singleton);
+		WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
+		WFSMessage.addResourceIdPredicate(this.reqEntity, singleton);
 		this.reqEntity.getDocumentElement().setAttribute("expiry", "60");
 		ClientResponse rsp = wfsClient.submitRequest(this.reqEntity,
 				ProtocolBinding.ANY);
@@ -180,7 +180,7 @@ public class GetFeatureWithLockTests extends LockingFixture {
 				"@lockId in response to GetFeatureWithLock"));
 		locks.add(lockId);
 		// Submit Q2 to lock all features in set
-		WFSRequest.addResourceIdPredicate(this.reqEntity, featureIdSet);
+		WFSMessage.addResourceIdPredicate(this.reqEntity, featureIdSet);
 		this.reqEntity.getDocumentElement().setAttribute("lockAction", "SOME");
 		rsp = wfsClient.submitRequest(this.reqEntity, ProtocolBinding.ANY);
 		this.rspEntity = rsp.getEntity(Document.class);

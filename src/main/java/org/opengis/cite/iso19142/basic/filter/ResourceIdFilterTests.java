@@ -12,7 +12,7 @@ import org.opengis.cite.iso19142.ErrorMessageKeys;
 import org.opengis.cite.iso19142.Namespaces;
 import org.opengis.cite.iso19142.ProtocolBinding;
 import org.opengis.cite.iso19142.WFS2;
-import org.opengis.cite.iso19142.util.WFSRequest;
+import org.opengis.cite.iso19142.util.WFSMessage;
 import org.testng.Assert;
 import org.testng.SkipException;
 import org.testng.annotations.Test;
@@ -53,10 +53,10 @@ public class ResourceIdFilterTests extends QueryFilterFixture {
 	@Test(description = "See ISO 19142: 7.2.2; ISO 19143: 7.11", dataProvider = "protocol-featureType")
 	public void twoValidFeatureIdentifiers(ProtocolBinding binding,
 			QName featureType) {
-		WFSRequest.appendSimpleQuery(this.reqEntity, featureType);
+		WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
 		Set<String> idSet = this.dataSampler.selectRandomFeatureIdentifiers(
 				featureType, 2);
-		WFSRequest.addResourceIdPredicate(this.reqEntity, idSet);
+		WFSMessage.addResourceIdPredicate(this.reqEntity, idSet);
 		ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
 		this.rspEntity = extractBodyAsDocument(rsp);
 		Assert.assertEquals(rsp.getStatus(),
@@ -81,10 +81,10 @@ public class ResourceIdFilterTests extends QueryFilterFixture {
 	@Test(description = "See ISO 19142: 7.2.2, Table 8", dataProvider = "protocol-featureType")
 	public void unknownFeatureIdentifier(ProtocolBinding binding,
 			QName featureType) {
-		WFSRequest.appendSimpleQuery(this.reqEntity, featureType);
+		WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
 		Set<String> idSet = new HashSet<String>();
 		idSet.add("test-" + UUID.randomUUID());
-		WFSRequest.addResourceIdPredicate(this.reqEntity, idSet);
+		WFSMessage.addResourceIdPredicate(this.reqEntity, idSet);
 		ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
 		this.rspEntity = extractBodyAsDocument(rsp);
 		Assert.assertEquals(rsp.getStatus(),
@@ -111,7 +111,7 @@ public class ResourceIdFilterTests extends QueryFilterFixture {
 	@Test(description = "See ISO 19142: 7.9.2.4.1", dataProvider = "protocol-featureType")
 	public void inconsistentFeatureIdentifierAndType(ProtocolBinding binding,
 			QName featureType) {
-		WFSRequest.appendSimpleQuery(this.reqEntity, featureType);
+		WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
 		Set<String> idSet = new HashSet<String>();
 		String featureId = this.dataSampler.getFeatureId(featureType, false);
 		if (null == featureId) {
@@ -120,7 +120,7 @@ public class ResourceIdFilterTests extends QueryFilterFixture {
 							+ featureType);
 		}
 		idSet.add(featureId);
-		WFSRequest.addResourceIdPredicate(this.reqEntity, idSet);
+		WFSMessage.addResourceIdPredicate(this.reqEntity, idSet);
 		ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
 		this.rspEntity = extractBodyAsDocument(rsp);
 		Assert.assertEquals(rsp.getStatus(),

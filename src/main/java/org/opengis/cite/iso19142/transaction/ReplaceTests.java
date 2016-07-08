@@ -18,7 +18,7 @@ import org.opengis.cite.iso19142.ProtocolBinding;
 import org.opengis.cite.iso19142.WFS2;
 import org.opengis.cite.iso19142.util.XMLUtils;
 import org.opengis.cite.iso19142.util.TestSuiteLogger;
-import org.opengis.cite.iso19142.util.WFSRequest;
+import org.opengis.cite.iso19142.util.WFSMessage;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
@@ -51,9 +51,9 @@ public class ReplaceTests extends TransactionFixture {
 		if (originalFeatures.isEmpty()) {
 			return;
 		}
-		Document req = WFSRequest.createRequestEntity(WFS2.TRANSACTION,
+		Document req = WFSMessage.createRequestEntity(WFS2.TRANSACTION,
 				this.wfsVersion);
-		WFSRequest.addReplaceStatements(req, originalFeatures);
+		WFSMessage.addReplaceStatements(req, originalFeatures);
 		ClientResponse rsp = wfsClient.submitRequest(req, ProtocolBinding.ANY);
 		Document rspEntity = rsp.getEntity(Document.class);
 		String expr = String.format("//wfs:totalReplaced = '%d'",
@@ -96,7 +96,7 @@ public class ReplaceTests extends TransactionFixture {
 		Element originalFeature = (Element) features.item(0);
 		Element replacement = createReplacementFeature(originalFeature);
 		List<Element> replacements = Arrays.asList(replacement);
-		WFSRequest.addReplaceStatements(this.reqEntity, replacements);
+		WFSMessage.addReplaceStatements(this.reqEntity, replacements);
 		ClientResponse rsp = wfsClient.submitRequest(this.reqEntity, binding);
 		this.rspEntity = rsp.getEntity(Document.class);
 		String xpath = String.format("//wfs:totalReplaced = '%d'",
@@ -140,13 +140,13 @@ public class ReplaceTests extends TransactionFixture {
 		identifier.setAttribute("codeSpace", "http://cite.opengeospatial.org/");
 		String idValue = UUID.randomUUID().toString();
 		identifier.setTextContent(idValue);
-		WFSRequest.insertGMLProperty(replacement, identifier);
+		WFSMessage.insertGMLProperty(replacement, identifier);
 		replProps.put("gml:identifier[1]", idValue);
 		propName = new QName(Namespaces.GML, "description");
 		Element desc = XMLUtils.createElement(propName);
 		String description = "Lorem ipsum dolor sit amet.";
 		desc.setTextContent(description);
-		WFSRequest.insertGMLProperty(replacement, desc);
+		WFSMessage.insertGMLProperty(replacement, desc);
 		replProps.put("gml:description[1]", description);
 		replacement.setUserData(REPL_PROPS, replProps, null);
 		return replacement;

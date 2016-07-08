@@ -19,7 +19,7 @@ import org.opengis.cite.iso19142.Namespaces;
 import org.opengis.cite.iso19142.joins.JoinQueryUtils;
 import org.opengis.cite.iso19142.util.FeatureProperty;
 import org.opengis.cite.iso19142.util.VerifyAppSchemaUtils;
-import org.opengis.cite.iso19142.util.WFSRequest;
+import org.opengis.cite.iso19142.util.WFSMessage;
 import org.opengis.cite.validation.XSModelBuilder;
 import org.opengis.cite.validation.XmlSchemaCompiler;
 import org.w3c.dom.Document;
@@ -49,7 +49,7 @@ public class VerifyJoinQueryUtils extends CommonTestFixture {
 	public void noFeatureProperties() {
 		thrown.expect(NullPointerException.class);
 		thrown.expectMessage("Feature properties are required");
-		Document reqEntity = WFSRequest.createRequestEntity(
+		Document reqEntity = WFSMessage.createRequestEntity(
 				"GetFeature-Minimal", "2.0.0");
 		List<FeatureProperty> geomProps = null;
 		JoinQueryUtils.appendSpatialJoinQuery(reqEntity, "Intersects",
@@ -58,7 +58,7 @@ public class VerifyJoinQueryUtils extends CommonTestFixture {
 
 	@Test
 	public void buildIntersectsQuery() {
-		Document reqEntity = WFSRequest.createRequestEntity(
+		Document reqEntity = WFSMessage.createRequestEntity(
 				"GetFeature-Minimal", "2.0.0");
 		List<FeatureProperty> geomProps = new ArrayList<FeatureProperty>();
 		geomProps.add(new FeatureProperty(new QName(NS1, "SimpleFeature"),

@@ -19,7 +19,7 @@ import org.opengis.cite.iso19142.Namespaces;
 import org.opengis.cite.iso19142.ProtocolBinding;
 import org.opengis.cite.iso19142.WFS2;
 import org.opengis.cite.iso19142.util.AppSchemaUtils;
-import org.opengis.cite.iso19142.util.WFSRequest;
+import org.opengis.cite.iso19142.util.WFSMessage;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.BeforeClass;
@@ -111,11 +111,11 @@ public class PropertyIsNilOperatorTests extends QueryFilterFixture {
 									"No feature type for which instances exist has nillable properties"));
 		}
 		for (QName typeName : this.nillableProperties.keySet()) {
-			this.reqEntity = WFSRequest.createRequestEntity(
+			this.reqEntity = WFSMessage.createRequestEntity(
 					GET_FEATURE_MINIMAL, this.wfsVersion);
 			List<XSElementDeclaration> nillables = this.nillableProperties
 					.get(typeName);
-			WFSRequest.appendSimpleQuery(this.reqEntity, typeName);
+			WFSMessage.appendSimpleQuery(this.reqEntity, typeName);
 			// get last nillable property for this feature type
 			XSElementDeclaration prop = nillables.get(nillables.size() - 1);
 			QName propName = new QName(prop.getNamespace(), prop.getName());
