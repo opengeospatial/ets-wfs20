@@ -52,7 +52,7 @@
     <dependency>
       <groupId>org.opengis.cite.teamengine</groupId>
       <artifactId>teamengine-spi</artifactId>
-      <version>4.8-SNAPSHOT</version>
+      <version>4.7.1</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>

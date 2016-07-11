@@ -111,35 +111,9 @@ dt {
     </ol>
 
     <p>A feature identifier may be supplied for the purpose of verifying the behavior of the 
-      <code>GetFeatureById</code> stored query. If this test run parameter is missing or does not 
-    identify an available feature instance, a "Simple WFS" implementation must also implement the 
-      <code>GetFeatureByType</code> stored query (see the definition below). The parameter may be 
-    omitted if the WFS under test implements the "Basic WFS" conformance class.</p>
-
-    <pre>
-&lt;wfs:StoredQueryDefinition id="urn:ogc:def:query:OGC-WFS::GetFeatureByType"
-  xmlns:xs="http://www.w3.org/2001/XMLSchema"&gt;
-  &lt;wfs:Abstract&gt;
-    A parameterized GetFeature request that returns a collection of features by type name.
-  &lt;/wfs:Abstract&gt;
-  &lt;wfs:Parameter name="typeName" type="xs:QName"&gt;
-    &lt;wfs:Abstract&gt;A QName specifying a feature type name (required); a corresponding namespace 
-    binding must also be present.&lt;/wfs:Abstract&gt;
-  &lt;/wfs:Parameter&gt;
-  &lt;wfs:Parameter name="startIndex" type="xs:nonNegativeInteger"&gt;
-    &lt;wfs:Abstract&gt;Default value is 0&lt;/wfs:Abstract&gt;
-  &lt;/wfs:Parameter&gt;
-  &lt;wfs:Parameter name="count" type="xs:nonNegativeInteger"&gt;
-    &lt;wfs:Abstract&gt;Optional&lt;/wfs:Abstract&gt;
-  &lt;/wfs:Parameter&gt;
-  &lt;wfs:QueryExpressionText returnFeatureTypes="gml:AbstractFeature"
-    language="http://schemas.opengis.net/wfs/2.0/wfs.xsd#xmlns(wfs=http://www.opengis.net/wfs/2.0)xscd(/wfs:GetFeature)"&gt;
-    &lt;wfs:GetFeature startIndex="${startIndex}" count="${count}"&gt;
-      &lt;wfs:Query typeNames="tns:${typeName}"/&gt;
-    &lt;/wfs:GetFeature&gt;
-  &lt;/wfs:QueryExpressionText&gt;
-&lt;/wfs:StoredQueryDefinition&gt;
-    </pre>
+    <code>GetFeatureById</code> stored query. This identifier is required to test a "Simple WFS" 
+    implementation but it may be omitted if the WFS under test implements the "Basic WFS" 
+    conformance class.</p>
 
     <h2>Test coverage</h2>
     <p>Several optional conformance classes are not covered by the current test suite. The following 
