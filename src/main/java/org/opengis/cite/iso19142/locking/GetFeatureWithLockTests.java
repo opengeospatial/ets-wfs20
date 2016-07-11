@@ -180,6 +180,8 @@ public class GetFeatureWithLockTests extends LockingFixture {
 				"@lockId in response to GetFeatureWithLock"));
 		locks.add(lockId);
 		// Submit Q2 to lock all features in set
+		buildGetFeatureWithLockRequest();
+		WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
 		WFSMessage.addResourceIdPredicate(this.reqEntity, featureIdSet);
 		this.reqEntity.getDocumentElement().setAttribute("lockAction", "SOME");
 		rsp = wfsClient.submitRequest(this.reqEntity, ProtocolBinding.ANY);

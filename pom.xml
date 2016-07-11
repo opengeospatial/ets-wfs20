@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.opengis.cite</groupId>
     <artifactId>ets-common</artifactId>
-    <version>6</version>
+    <version>7</version>
   </parent>
   <artifactId>ets-wfs20</artifactId>
   <version>1.23-SNAPSHOT</version>
@@ -49,6 +49,11 @@
   </properties>
 
   <dependencies>
+    <dependency>
+      <groupId>org.opengis.cite.teamengine</groupId>
+      <artifactId>teamengine-spi</artifactId>
+      <version>4.8-SNAPSHOT</version>
+    </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>ets-gml32</artifactId>
