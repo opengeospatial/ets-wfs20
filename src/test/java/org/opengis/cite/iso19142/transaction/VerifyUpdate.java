@@ -3,6 +3,7 @@ package org.opengis.cite.iso19142.transaction;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.namespace.QName;
@@ -46,8 +47,7 @@ public class VerifyUpdate {
         suite = mock(ISuite.class);
         when(testContext.getSuite()).thenReturn(suite);
         dataSampler = mock(DataSampler.class);
-        when(suite.getAttribute(SuiteAttribute.SAMPLER.getName())).thenReturn(
-                dataSampler);
+        when(suite.getAttribute(SuiteAttribute.SAMPLER.getName())).thenReturn(dataSampler);
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
         dbf.newDocumentBuilder();
@@ -55,11 +55,9 @@ public class VerifyUpdate {
 
     @BeforeClass
     public static void buildSchemaModel() throws SAXException {
-        URL entityCatalog = VerifyUpdate.class
-                .getResource("/schema-catalog.xml");
+        URL entityCatalog = VerifyUpdate.class.getResource("/schema-catalog.xml");
         XmlSchemaCompiler xsdCompiler = new XmlSchemaCompiler(entityCatalog);
-        InputStream xis = VerifyUpdate.class
-                .getResourceAsStream("/xsd/simple.xsd");
+        InputStream xis = VerifyUpdate.class.getResourceAsStream("/xsd/simple.xsd");
         Schema schema = xsdCompiler.compileXmlSchema(new StreamSource(xis));
         model = XSModelBuilder.buildXMLSchemaModel(schema, NS1);
     }
@@ -67,39 +65,55 @@ public class VerifyUpdate {
     @Test
     public void createNewStringEnumValue() throws SAXException, IOException {
         QName featureType = new QName(NS1, "ComplexFeature");
-        List<XSElementDeclaration> simpleProps = AppSchemaUtils
-                .getSimpleFeatureProperties(model, featureType);
+        List<XSElementDeclaration> simpleProps = AppSchemaUtils.getSimpleFeatureProperties(model, featureType);
         List<String> propValues = new ArrayList<String>();
         propValues.add("CA-AB");
         Update iut = new Update();
-        String newVal = iut.newPropertyValue(
-                simpleProps.get(simpleProps.size() - 1), propValues);
+        String newVal = iut.newPropertyValue(simpleProps.get(simpleProps.size() - 1), propValues);
         assertEquals("CA-BC", newVal);
     }
 
     @Test
     public void createNewDateTimeValue() throws SAXException, IOException {
         QName featureType = new QName(NS1, "ComplexFeature");
-        List<XSElementDeclaration> simpleProps = AppSchemaUtils
-                .getSimpleFeatureProperties(model, featureType);
+        List<XSElementDeclaration> simpleProps = AppSchemaUtils.getSimpleFeatureProperties(model, featureType);
         List<String> propValues = new ArrayList<String>();
         propValues.add("2010-03-20T13:32:00-04:00");
         Update iut = new Update();
-        String newVal = iut.newPropertyValue(
-                simpleProps.get(simpleProps.size() - 2), propValues);
-        assertTrue(String.format("Expected %s isBeforeNow", newVal),
-                new DateTime(newVal).isBeforeNow());
+        String newVal = iut.newPropertyValue(simpleProps.get(simpleProps.size() - 2), propValues);
+        assertTrue(String.format("Expected %s isBeforeNow", newVal), new DateTime(newVal).isBeforeNow());
     }
 
     @Test
     public void createNewDoubleValue() throws SAXException, IOException {
         QName featureType = new QName(NS1, "ComplexFeature");
-        List<XSElementDeclaration> simpleProps = AppSchemaUtils
-                .getSimpleFeatureProperties(model, featureType);
+        List<XSElementDeclaration> simpleProps = AppSchemaUtils.getSimpleFeatureProperties(model, featureType);
         List<String> propValues = new ArrayList<String>();
         propValues.add("49.25");
         Update iut = new Update();
         String newVal = iut.newPropertyValue(simpleProps.get(0), propValues);
         assertEquals(3.8969, Double.parseDouble(newVal), 0.00001);
+    }
+
+    @Test
+    public void createNewDecimalValue() throws SAXException, IOException {
+        QName featureType = new QName(NS1, "SimpleFeature");
+        List<XSElementDeclaration> simpleProps = AppSchemaUtils.getSimpleFeatureProperties(model, featureType);
+        List<String> propValues = new ArrayList<String>();
+        propValues.add("49.25");
+        Update iut = new Update();
+        String newVal = iut.newPropertyValue(simpleProps.get(simpleProps.size() - 1), propValues);
+        assertEquals(4.925, Double.parseDouble(newVal), 0.0001);
+    }
+
+    @Test
+    public void createNewDateValue() throws SAXException, IOException {
+        QName featureType = new QName(NS1, "SimpleFeature");
+        List<XSElementDeclaration> simpleProps = AppSchemaUtils.getSimpleFeatureProperties(model, featureType);
+        List<String> propValues = new ArrayList<String>();
+        propValues.add("2010-01-01");
+        Update iut = new Update();
+        String newVal = iut.newPropertyValue(simpleProps.get(simpleProps.size() - 2), propValues);
+        assertEquals(LocalDate.now(), LocalDate.parse(newVal));
     }
 }
