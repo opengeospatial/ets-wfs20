@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gml:TimePeriod xmlns:gml="http://www.opengis.net/gml/3.2" gml:id="TP01"
+  frame="http://www.iso.org/iso/iso8601">
+  <gml:beginPosition />
+  <gml:endPosition />
+</gml:TimePeriod>

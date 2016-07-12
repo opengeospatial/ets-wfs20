@@ -129,7 +129,6 @@ public class IntersectsTests extends QueryFilterFixture {
         Element valueRef = WFSMessage.createValueReference(geomProperty);
         addSpatialPredicate(this.reqEntity, INTERSECTS_OP, gmlPolygon, valueRef);
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.GET_FEATURE, binding);
-        XMLUtils.writeNode(reqEntity, System.out);
         ClientResponse rsp = wfsClient.submitRequest(new DOMSource(reqEntity), binding, endpoint);
         this.rspEntity = extractBodyAsDocument(rsp);
         XMLUtils.writeNode(rspEntity, System.out);

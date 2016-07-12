@@ -33,8 +33,7 @@
 					<xsd:element name="uriProperty" type="xsd:anyURI"
 						minOccurs="0" />
 					<xsd:element name="measurand" type="xsd:double" />
-					<xsd:element name="dateTimeProperty" type="xsd:dateTime"
-						minOccurs="0" />
+					<xsd:element ref="tns:dateTimeProperty" minOccurs="0" />
 					<xsd:element name="dateProperty" type="xsd:date"
 						minOccurs="0" />
 					<xsd:element name="decimalProperty">
@@ -55,6 +54,7 @@
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
+	<xsd:element name="dateTimeProperty" type="xsd:dateTime" />
 
 	<xsd:element name="lineProperty" type="tns:LineStringPropertyType" />
 	<xsd:complexType name="LineStringPropertyType">
