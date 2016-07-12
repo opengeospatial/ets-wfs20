@@ -15,6 +15,7 @@ import org.apache.xerces.xs.XSTypeDefinition;
 import org.opengis.cite.geomatics.Extents;
 import org.opengis.cite.geomatics.TopologicalRelationships;
 import org.opengis.cite.geomatics.gml.GmlUtils;
+import org.opengis.cite.iso19136.util.XMLSchemaModelUtils;
 import org.opengis.cite.iso19142.ErrorMessage;
 import org.opengis.cite.iso19142.ErrorMessageKeys;
 import org.opengis.cite.iso19142.Namespaces;
@@ -131,17 +132,25 @@ public class IntersectsTests extends QueryFilterFixture {
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.GET_FEATURE, binding);
         ClientResponse rsp = wfsClient.submitRequest(new DOMSource(reqEntity), binding, endpoint);
         this.rspEntity = extractBodyAsDocument(rsp);
-        XMLUtils.writeNode(rspEntity, System.out);
         Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
         Map<String, String> nsBindings = new HashMap<String, String>();
         nsBindings.put(Namespaces.WFS, "wfs");
         XSElementDeclaration geomValue = AppSchemaUtils.getComplexPropertyValue(geomProperty);
+        XSElementDeclaration[] expectedValues = new XSElementDeclaration[1];
         if (geomValue.getAbstract()) {
-         // TODO: Find allowable substitutions in schema
-            throw new RuntimeException("Expected geometry property value is abstract: " + geomValue.getName());
+            List<XSElementDeclaration> allowedValues = XMLSchemaModelUtils.getElementsByAffiliation(this.model,
+                    geomValue);
+            if (allowedValues.isEmpty()) {
+                throw new AssertionError(
+                        String.format("For property %s, no substitutable elements found for abstract property value: ",
+                                geomProperty, geomValue));
+            }
+            expectedValues = allowedValues.toArray(expectedValues);
+        } else {
+            expectedValues[0] = geomValue;
         }
-        List<Node> geomNodes = WFSMessage.findMatchingElements(this.rspEntity, geomValue);
+        List<Node> geomNodes = WFSMessage.findMatchingElements(this.rspEntity, expectedValues);
         Assert.assertFalse(geomNodes.isEmpty(), String.format("No geometry elements found in response: %s", geomValue));
         for (Node geom : geomNodes) {
             try {

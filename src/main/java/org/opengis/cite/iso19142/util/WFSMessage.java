@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
@@ -37,6 +38,7 @@ import org.w3c.dom.NodeList;
  */
 public class WFSMessage {
 
+    private static final Logger LOGR = Logger.getLogger(WFSMessage.class.getPackage().getName());
     private static final String TNS_PREFIX = "tns";
     private static final DocumentBuilder BUILDER = initDocBuilder();
 
@@ -463,9 +465,14 @@ public class WFSMessage {
      * @return A list of matching element nodes. It may be empty.
      */
     public static List<Node> findMatchingElements(Document doc, XSElementDeclaration... elemDeclarations) {
+        LOGR.log(Level.FINE, String.format("In %s, find %s", doc.getDocumentElement().getNodeName(),
+                Arrays.toString(elemDeclarations)));
         List<Node> nodes = new ArrayList<>();
         for (XSElementDeclaration decl : elemDeclarations) {
             NodeList matches = doc.getElementsByTagNameNS(decl.getNamespace(), decl.getName());
+            if (matches.getLength() > 0) {
+                LOGR.log(Level.FINE, String.format("Found %d instances of %s", matches.getLength(), decl));
+            }
             for (int i = 0; i < matches.getLength(); i++) {
                 nodes.add(matches.item(i));
             }
