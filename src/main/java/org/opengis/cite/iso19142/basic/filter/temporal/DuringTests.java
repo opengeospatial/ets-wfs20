@@ -12,6 +12,9 @@ import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.xerces.xs.XSElementDeclaration;
 import org.apache.xerces.xs.XSTypeDefinition;
+import org.opengis.cite.geomatics.TemporalAssert;
+import org.opengis.cite.geomatics.gml.GmlUtils;
+import org.opengis.cite.iso19136.util.XMLSchemaModelUtils;
 import org.opengis.cite.iso19142.ErrorMessage;
 import org.opengis.cite.iso19142.ErrorMessageKeys;
 import org.opengis.cite.iso19142.Namespaces;
@@ -25,6 +28,8 @@ import org.opengis.cite.iso19142.util.TestSuiteLogger;
 import org.opengis.cite.iso19142.util.TimeUtils;
 import org.opengis.cite.iso19142.util.WFSMessage;
 import org.opengis.cite.iso19142.util.XMLUtils;
+import org.opengis.temporal.RelativePosition;
+import org.opengis.temporal.TemporalGeometricPrimitive;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.SkipException;
@@ -33,6 +38,7 @@ import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.sun.jersey.api.client.ClientResponse;
@@ -140,48 +146,33 @@ public class DuringTests extends QueryFilterFixture {
         Document gmlTimePeriod = TimeUtils.periodAsGML(startTime, endTime);
         XSElementDeclaration timeProperty = timeProps.get(0);
         Element valueRef = WFSMessage.createValueReference(timeProperty);
-        addTemporalPredicate(this.reqEntity, DURING_OP, gmlTimePeriod, valueRef);
+        WFSMessage.addTemporalPredicate(this.reqEntity, DURING_OP, gmlTimePeriod, valueRef);
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.GET_FEATURE, binding);
         ClientResponse rsp = wfsClient.submitRequest(new DOMSource(reqEntity), binding, endpoint);
         this.rspEntity = extractBodyAsDocument(rsp);
         Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
-        // TODO: verify temporal relation
+        List<Node> temporalNodes;
+        if (timeProperty.getTypeDefinition().getTypeCategory() == XSTypeDefinition.SIMPLE_TYPE) {
+            temporalNodes = WFSMessage.findMatchingElements(this.rspEntity, timeProperty);
+        } else { // GML temporal property
+            XSElementDeclaration gmlAbstractTimeGeometricPrimitive = this.model
+                    .getElementDeclaration("AbstractTimeGeometricPrimitive", Namespaces.GML);
+            List<XSElementDeclaration> allowedValues = XMLSchemaModelUtils.getElementsByAffiliation(this.model,
+                    gmlAbstractTimeGeometricPrimitive);
+            temporalNodes = WFSMessage.findMatchingElements(this.rspEntity,
+                    (XSElementDeclaration[]) allowedValues.toArray());
+        }
+        TemporalGeometricPrimitive t2 = GmlUtils.gmlToTemporalGeometricPrimitive(gmlTimePeriod.getDocumentElement());
+        for (Node timeNode : temporalNodes) {
+            TemporalGeometricPrimitive t1 = null;
+            if (!timeNode.hasChildNodes()) {
+                t1 = TimeUtils.parseTemporalValue(timeNode.getTextContent(), timeProperty.getTypeDefinition());
+            } else {
+                t1 = GmlUtils.gmlToTemporalGeometricPrimitive((Element) timeNode);
+            }
+            TemporalAssert.assertTemporalRelation(RelativePosition.DURING, t1, t2);
+        }
     }
 
-    /**
-     * Adds a temporal predicate to a GetFeature request entity. If the given
-     * temporal element has no temporal reference (frame) it is assumed to use
-     * the default TRS (ISO 8601).
-     * 
-     * @param request
-     *            The request entity (wfs:GetFeature).
-     * @param temporalOp
-     *            The name of a spatial operator.
-     * @param gmlTime
-     *            A Document containing a GML temporal primitive.
-     * @param valueRef
-     *            An Element (fes:ValueReference) that specifies the temporal
-     *            property to check. If it is {@code null}, the predicate
-     *            applies to all temporal properties.
-     */
-    void addTemporalPredicate(Document request, String temporalOp, Document gmlTime, Element valueRef) {
-        if (!request.getDocumentElement().getLocalName().equals(WFS2.GET_FEATURE)) {
-            throw new IllegalArgumentException(
-                    "Not a GetFeature request: " + request.getDocumentElement().getNodeName());
-        }
-        Element queryElem = (Element) request.getElementsByTagNameNS(Namespaces.WFS, WFS2.QUERY_ELEM).item(0);
-        if (null == queryElem) {
-            throw new IllegalArgumentException("No Query element found in GetFeature request entity.");
-        }
-        Element filter = request.createElementNS(Namespaces.FES, "fes:Filter");
-        queryElem.appendChild(filter);
-        Element predicate = request.createElementNS(Namespaces.FES, "fes:" + temporalOp);
-        filter.appendChild(predicate);
-        if (null != valueRef) {
-            predicate.appendChild(request.importNode(valueRef, true));
-        }
-        // import temporal element to avoid WRONG_DOCUMENT_ERR
-        predicate.appendChild(request.importNode(gmlTime.getDocumentElement(), true));
-    }
 }
