@@ -14,6 +14,7 @@
 					</gml:posList>
 				</gml:LineString>
 			</tns:lineProperty>
+			<tns:dateTimeProperty>2016-07-21T14:47:51Z</tns:dateTimeProperty>
 			<tns:decimalProperty>11.74</tns:decimalProperty>
 		</tns:SimpleFeature>
 	</wfs:member>
@@ -29,6 +30,7 @@
 					</gml:posList>
 				</gml:LineString>
 			</tns:lineProperty>
+			<tns:dateProperty>2015-11-11Z</tns:dateProperty>
 			<tns:decimalProperty>21.05</tns:decimalProperty>
 		</tns:SimpleFeature>
 	</wfs:member>

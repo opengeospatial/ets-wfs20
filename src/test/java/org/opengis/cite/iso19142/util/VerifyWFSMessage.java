@@ -253,7 +253,7 @@ public class VerifyWFSMessage {
         WFSMessage.appendSimpleQuery(reqEntity, new QName(NS1, "SimpleFeature"));
         ZonedDateTime endTime = ZonedDateTime.now(ZoneId.of("Z"));
         ZonedDateTime startTime = endTime.minusYears(5);
-        Document gmlTime = TimeUtils.periodAsGML(startTime, endTime);
+        Document gmlTime = TimeUtils.intervalAsGML(startTime, endTime);
         Element valueRef = WFSMessage.createValueReference(propertyElem);
         WFSMessage.addTemporalPredicate(reqEntity, "During", gmlTime, valueRef);
         Node predicate = reqEntity.getElementsByTagNameNS(Namespaces.FES, "During").item(0);

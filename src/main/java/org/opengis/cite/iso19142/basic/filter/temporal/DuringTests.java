@@ -1,8 +1,6 @@
 package org.opengis.cite.iso19142.basic.filter.temporal;
 
 import java.net.URI;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -12,8 +10,8 @@ import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.xerces.xs.XSElementDeclaration;
 import org.apache.xerces.xs.XSTypeDefinition;
-import org.opengis.cite.geomatics.TemporalAssert;
 import org.opengis.cite.geomatics.gml.GmlUtils;
+import org.opengis.cite.geomatics.time.TemporalUtils;
 import org.opengis.cite.iso19136.util.XMLSchemaModelUtils;
 import org.opengis.cite.iso19142.ErrorMessage;
 import org.opengis.cite.iso19142.ErrorMessageKeys;
@@ -28,6 +26,7 @@ import org.opengis.cite.iso19142.util.TestSuiteLogger;
 import org.opengis.cite.iso19142.util.TimeUtils;
 import org.opengis.cite.iso19142.util.WFSMessage;
 import org.opengis.cite.iso19142.util.XMLUtils;
+import org.opengis.temporal.Period;
 import org.opengis.temporal.RelativePosition;
 import org.opengis.temporal.TemporalGeometricPrimitive;
 import org.testng.Assert;
@@ -117,9 +116,9 @@ public class DuringTests extends QueryFilterFixture {
 
     /**
      * [{@code Test}] Submits a GetFeature request containing a During temporal
-     * predicate with a gml:TimePeriod operand (spanning the previous 5 years).
-     * The response entity must contain only instances of the requested type
-     * that satisfy the temporal relation.
+     * predicate with a gml:TimePeriod operand spanning some time interval. The
+     * response entity must contain only instances of the requested type that
+     * satisfy the temporal relation.
      * 
      * @param binding
      *            The ProtocolBinding to use for this request.
@@ -127,7 +126,7 @@ public class DuringTests extends QueryFilterFixture {
      *            A QName representing the qualified name of some feature type.
      */
     @Test(description = "See ISO 19143: 7.14.6, A.9", dataProvider = "protocol-featureType")
-    public void duringFixedPeriod(ProtocolBinding binding, QName featureType) {
+    public void duringPeriod(ProtocolBinding binding, QName featureType) {
         List<XSElementDeclaration> timeProps = AppSchemaUtils.getFeaturePropertiesByType(this.model, featureType,
                 this.gmlTimeBaseType);
         // also look for simple temporal types
@@ -140,10 +139,9 @@ public class DuringTests extends QueryFilterFixture {
             throw new SkipException("Feature type has no temporal properties: " + featureType);
         }
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
-        // previous 5 years
-        ZonedDateTime endTime = ZonedDateTime.now(ZoneId.of("Z"));
-        ZonedDateTime startTime = endTime.minusYears(5);
-        Document gmlTimePeriod = TimeUtils.periodAsGML(startTime, endTime);
+        // use actual temporal extent of sample data
+        Period temporalExtent = this.dataSampler.getTemporalExtent(this.model, featureType);
+        Document gmlTimePeriod = TimeUtils.periodAsGML(temporalExtent);
         XSElementDeclaration timeProperty = timeProps.get(0);
         Element valueRef = WFSMessage.createValueReference(timeProperty);
         WFSMessage.addTemporalPredicate(this.reqEntity, DURING_OP, gmlTimePeriod, valueRef);
@@ -153,7 +151,8 @@ public class DuringTests extends QueryFilterFixture {
         Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
         List<Node> temporalNodes;
-        if (timeProperty.getTypeDefinition().getTypeCategory() == XSTypeDefinition.SIMPLE_TYPE) {
+        XSTypeDefinition timePropType = timeProperty.getTypeDefinition();
+        if (timePropType.getTypeCategory() == XSTypeDefinition.SIMPLE_TYPE) {
             temporalNodes = WFSMessage.findMatchingElements(this.rspEntity, timeProperty);
         } else { // GML temporal property
             XSElementDeclaration gmlAbstractTimeGeometricPrimitive = this.model
@@ -166,12 +165,12 @@ public class DuringTests extends QueryFilterFixture {
         TemporalGeometricPrimitive t2 = GmlUtils.gmlToTemporalGeometricPrimitive(gmlTimePeriod.getDocumentElement());
         for (Node timeNode : temporalNodes) {
             TemporalGeometricPrimitive t1 = null;
-            if (!timeNode.hasChildNodes()) {
+            if (timePropType.getTypeCategory() == XSTypeDefinition.SIMPLE_TYPE) {
                 t1 = TimeUtils.parseTemporalValue(timeNode.getTextContent(), timeProperty.getTypeDefinition());
             } else {
                 t1 = GmlUtils.gmlToTemporalGeometricPrimitive((Element) timeNode);
             }
-            TemporalAssert.assertTemporalRelation(RelativePosition.DURING, t1, t2);
+            TemporalUtils.assertTemporalRelation(RelativePosition.DURING, t1, t2);
         }
     }
 
