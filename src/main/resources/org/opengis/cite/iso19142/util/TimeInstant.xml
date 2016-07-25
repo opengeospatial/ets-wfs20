@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gml:TimeInstant xmlns:gml="http://www.opengis.net/gml/3.2" gml:id="T01"
+  frame="http://www.iso.org/iso/iso8601">
+  <gml:timePosition />
+</gml:TimeInstant>

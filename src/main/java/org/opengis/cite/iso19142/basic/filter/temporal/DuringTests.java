@@ -1,8 +1,6 @@
 package org.opengis.cite.iso19142.basic.filter.temporal;
 
-import java.net.URI;
 import java.util.List;
-import java.util.logging.Level;
 
 import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMSource;
@@ -12,17 +10,11 @@ import org.apache.xerces.xs.XSElementDeclaration;
 import org.apache.xerces.xs.XSTypeDefinition;
 import org.opengis.cite.geomatics.gml.GmlUtils;
 import org.opengis.cite.geomatics.time.TemporalUtils;
-import org.opengis.cite.iso19136.util.XMLSchemaModelUtils;
 import org.opengis.cite.iso19142.ErrorMessage;
 import org.opengis.cite.iso19142.ErrorMessageKeys;
-import org.opengis.cite.iso19142.Namespaces;
 import org.opengis.cite.iso19142.ProtocolBinding;
 import org.opengis.cite.iso19142.SuiteAttribute;
-import org.opengis.cite.iso19142.WFS2;
 import org.opengis.cite.iso19142.basic.filter.QueryFilterFixture;
-import org.opengis.cite.iso19142.util.AppSchemaUtils;
-import org.opengis.cite.iso19142.util.ServiceMetadataUtils;
-import org.opengis.cite.iso19142.util.TestSuiteLogger;
 import org.opengis.cite.iso19142.util.TimeUtils;
 import org.opengis.cite.iso19142.util.WFSMessage;
 import org.opengis.cite.iso19142.util.XMLUtils;
@@ -32,7 +24,6 @@ import org.opengis.temporal.TemporalGeometricPrimitive;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.SkipException;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
@@ -77,13 +68,12 @@ import com.sun.jersey.api.client.ClientResponse;
 public class DuringTests extends QueryFilterFixture {
 
     private static final String DURING_OP = "During";
-    public final static String IMPL_TEMPORAL_FILTER = "ImplementsTemporalFilter";
-    private XSTypeDefinition gmlTimeBaseType;
+    public final static String IMPL_MIN_TEMPORAL_FILTER = "ImplementsMinTemporalFilter";
 
     /**
-     * Checks the value of the filter constraint {@value #IMPL_TEMPORAL_FILTER}
-     * in the capabilities document. All tests are skipped if this is not
-     * "TRUE".
+     * Checks the value of the filter constraint
+     * {@value #IMPL_MIN_TEMPORAL_FILTER} in the capabilities document. All
+     * tests are skipped if this is not "TRUE".
      * 
      * @param testContext
      *            Information about the test run environment.
@@ -92,7 +82,7 @@ public class DuringTests extends QueryFilterFixture {
     public void implementsTemporalFilter(ITestContext testContext) {
         this.wfsMetadata = (Document) testContext.getSuite().getAttribute(SuiteAttribute.TEST_SUBJECT.getName());
         String xpath = String.format("//fes:Constraint[@name='%s' and (ows:DefaultValue = 'TRUE')]",
-                IMPL_TEMPORAL_FILTER);
+                IMPL_MIN_TEMPORAL_FILTER);
         NodeList result;
         try {
             result = XMLUtils.evaluateXPath(this.wfsMetadata, xpath, null);
@@ -100,18 +90,8 @@ public class DuringTests extends QueryFilterFixture {
             throw new AssertionError(e.getMessage());
         }
         if (result.getLength() == 0) {
-            throw new SkipException(ErrorMessage.format(ErrorMessageKeys.NOT_IMPLEMENTED, IMPL_TEMPORAL_FILTER));
+            throw new SkipException(ErrorMessage.format(ErrorMessageKeys.NOT_IMPLEMENTED, IMPL_MIN_TEMPORAL_FILTER));
         }
-    }
-
-    /**
-     * Creates an XSTypeDefinition object representing the
-     * gml:AbstractTimeGeometricPrimitiveType definition. This is the base type
-     * for <code>TimeInstantType</code> and <code>TimePeriodType</code>.
-     */
-    @BeforeClass
-    public void createTemporalPrimitiveBaseType() {
-        this.gmlTimeBaseType = this.model.getTypeDefinition("AbstractTimeGeometricPrimitiveType", Namespaces.GML);
     }
 
     /**
@@ -127,46 +107,42 @@ public class DuringTests extends QueryFilterFixture {
      */
     @Test(description = "See ISO 19143: 7.14.6, A.9", dataProvider = "protocol-featureType")
     public void duringPeriod(ProtocolBinding binding, QName featureType) {
-        List<XSElementDeclaration> timeProps = AppSchemaUtils.getFeaturePropertiesByType(this.model, featureType,
-                this.gmlTimeBaseType);
-        // also look for simple temporal types
-        for (XSTypeDefinition dataType : AppSchemaUtils.getSimpleTemporalDataTypes(this.model)) {
-            timeProps.addAll(AppSchemaUtils.getFeaturePropertiesByType(this.model, featureType, dataType));
-        }
-        TestSuiteLogger.log(Level.FINE,
-                String.format("Temporal properties for feature type %s: %s", featureType, timeProps));
+        List<XSElementDeclaration> timeProps = findTemporalProperties(featureType);
         if (timeProps.isEmpty()) {
             throw new SkipException("Feature type has no temporal properties: " + featureType);
         }
-        WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
         // use actual temporal extent of sample data
         Period temporalExtent = this.dataSampler.getTemporalExtent(this.model, featureType);
-        Document gmlTimePeriod = TimeUtils.periodAsGML(temporalExtent);
+        Document gmlTimeLiteral = TimeUtils.periodAsGML(temporalExtent);
+        WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
         XSElementDeclaration timeProperty = timeProps.get(0);
         Element valueRef = WFSMessage.createValueReference(timeProperty);
-        WFSMessage.addTemporalPredicate(this.reqEntity, DURING_OP, gmlTimePeriod, valueRef);
-        URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.GET_FEATURE, binding);
-        ClientResponse rsp = wfsClient.submitRequest(new DOMSource(reqEntity), binding, endpoint);
+        WFSMessage.addTemporalPredicate(this.reqEntity, DURING_OP, gmlTimeLiteral, valueRef);
+        ClientResponse rsp = wfsClient.getFeature(new DOMSource(reqEntity), binding);
         this.rspEntity = extractBodyAsDocument(rsp);
         Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
-        List<Node> temporalNodes;
-        XSTypeDefinition timePropType = timeProperty.getTypeDefinition();
-        if (timePropType.getTypeCategory() == XSTypeDefinition.SIMPLE_TYPE) {
-            temporalNodes = WFSMessage.findMatchingElements(this.rspEntity, timeProperty);
-        } else { // GML temporal property
-            XSElementDeclaration gmlAbstractTimeGeometricPrimitive = this.model
-                    .getElementDeclaration("AbstractTimeGeometricPrimitive", Namespaces.GML);
-            List<XSElementDeclaration> allowedValues = XMLSchemaModelUtils.getElementsByAffiliation(this.model,
-                    gmlAbstractTimeGeometricPrimitive);
-            temporalNodes = WFSMessage.findMatchingElements(this.rspEntity,
-                    (XSElementDeclaration[]) allowedValues.toArray());
-        }
-        TemporalGeometricPrimitive t2 = GmlUtils.gmlToTemporalGeometricPrimitive(gmlTimePeriod.getDocumentElement());
+        List<Node> temporalNodes = TemporalQuery.extractTemporalNodes(this.rspEntity, timeProperty, this.model);
+        assertDuring(temporalNodes, timeProperty.getTypeDefinition(), gmlTimeLiteral);
+    }
+
+    /**
+     * Asserts that all temporal values in the given list occur during the
+     * specified GML temporal value (gml:TimePeriod).
+     * 
+     * @param temporalNodes
+     *            A list of simple or complex temporal values.
+     * @param typeDef
+     *            The relevant definition of the temporal property type.
+     * @param gmlTimeLiteral
+     *            A document that contains a GML representation of a period.
+     */
+    void assertDuring(List<Node> temporalNodes, XSTypeDefinition typeDef, Document gmlTimeLiteral) {
+        TemporalGeometricPrimitive t2 = GmlUtils.gmlToTemporalGeometricPrimitive(gmlTimeLiteral.getDocumentElement());
         for (Node timeNode : temporalNodes) {
             TemporalGeometricPrimitive t1 = null;
-            if (timePropType.getTypeCategory() == XSTypeDefinition.SIMPLE_TYPE) {
-                t1 = TimeUtils.parseTemporalValue(timeNode.getTextContent(), timeProperty.getTypeDefinition());
+            if (typeDef.getTypeCategory() == XSTypeDefinition.SIMPLE_TYPE) {
+                t1 = TemporalQuery.parseTemporalValue(timeNode.getTextContent(), typeDef);
             } else {
                 t1 = GmlUtils.gmlToTemporalGeometricPrimitive((Element) timeNode);
             }

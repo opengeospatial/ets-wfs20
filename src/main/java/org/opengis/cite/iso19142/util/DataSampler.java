@@ -38,6 +38,7 @@ import org.opengis.cite.iso19142.FeatureTypeInfo;
 import org.opengis.cite.iso19142.Namespaces;
 import org.opengis.cite.iso19142.ProtocolBinding;
 import org.opengis.cite.iso19142.WFS2;
+import org.opengis.cite.iso19142.basic.filter.temporal.TemporalQuery;
 import org.opengis.geometry.Envelope;
 import org.opengis.temporal.Period;
 import org.opengis.temporal.TemporalGeometricPrimitive;
@@ -433,7 +434,7 @@ public class DataSampler {
                 Node prop = props.item(i);
                 try {
                     if (propType.getTypeCategory() == XSTypeDefinition.SIMPLE_TYPE) {
-                        t = TimeUtils.parseTemporalValue(prop.getTextContent(), propType);
+                        t = TemporalQuery.parseTemporalValue(prop.getTextContent(), propType);
                     } else {
                         t = GmlUtils.gmlToTemporalGeometricPrimitive((Element) prop.getFirstChild());
                     }
