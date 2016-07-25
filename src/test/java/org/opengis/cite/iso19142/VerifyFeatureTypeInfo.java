@@ -41,7 +41,7 @@ public class VerifyFeatureTypeInfo {
 	public void getDefaultExtent_epsg4326() throws FactoryException {
 		FeatureTypeInfo iut = new FeatureTypeInfo();
 		iut.addCRSIdentifiers("urn:ogc:def:crs:EPSG::4326");
-		Envelope envelope = iut.getGeoExtent();
+		Envelope envelope = iut.getSpatialExtent();
 		Assert.assertNotNull("Default extent is null.", envelope);
 		String lowerCoordAsWKT = envelope.getLowerCorner().toString();
 		String lowerCoord = lowerCoordAsWKT.substring(
@@ -55,7 +55,7 @@ public class VerifyFeatureTypeInfo {
 		FeatureTypeInfo iut = new FeatureTypeInfo();
 		// NAD83 / UTM zone 10N
 		iut.addCRSIdentifiers("http://www.opengis.net/def/crs/EPSG/0/26910");
-		Envelope envelope = iut.getGeoExtent();
+		Envelope envelope = iut.getSpatialExtent();
 		Assert.assertNotNull("Default extent is null.", envelope);
 		DirectPosition pos = envelope.getLowerCorner();
 		Assert.assertTrue("Expected easting of lower corner > 200000 ",

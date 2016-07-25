@@ -87,7 +87,7 @@ public class VerifyServiceMetadataUtils {
         assertEquals("Unexpected default CRS.", "urn:ogc:def:crs:EPSG::4326",
                 typeInfo.get(qName).getDefaultCRS());
         Document gmlEnv = Extents.envelopeAsGML(typeInfo.get(qName)
-                .getGeoExtent());
+                .getSpatialExtent());
         assertEquals("Unexpected [local name] for extent.", "Envelope", gmlEnv
                 .getDocumentElement().getLocalName());
     }

@@ -123,7 +123,7 @@ public class DuringTests extends QueryFilterFixture {
         Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
         List<Node> temporalNodes = TemporalQuery.extractTemporalNodes(this.rspEntity, timeProperty, this.model);
-        assertDuring(temporalNodes, timeProperty.getTypeDefinition(), gmlTimeLiteral);
+        assertDuring(temporalNodes, timeProperty, gmlTimeLiteral);
     }
 
     /**
@@ -132,13 +132,16 @@ public class DuringTests extends QueryFilterFixture {
      * 
      * @param temporalNodes
      *            A list of simple or complex temporal values.
-     * @param typeDef
-     *            The relevant definition of the temporal property type.
+     * @param propertyDecl
+     *            An element declaration for a temporal property.
      * @param gmlTimeLiteral
      *            A document that contains a GML representation of a period.
      */
-    void assertDuring(List<Node> temporalNodes, XSTypeDefinition typeDef, Document gmlTimeLiteral) {
+    void assertDuring(List<Node> temporalNodes, XSElementDeclaration propertyDecl, Document gmlTimeLiteral) {
+        Assert.assertFalse(temporalNodes.isEmpty(),
+                String.format("No temporal values found in results: property is %s.", propertyDecl));
         TemporalGeometricPrimitive t2 = GmlUtils.gmlToTemporalGeometricPrimitive(gmlTimeLiteral.getDocumentElement());
+        XSTypeDefinition typeDef = propertyDecl.getTypeDefinition();
         for (Node timeNode : temporalNodes) {
             TemporalGeometricPrimitive t1 = null;
             if (typeDef.getTypeCategory() == XSTypeDefinition.SIMPLE_TYPE) {

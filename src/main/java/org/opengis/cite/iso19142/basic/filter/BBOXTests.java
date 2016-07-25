@@ -87,7 +87,7 @@ public class BBOXTests extends QueryFilterFixture {
 		}
 		WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
 		Document gmlEnv = Extents.envelopeAsGML(featureInfo.get(featureType)
-				.getGeoExtent());
+				.getSpatialExtent());
 		addBBOXPredicate(this.reqEntity, gmlEnv.getDocumentElement(), null);
 		URI endpoint = ServiceMetadataUtils.getOperationEndpoint(
 				this.wfsMetadata, WFS2.GET_FEATURE, binding);
@@ -146,7 +146,7 @@ public class BBOXTests extends QueryFilterFixture {
 		Element valueRef = WFSMessage.createValueReference(geomProp);
 		WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
 		Document gmlEnv = Extents.envelopeAsGML(featureInfo.get(featureType)
-				.getGeoExtent());
+				.getSpatialExtent());
 		addBBOXPredicate(this.reqEntity, gmlEnv.getDocumentElement(), valueRef);
 		ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
 		this.rspEntity = extractBodyAsDocument(rsp);
@@ -217,7 +217,7 @@ public class BBOXTests extends QueryFilterFixture {
 		Element valueRef = WFSMessage.createValueReference(gmlDesc);
 		WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
 		Document gmlEnv = Extents.envelopeAsGML(featureInfo.get(featureType)
-				.getGeoExtent());
+				.getSpatialExtent());
 		addBBOXPredicate(this.reqEntity, gmlEnv.getDocumentElement(), valueRef);
 		ClientResponse rsp = wfsClient.submitRequest(reqEntity,
 				ProtocolBinding.ANY);

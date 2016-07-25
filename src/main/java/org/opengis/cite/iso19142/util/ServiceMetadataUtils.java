@@ -210,7 +210,7 @@ public class ServiceMetadataUtils {
 			try {
 				if (null != bboxNode) {
 					Envelope envelope = Extents.createEnvelope(bboxNode);
-					typeInfo.setGeoExtent(envelope);
+					typeInfo.setSpatialExtent(envelope);
 				}
 			} catch (FactoryException e) {
 				TestSuiteLogger.log(Level.WARNING, e.getMessage());

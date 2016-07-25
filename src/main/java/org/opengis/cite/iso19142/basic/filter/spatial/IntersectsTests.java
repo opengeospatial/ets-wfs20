@@ -122,7 +122,7 @@ public class IntersectsTests extends QueryFilterFixture {
             throw new SkipException("Feature type has no geometry properties: " + featureType);
         }
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
-        Document gmlEnv = Extents.envelopeAsGML(featureInfo.get(featureType).getGeoExtent());
+        Document gmlEnv = Extents.envelopeAsGML(featureInfo.get(featureType).getSpatialExtent());
         Element gmlPolygon = XMLUtils
                 .transform(new StreamSource(getClass().getResourceAsStream(XSLT_ENV2POLYGON)), gmlEnv)
                 .getDocumentElement();
