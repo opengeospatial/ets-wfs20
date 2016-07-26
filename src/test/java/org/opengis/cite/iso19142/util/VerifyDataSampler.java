@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.List;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
@@ -15,6 +16,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 
+import org.apache.xerces.xs.XSElementDeclaration;
 import org.apache.xerces.xs.XSModel;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -82,11 +84,14 @@ public class VerifyDataSampler {
         File dataFile = new File(dataURL.toURI());
         Document capabilitiesDoc = docBuilder.parse(getClass().getResourceAsStream("/wfs/capabilities-acme.xml"));
         QName simpleFeature = new QName(TNS, "SimpleFeature");
+        List<XSElementDeclaration> tmProps = AppSchemaUtils.getTemporalFeatureProperties(model, simpleFeature);
+        XSElementDeclaration tmProp = tmProps.stream().filter(decl -> decl.getName().equals("dateTimeProperty"))
+                .findAny().orElse(null);
         DataSampler iut = new DataSampler(capabilitiesDoc);
         FeatureTypeInfo typeInfo = iut.getFeatureTypeInfo().get(simpleFeature);
         typeInfo.setInstantiated(true);
         typeInfo.setSampleData(dataFile);
-        Period period = iut.getTemporalExtent(model, simpleFeature);
+        Period period = iut.getTemporalExtent(model, simpleFeature, tmProp);
         assertNotNull("Period is null.", period);
         assertTrue("Expected duration P8M", period.length().toString().startsWith("P8M"));
     }

@@ -1,5 +1,6 @@
 package org.opengis.cite.iso19142.basic.filter.temporal;
 
+import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.namespace.QName;
@@ -111,19 +112,26 @@ public class DuringTests extends QueryFilterFixture {
         if (timeProps.isEmpty()) {
             throw new SkipException("Feature type has no temporal properties: " + featureType);
         }
-        // use actual temporal extent of sample data
-        Period temporalExtent = this.dataSampler.getTemporalExtent(this.model, featureType);
+        Period temporalExtent = null;
+        XSElementDeclaration tmProperty;
+        Iterator<XSElementDeclaration> propsItr = timeProps.iterator();
+        do {
+            tmProperty = propsItr.next();
+            temporalExtent = this.dataSampler.getTemporalExtent(this.model, featureType, tmProperty);
+            if (null != temporalExtent) {
+                break;
+            }
+        } while (propsItr.hasNext());
         Document gmlTimeLiteral = TimeUtils.periodAsGML(temporalExtent);
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
-        XSElementDeclaration timeProperty = timeProps.get(0);
-        Element valueRef = WFSMessage.createValueReference(timeProperty);
+        Element valueRef = WFSMessage.createValueReference(tmProperty);
         WFSMessage.addTemporalPredicate(this.reqEntity, DURING_OP, gmlTimeLiteral, valueRef);
         ClientResponse rsp = wfsClient.getFeature(new DOMSource(reqEntity), binding);
         this.rspEntity = extractBodyAsDocument(rsp);
         Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
-        List<Node> temporalNodes = TemporalQuery.extractTemporalNodes(this.rspEntity, timeProperty, this.model);
-        assertDuring(temporalNodes, timeProperty, gmlTimeLiteral);
+        List<Node> temporalNodes = TemporalQuery.extractTemporalNodes(this.rspEntity, tmProperty, this.model);
+        assertDuring(temporalNodes, tmProperty, gmlTimeLiteral);
     }
 
     /**

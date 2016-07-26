@@ -30,7 +30,7 @@
 					</gml:posList>
 				</gml:LineString>
 			</tns:lineProperty>
-			<tns:dateProperty>2015-11-11Z</tns:dateProperty>
+			<tns:dateTimeProperty>2015-11-11T00:00:00Z</tns:dateTimeProperty>
 			<tns:decimalProperty>21.05</tns:decimalProperty>
 		</tns:SimpleFeature>
 	</wfs:member>

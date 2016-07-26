@@ -393,25 +393,23 @@ public class DataSampler {
     }
 
     /**
-     * Determines the temporal extent of all feature instances of the specified
-     * type in the sample data.
+     * Determines the temporal extent of all instances of the specified feature
+     * property in the sample data.
      * 
      * @param model
      *            A model representing the relevant GML application schema.
      * @param featureType
      *            The name of the feature type.
-     * @return A Period, or null if it cannot be created or the feature type has
-     *         no temporal properties defined.
+     * @param tmProp
+     *            A declaration of a temporal property.
+     * @return A Period, or null if the property does not occur or has no
+     *         values.
      */
-    public Period getTemporalExtent(XSModel model, QName featureType) {
-        List<XSElementDeclaration> tmProps = AppSchemaUtils.getFeaturePropertiesByType(model, featureType,
-                model.getTypeDefinition("AbstractTimeGeometricPrimitiveType", Namespaces.GML));
-        // also look for simple temporal types
-        for (XSTypeDefinition dataType : AppSchemaUtils.getSimpleTemporalDataTypes(model)) {
-            tmProps.addAll(AppSchemaUtils.getFeaturePropertiesByType(model, featureType, dataType));
-        }
-        if (tmProps.isEmpty()) {
-            return null;
+    public Period getTemporalExtent(XSModel model, QName featureType, XSElementDeclaration tmProp) {
+        QName propertyName = new QName(tmProp.getNamespace(), tmProp.getName());
+        Period period = this.featureInfo.get(featureType).getTemporalExtent(propertyName);
+        if (null != period) {
+            return period;
         }
         File dataFile = this.featureInfo.get(featureType).getSampleData();
         Document data;
@@ -423,28 +421,26 @@ public class DataSampler {
             throw new RuntimeException(
                     String.format("Failed to parse data file at %s.\n %s", dataFile.getAbsolutePath(), e.getMessage()));
         }
-        Iterator<XSElementDeclaration> propsItr = tmProps.iterator();
         TreeSet<TemporalGeometricPrimitive> tmSet = new TreeSet<>(new TemporalComparator());
-        do {
-            XSElementDeclaration tmProp = propsItr.next();
-            NodeList props = data.getElementsByTagNameNS(tmProp.getNamespace(), tmProp.getName());
-            for (int i = 0; i < props.getLength(); i++) {
-                TemporalGeometricPrimitive t;
-                XSTypeDefinition propType = tmProp.getTypeDefinition();
-                Node prop = props.item(i);
-                try {
-                    if (propType.getTypeCategory() == XSTypeDefinition.SIMPLE_TYPE) {
-                        t = TemporalQuery.parseTemporalValue(prop.getTextContent(), propType);
-                    } else {
-                        t = GmlUtils.gmlToTemporalGeometricPrimitive((Element) prop.getFirstChild());
-                    }
-                    tmSet.add(t);
-                } catch (RuntimeException re) {
-                    LOGR.log(Level.WARNING, re.getMessage());
-                    continue;
+        NodeList propNodes = data.getElementsByTagNameNS(tmProp.getNamespace(), tmProp.getName());
+        for (int i = 0; i < propNodes.getLength(); i++) {
+            TemporalGeometricPrimitive tVal;
+            XSTypeDefinition propType = tmProp.getTypeDefinition();
+            Node prop = propNodes.item(i);
+            try {
+                if (propType.getTypeCategory() == XSTypeDefinition.SIMPLE_TYPE) {
+                    tVal = TemporalQuery.parseTemporalValue(prop.getTextContent(), propType);
+                } else {
+                    tVal = GmlUtils.gmlToTemporalGeometricPrimitive((Element) prop.getFirstChild());
                 }
+                tmSet.add(tVal);
+            } catch (RuntimeException re) {
+                LOGR.log(Level.WARNING, re.getMessage());
+                continue;
             }
-        } while (propsItr.hasNext());
-        return TemporalUtils.temporalExtent(tmSet);
+        }
+        period = TemporalUtils.temporalExtent(tmSet);
+        this.featureInfo.get(featureType).setTemporalExtent(propertyName, period);
+        return period;
     }
 }

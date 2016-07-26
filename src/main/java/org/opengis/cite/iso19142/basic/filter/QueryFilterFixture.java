@@ -9,9 +9,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.xerces.xs.XSElementDeclaration;
 import org.apache.xerces.xs.XSModel;
-import org.apache.xerces.xs.XSTypeDefinition;
 import org.opengis.cite.iso19142.BaseFixture;
-import org.opengis.cite.iso19142.Namespaces;
 import org.opengis.cite.iso19142.SuiteAttribute;
 import org.opengis.cite.iso19142.util.AppSchemaUtils;
 import org.opengis.cite.iso19142.util.DataSampler;
@@ -96,14 +94,7 @@ public class QueryFilterFixture extends BaseFixture {
         if (tmProps != null) {
             return tmProps;
         }
-        // base type gml:TimeInstantType and gml:TimePeriodType
-        XSTypeDefinition gmlTimeBaseType = this.model.getTypeDefinition("AbstractTimeGeometricPrimitiveType",
-                Namespaces.GML);
-        tmProps = AppSchemaUtils.getFeaturePropertiesByType(this.model, featureType, gmlTimeBaseType);
-        // also look for simple temporal types
-        for (XSTypeDefinition dataType : AppSchemaUtils.getSimpleTemporalDataTypes(this.model)) {
-            tmProps.addAll(AppSchemaUtils.getFeaturePropertiesByType(this.model, featureType, dataType));
-        }
+        tmProps = AppSchemaUtils.getTemporalFeatureProperties(this.model, featureType);
         this.temporalProperties.put(featureType, tmProps);
         TestSuiteLogger.log(Level.FINE,
                 String.format("Temporal properties for feature type %s: %s", featureType, tmProps));

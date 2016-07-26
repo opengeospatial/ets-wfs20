@@ -308,4 +308,25 @@ public class AppSchemaUtils {
         }
         return value;
     }
+
+    /**
+     * Finds all simple and complex temporal properties defined for a particular
+     * feature type.
+     * 
+     * @param model
+     *            A representation of a GML application schema.
+     * @param featureType
+     *            The qualified name of a feature type.
+     * @return A list of element declarations corresponding to properties that
+     *         have temporal values; it may be empty.
+     */
+    public static List<XSElementDeclaration> getTemporalFeatureProperties(XSModel model, QName featureType) {
+        List<XSElementDeclaration> tmProps = getFeaturePropertiesByType(model, featureType,
+                model.getTypeDefinition("AbstractTimeGeometricPrimitiveType", Namespaces.GML));
+        // also look for simple temporal types
+        for (XSTypeDefinition dataType : getSimpleTemporalDataTypes(model)) {
+            tmProps.addAll(AppSchemaUtils.getFeaturePropertiesByType(model, featureType, dataType));
+        }
+        return tmProps;
+    }
 }

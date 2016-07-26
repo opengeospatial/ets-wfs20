@@ -3,7 +3,10 @@ package org.opengis.cite.iso19142;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 
 import javax.xml.namespace.QName;
@@ -12,16 +15,18 @@ import org.geotoolkit.geometry.Envelopes;
 import org.geotoolkit.geometry.ImmutableEnvelope;
 import org.geotoolkit.referencing.CRS;
 import org.opengis.cite.geomatics.GeodesyUtils;
+import org.opengis.cite.geomatics.time.TemporalUtils;
 import org.opengis.cite.iso19142.util.TestSuiteLogger;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
+import org.opengis.temporal.Period;
 import org.opengis.util.FactoryException;
 
 /**
  * Provides information about a feature type managed by a WFS. Much of the
- * information is gleaned from the content of the <code>FeatureTypeList</code>
- * in the service description (wfs:WFS_Capabilities).
+ * information is gleaned from the content of the service description
+ * (wfs:WFS_Capabilities).
  */
 public class FeatureTypeInfo {
     private QName typeName;
@@ -29,9 +34,11 @@ public class FeatureTypeInfo {
     private boolean instantiated;
     private List<String> supportedCRSList;
     private File sampleData;
+    private Map<QName, Period> temporalExtents;
 
     public FeatureTypeInfo() {
         this.supportedCRSList = new ArrayList<String>();
+        this.temporalExtents = new HashMap<>();
     }
 
     /**
@@ -182,12 +189,42 @@ public class FeatureTypeInfo {
         sb.append("\n typeName: '").append(typeName);
         sb.append("',\n supportedCRS: '").append(supportedCRSList);
         sb.append("',\n instantiated: ").append(instantiated);
-        sb.append(",\n envelope: '").append(Envelopes.toWKT(getSpatialExtent()));
+        sb.append(",\n spatial extent: '").append(Envelopes.toWKT(getSpatialExtent()));
+        sb.append(",\n temporal extent: [");
+        for (Entry<QName, Period> entry : temporalExtents.entrySet()) {
+            sb.append("\n  ").append(entry.getKey()).append(" : ");
+            sb.append(TemporalUtils.temporalGeometricPrimitiveToString(entry.getValue()));
+        }
+        sb.append("]");
         if (sampleData != null && sampleData.exists()) {
-            sb.append("',\n data: '").append(sampleData.toString());
+            sb.append(",\n data: '").append(sampleData.toString());
         }
         sb.append("'\n}");
         return sb.toString();
+    }
+
+    /**
+     * Gets the temporal extent of the specified feature property.
+     * 
+     * @param propertyName
+     *            The qualified name of a (temporal) feature property.
+     * @return A period representing a time interval that contains the property
+     *         values, or null if the property has no temporal values.
+     */
+    public Period getTemporalExtent(QName propertyName) {
+        return this.temporalExtents.get(propertyName);
+    }
+
+    /**
+     * Sets the temporal extent of the specified temporal property.
+     * 
+     * @param propertyName
+     *            The qualified name of a (temporal) feature property.
+     * @param period
+     *            A period representing a time interval.
+     */
+    public void setTemporalExtent(QName propertyName, Period period) {
+        this.temporalExtents.put(propertyName, period);
     }
 
     /**

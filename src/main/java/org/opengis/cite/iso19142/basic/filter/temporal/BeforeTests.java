@@ -74,12 +74,12 @@ public class BeforeTests extends QueryFilterFixture {
         if (timeProps.isEmpty()) {
             throw new SkipException("Feature type has no temporal properties: " + featureType);
         }
-        Period temporalExtent = this.dataSampler.getTemporalExtent(this.model, featureType);
+        XSElementDeclaration timeProperty = timeProps.get(0);
+        Period temporalExtent = this.dataSampler.getTemporalExtent(this.model, featureType, timeProperty);
         List<Period> subIntervals = TemporalUtils.splitInterval(temporalExtent, 2);
         Period lastSubInterval = subIntervals.get(1);
         Document gmlTimeLiteral = TimeUtils.periodAsGML(lastSubInterval);
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
-        XSElementDeclaration timeProperty = timeProps.get(0);
         Element valueRef = WFSMessage.createValueReference(timeProperty);
         WFSMessage.addTemporalPredicate(this.reqEntity, BEFORE_OP, gmlTimeLiteral, valueRef);
         ClientResponse rsp = wfsClient.getFeature(new DOMSource(this.reqEntity), binding);
