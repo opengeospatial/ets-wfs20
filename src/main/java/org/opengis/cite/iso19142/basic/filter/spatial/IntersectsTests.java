@@ -13,8 +13,8 @@ import javax.xml.xpath.XPathExpressionException;
 import org.apache.xerces.xs.XSElementDeclaration;
 import org.apache.xerces.xs.XSTypeDefinition;
 import org.opengis.cite.geomatics.Extents;
+import org.opengis.cite.geomatics.SpatialRelationship;
 import org.opengis.cite.geomatics.TopologicalRelationships;
-import org.opengis.cite.geomatics.gml.GmlUtils;
 import org.opengis.cite.iso19136.util.XMLSchemaModelUtils;
 import org.opengis.cite.iso19142.ErrorMessage;
 import org.opengis.cite.iso19142.ErrorMessageKeys;
@@ -27,7 +27,6 @@ import org.opengis.cite.iso19142.util.AppSchemaUtils;
 import org.opengis.cite.iso19142.util.ServiceMetadataUtils;
 import org.opengis.cite.iso19142.util.WFSMessage;
 import org.opengis.cite.iso19142.util.XMLUtils;
-import org.opengis.referencing.operation.TransformException;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.SkipException;
@@ -153,14 +152,10 @@ public class IntersectsTests extends QueryFilterFixture {
         List<Node> geomNodes = WFSMessage.findMatchingElements(this.rspEntity, expectedValues);
         Assert.assertFalse(geomNodes.isEmpty(), String.format("No geometry elements found in response: %s", geomValue));
         for (Node geom : geomNodes) {
-            try {
-                boolean intersects = TopologicalRelationships.intersects(gmlPolygon, geom);
-                Assert.assertTrue(intersects, ErrorMessage.format(ErrorMessageKeys.PREDICATE_NOT_SATISFIED,
-                        INTERSECTS_OP, XMLUtils.writeNodeToString(gmlPolygon), XMLUtils.writeNodeToString(geom)));
-            } catch (TransformException te) {
-                throw new RuntimeException(String.format("Attempted coordinate transformation failed for srsName=%s",
-                        GmlUtils.findCRSReference((Element) geom)), te);
-            }
+            boolean intersects = TopologicalRelationships.isSpatiallyRelated(SpatialRelationship.INTERSECTS, gmlPolygon,
+                    geom);
+            Assert.assertTrue(intersects, ErrorMessage.format(ErrorMessageKeys.PREDICATE_NOT_SATISFIED, INTERSECTS_OP,
+                    XMLUtils.writeNodeToString(gmlPolygon), XMLUtils.writeNodeToString(geom)));
         }
     }
 
