@@ -17,6 +17,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opengis.cite.geomatics.Extents;
+import org.opengis.cite.geomatics.SpatialRelationship;
 import org.opengis.cite.iso19142.ConformanceClass;
 import org.opengis.cite.iso19142.FeatureTypeInfo;
 import org.opengis.cite.iso19142.ProtocolBinding;
@@ -43,22 +44,17 @@ public class VerifyServiceMetadataUtils {
     }
 
     @Test
-    public void findDescribeFeatureTypeUsingGET() throws SAXException,
-            IOException {
+    public void findDescribeFeatureTypeUsingGET() throws SAXException, IOException {
         File xmlFile = new File("src/test/resources/capabilities-simple.xml");
-        URI endpoint = ServiceMetadataUtils.getOperationEndpoint(
-                docBuilder.parse(xmlFile), WFS2.DESCRIBE_FEATURE_TYPE,
+        URI endpoint = ServiceMetadataUtils.getOperationEndpoint(docBuilder.parse(xmlFile), WFS2.DESCRIBE_FEATURE_TYPE,
                 ProtocolBinding.GET);
-        assertEquals("Unexpected endpoint for DescribeFeatureType(GET)",
-                "http://localhost/wfs2", endpoint.toString());
+        assertEquals("Unexpected endpoint for DescribeFeatureType(GET)", "http://localhost/wfs2", endpoint.toString());
     }
 
     @Test
-    public void findDescribeFeatureTypeUsingPOST_notFound()
-            throws SAXException, IOException {
+    public void findDescribeFeatureTypeUsingPOST_notFound() throws SAXException, IOException {
         File xmlFile = new File("src/test/resources/capabilities-simple.xml");
-        URI endpoint = ServiceMetadataUtils.getOperationEndpoint(
-                docBuilder.parse(xmlFile), WFS2.DESCRIBE_FEATURE_TYPE,
+        URI endpoint = ServiceMetadataUtils.getOperationEndpoint(docBuilder.parse(xmlFile), WFS2.DESCRIBE_FEATURE_TYPE,
                 ProtocolBinding.POST);
         assertEquals("Expected empty URI reference.", URI.create(""), endpoint);
     }
@@ -66,65 +62,48 @@ public class VerifyServiceMetadataUtils {
     @Test
     public void getFeatureTypeList() throws SAXException, IOException {
         File xmlFile = new File("src/test/resources/capabilities-simple.xml");
-        List<QName> typeNames = ServiceMetadataUtils.getFeatureTypes(docBuilder
-                .parse(xmlFile));
+        List<QName> typeNames = ServiceMetadataUtils.getFeatureTypes(docBuilder.parse(xmlFile));
         assertEquals("Unexpected size of type name list.", 1, typeNames.size());
         QName typeName = typeNames.get(0);
-        assertEquals("Feature type has unexpected [namespace name].",
-                "http://example.org/ns1", typeName.getNamespaceURI());
-        assertEquals("Feature type has unexpected [local name].", "Alpha",
-                typeName.getLocalPart());
+        assertEquals("Feature type has unexpected [namespace name].", "http://example.org/ns1",
+                typeName.getNamespaceURI());
+        assertEquals("Feature type has unexpected [local name].", "Alpha", typeName.getLocalPart());
     }
 
     @Test
     public void acquireFeatureTypeInfo() throws SAXException, IOException {
         File xmlFile = new File("src/test/resources/capabilities-simple.xml");
-        Map<QName, FeatureTypeInfo> typeInfo = ServiceMetadataUtils
-                .extractFeatureInfo(docBuilder.parse(xmlFile));
-        assertEquals("Unexpected size of type info collection.", 1,
-                typeInfo.size());
+        Map<QName, FeatureTypeInfo> typeInfo = ServiceMetadataUtils.extractFeatureInfo(docBuilder.parse(xmlFile));
+        assertEquals("Unexpected size of type info collection.", 1, typeInfo.size());
         QName qName = new QName("http://example.org/ns1", "Alpha");
-        assertEquals("Unexpected default CRS.", "urn:ogc:def:crs:EPSG::4326",
-                typeInfo.get(qName).getDefaultCRS());
-        Document gmlEnv = Extents.envelopeAsGML(typeInfo.get(qName)
-                .getSpatialExtent());
-        assertEquals("Unexpected [local name] for extent.", "Envelope", gmlEnv
-                .getDocumentElement().getLocalName());
+        assertEquals("Unexpected default CRS.", "urn:ogc:def:crs:EPSG::4326", typeInfo.get(qName).getDefaultCRS());
+        Document gmlEnv = Extents.envelopeAsGML(typeInfo.get(qName).getSpatialExtent());
+        assertEquals("Unexpected [local name] for extent.", "Envelope", gmlEnv.getDocumentElement().getLocalName());
     }
 
     @Test
-    public void getRequestEndpoints_getCapabilities() throws SAXException,
-            IOException {
+    public void getRequestEndpoints_getCapabilities() throws SAXException, IOException {
         File xmlFile = new File("src/test/resources/capabilities-simple.xml");
-        Map<String, URI> endpoints = ServiceMetadataUtils.getRequestEndpoints(
-                docBuilder.parse(xmlFile), "GetCapabilities");
+        Map<String, URI> endpoints = ServiceMetadataUtils.getRequestEndpoints(docBuilder.parse(xmlFile),
+                "GetCapabilities");
         assertEquals("Unexpected number of endpoints.", 2, endpoints.size());
-        assertEquals("Unexpected GET endpoint.",
-                "http://localhost/wfs2/capabilities", endpoints.get("GET")
-                        .toString());
+        assertEquals("Unexpected GET endpoint.", "http://localhost/wfs2/capabilities", endpoints.get("GET").toString());
     }
 
     @Test
-    public void getOperationBindings_getFeature() throws SAXException,
-            IOException {
+    public void getOperationBindings_getFeature() throws SAXException, IOException {
         File xmlFile = new File("src/test/resources/capabilities-simple.xml");
-        Set<ProtocolBinding> bindings = ServiceMetadataUtils
-                .getOperationBindings(docBuilder.parse(xmlFile),
-                        WFS2.GET_FEATURE);
-        assertEquals(
-                "Unexpected number of GetFeature bindings (request encodings).",
-                2, bindings.size());
+        Set<ProtocolBinding> bindings = ServiceMetadataUtils.getOperationBindings(docBuilder.parse(xmlFile),
+                WFS2.GET_FEATURE);
+        assertEquals("Unexpected number of GetFeature bindings (request encodings).", 2, bindings.size());
     }
 
     @Test
     public void getConformanceClaims() throws SAXException, IOException {
         File xmlFile = new File("src/test/resources/capabilities-simple.xml");
-        Set<ConformanceClass> claims = ServiceMetadataUtils
-                .getConformanceClaims(docBuilder.parse(xmlFile));
-        assertEquals("Unexpected number of conformance claims", 3,
-                claims.size());
-        assertTrue("Expected 'Simple WFS' conformance claim",
-                claims.contains(ConformanceClass.SIMPLE_WFS));
+        Set<ConformanceClass> claims = ServiceMetadataUtils.getConformanceClaims(docBuilder.parse(xmlFile));
+        assertEquals("Unexpected number of conformance claims", 3, claims.size());
+        assertTrue("Expected 'Simple WFS' conformance claim", claims.contains(ConformanceClass.SIMPLE_WFS));
     }
 
     @Test
@@ -134,8 +113,7 @@ public class VerifyServiceMetadataUtils {
         doc.getDocumentElement().setTextContent("localPart");
         QName qName = ServiceMetadataUtils.buildQName(doc.getDocumentElement());
         assertEquals("Unexpected local name", "localPart", qName.getLocalPart());
-        assertEquals("Unexpected namespace name", XMLConstants.NULL_NS_URI,
-                qName.getNamespaceURI());
+        assertEquals("Unexpected namespace name", XMLConstants.NULL_NS_URI, qName.getNamespaceURI());
     }
 
     @Test
@@ -146,5 +124,13 @@ public class VerifyServiceMetadataUtils {
         QName qName = ServiceMetadataUtils.buildQName(doc.getDocumentElement());
         assertEquals("Unexpected local name", "localPart", qName.getLocalPart());
         assertEquals("Unexpected namespace name", TNS, qName.getNamespaceURI());
+    }
+
+    @Test
+    public void implementedSpatialOperators() throws SAXException, IOException {
+        Document wfsDescr = docBuilder.parse(getClass().getResourceAsStream("/capabilities-simple.xml"));
+        Set<SpatialRelationship> spatialOps = ServiceMetadataUtils.getImplementedSpatialOperators(wfsDescr);
+        assertEquals("Unexpected number of spatial operators.", 2, spatialOps.size());
+        assertTrue("Expected INTERSECTS in set.", spatialOps.contains(SpatialRelationship.INTERSECTS));
     }
 }

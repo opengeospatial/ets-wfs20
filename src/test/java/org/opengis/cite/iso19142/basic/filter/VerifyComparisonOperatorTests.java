@@ -138,7 +138,24 @@ public class VerifyComparisonOperatorTests {
     public void calculateIntegerRange() {
         String[] values = new String[] { "9", "-2", "7" };
         ComparisonOperatorTests iut = new ComparisonOperatorTests();
-        iut.calculateRange(values, new QName(XMLConstants.W3C_XML_SCHEMA_NS_URI, "integer"));
-        assertEquals("Unexpected min value.", "-2", values[0]);
+        String[] range = iut.calculateRange(values, new QName(XMLConstants.W3C_XML_SCHEMA_NS_URI, "integer"));
+        assertEquals("Unexpected min value.", -2, Integer.parseInt(range[0]));
+    }
+
+    @Test
+    public void calculateDecimalRange() {
+        String[] values = new String[] { "6919880000", "3571970000", "964773000", "45401800" };
+        ComparisonOperatorTests iut = new ComparisonOperatorTests();
+        String[] range = iut.calculateRange(values, new QName(XMLConstants.W3C_XML_SCHEMA_NS_URI, "decimal"));
+        assertEquals("Unexpected min value.", "45401800", range[0]);
+        assertEquals("Unexpected max value.", 6919880000d, Double.parseDouble(range[1]), 0);
+    }
+
+    @Test
+    public void sortNumericValuesWithExponents() {
+        String[] values = new String[] { "0.8", "1.20528E5", "1.20528E3" };
+        ComparisonOperatorTests iut = new ComparisonOperatorTests();
+        iut.sortValues(values);
+        assertEquals("Unexpected max value.", 120528, Double.parseDouble(values[values.length - 1]), 0);
     }
 }

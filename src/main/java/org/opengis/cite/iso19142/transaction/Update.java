@@ -114,12 +114,17 @@ public class Update extends TransactionFixture {
         Element originalFeature = (Element) features.item(0);
         String gmlId = originalFeature.getAttributeNS(Namespaces.GML, "id");
         Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("gml:name[1]", "Ce n&apos;est pas Vieux-Port de Montr&#xe9;al!");
+        String newName = "Pellentesque Arcu Lorem";
+        properties.put("gml:name[1]", newName);
         this.rspEntity = wfsClient.updateFeature(this.reqEntity, gmlId, featureType, properties, binding);
         if (this.rspEntity.getDocumentElement().getLocalName().equals(WFS2.TRANSACTION_RSP)) {
             modifiedFeatures.add(originalFeature);
         }
-        ETSAssert.assertFeatureProperties(gmlId, properties, null, wfsClient);
+        this.rspEntity = wfsClient.invokeStoredQuery(WFS2.QRY_GET_FEATURE_BY_ID, Collections.singletonMap("id", gmlId));
+        Element feature = this.rspEntity.getDocumentElement();
+        ETSAssert.assertQualifiedName(feature, featureType);
+        XSElementDeclaration gmlName = this.model.getElementDeclaration("name", Namespaces.GML);
+        ETSAssert.assertSimpleProperties(feature, Collections.singletonMap(gmlName, newName), null);
     }
 
     /**
@@ -194,8 +199,12 @@ public class Update extends TransactionFixture {
         if (this.rspEntity.getDocumentElement().getLocalName().equals(WFS2.TRANSACTION_RSP)) {
             modifiedFeatures.add(this.dataSampler.getFeatureById(featureId));
         }
-        ETSAssert.assertFeatureProperties(featureId, properties,
-                Collections.singletonMap(propName.getNamespaceURI(), propName.getPrefix()), wfsClient);
+        this.rspEntity = wfsClient.invokeStoredQuery(WFS2.QRY_GET_FEATURE_BY_ID,
+                Collections.singletonMap("id", featureId));
+        Element feature = this.rspEntity.getDocumentElement();
+        ETSAssert.assertQualifiedName(feature, featureType);
+        ETSAssert.assertSimpleProperties(feature, Collections.singletonMap(prop, newVal),
+                Collections.singletonMap(propName.getNamespaceURI(), propName.getPrefix()));
     }
 
     /**

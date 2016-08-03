@@ -1,5 +1,6 @@
 package org.opengis.cite.iso19142.basic.filter;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
@@ -559,7 +560,7 @@ public class ComparisonOperatorTests extends QueryFilterFixture {
                 GregorianCalendar gCal = (GregorianCalendar) objValues[i];
                 values[i] = dtFactory.newXMLGregorianCalendar(gCal).normalize().toString();
             } else {
-                values[i] = objValues[i].toString();
+                values[i] = DatatypeConverter.printDecimal(new BigDecimal(objValues[i].toString()));
             }
         }
     }

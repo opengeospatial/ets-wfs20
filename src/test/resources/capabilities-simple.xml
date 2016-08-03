@@ -143,13 +143,28 @@
 			</ows:WGS84BoundingBox>
 		</wfs:FeatureType>
 	</wfs:FeatureTypeList>
-	<fes:Filter_Capabilities>
-		<fes:Conformance>
-			<fes:Constraint name="ImplementsQuery">
-				<ValuesReference ows:reference="http://www.w3.org/2001/XMLSchema#boolean" />
-				<DefaultValue>true</DefaultValue>
-			</fes:Constraint>
-		</fes:Conformance>
-	</fes:Filter_Capabilities>
+    <fes:Filter_Capabilities>
+      <fes:Conformance>
+		<fes:Constraint name="ImplementsQuery">
+		  <ValuesReference ows:reference="http://www.w3.org/2001/XMLSchema#boolean" />
+		  <DefaultValue>true</DefaultValue>
+        </fes:Constraint>
+      </fes:Conformance>
+      <fes:Spatial_Capabilities>
+        <fes:GeometryOperands xmlns:gml="http://www.opengis.net/gml">
+          <fes:GeometryOperand name="gml:Envelope"/>
+          <fes:GeometryOperand name="gml:Point"/>
+          <fes:GeometryOperand name="gml:LineString"/>
+          <fes:GeometryOperand name="gml:Curve"/>
+          <fes:GeometryOperand name="gml:Polygon"/>
+          <fes:GeometryOperand name="gml:Surface"/>
+        </fes:GeometryOperands>
+        <fes:SpatialOperators>
+          <fes:SpatialOperator name="BBOX"/>
+          <fes:SpatialOperator name="Disjoint"/>
+          <fes:SpatialOperator name="Intersects"/>
+        </fes:SpatialOperators>
+      </fes:Spatial_Capabilities>
+    </fes:Filter_Capabilities>
 
 </wfs:WFS_Capabilities>

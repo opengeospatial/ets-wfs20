@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:SimpleFeature gml:id="SF-01" xmlns:tns="http://example.org/ns1"
+	xmlns:gml="http://www.opengis.net/gml/3.2">
+	<gml:name>Alpha</gml:name>
+	<tns:lineProperty>
+		<gml:LineString gml:id="SF-01-G1"
+			srsName="http://www.opengis.net/def/crs/EPSG/0/4326">
+			<gml:posList>
+				51.921 5.519
+				49.304 8.541
+			</gml:posList>
+		</gml:LineString>
+	</tns:lineProperty>
+	<tns:dateTimeProperty>2016-07-21T14:47:51Z</tns:dateTimeProperty>
+	<tns:decimalProperty>11.74</tns:decimalProperty>
+</tns:SimpleFeature>

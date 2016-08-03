@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
@@ -13,6 +14,7 @@ import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.xerces.xs.XSElementDeclaration;
 import org.apache.xerces.xs.XSTypeDefinition;
+import org.opengis.cite.geomatics.SpatialRelationship;
 import org.opengis.cite.iso19142.ConformanceClass;
 import org.opengis.cite.iso19142.ErrorMessage;
 import org.opengis.cite.iso19142.ErrorMessageKeys;
@@ -88,6 +90,7 @@ public class SpatialJoinTests extends QueryFilterFixture {
     private Map<QName, List<XSElementDeclaration>> surfaceProps;
     private Map<QName, List<XSElementDeclaration>> curveProps;
     private Map<QName, List<XSElementDeclaration>> pointProps;
+    private Set<SpatialRelationship> implementedSpatialOps;
 
     /**
      * Searches the application schema for geometry properties where the value
@@ -137,12 +140,14 @@ public class SpatialJoinTests extends QueryFilterFixture {
     }
 
     /**
-     * Finds surface, curve, and point properties defined in the application
-     * schema. Properties that use primitive types are preferred, but if none
-     * are defined then aggregate geometry types (Multi*) will be used instead.
+     * Initializes the test class fixture. Finds surface, curve, and point
+     * properties defined in the application schema. Properties that use
+     * primitive types are preferred, but if none are defined then aggregate
+     * geometry types (Multi*) will be used instead.
      */
     @BeforeClass
-    public void findGeometryPropertiesToJoin() {
+    public void initFixture() {
+        this.implementedSpatialOps = ServiceMetadataUtils.getImplementedSpatialOperators(this.wfsMetadata);
         this.surfaceProps = findGeometryProperties("AbstractSurfaceType");
         if (this.surfaceProps.isEmpty()) {
             this.surfaceProps = findGeometryProperties("MultiSurfaceType");
@@ -168,8 +173,9 @@ public class SpatialJoinTests extends QueryFilterFixture {
      */
     @Test(description = "See OGC 09-025r2: 7.9.2.5.3, A.1.12")
     public void joinWithIntersects() {
-        if (!ServiceMetadataUtils.implementsSpatialOperator(this.wfsMetadata, "Intersects")) {
-            throw new SkipException(ErrorMessage.format(ErrorMessageKeys.NOT_IMPLEMENTED, "Intersects operator"));
+        if (!this.implementedSpatialOps.contains(SpatialRelationship.INTERSECTS)) {
+            throw new SkipException(
+                    ErrorMessage.format(ErrorMessageKeys.NOT_IMPLEMENTED, SpatialRelationship.INTERSECTS));
         }
         List<FeatureProperty> joinProperties = new ArrayList<FeatureProperty>();
         if (this.surfaceProps.size() > 1) {

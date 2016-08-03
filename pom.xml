@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.opengis.cite</groupId>
     <artifactId>ets-common</artifactId>
-    <version>7</version>
+    <version>8</version>
   </parent>
   <artifactId>ets-wfs20</artifactId>
   <version>1.24-SNAPSHOT</version>
@@ -52,7 +52,6 @@
     <dependency>
       <groupId>org.opengis.cite.teamengine</groupId>
       <artifactId>teamengine-spi</artifactId>
-      <version>4.7.1</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -62,7 +61,7 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>geomatics-geotk</artifactId>
-      <version>1.12-SNAPSHOT</version>
+      <version>1.12</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -79,7 +78,6 @@
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <version>1.10.19</version>
     </dependency>
   </dependencies>
 
