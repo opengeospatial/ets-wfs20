@@ -117,7 +117,7 @@ public class DuringTests extends QueryFilterFixture {
         Iterator<XSElementDeclaration> propsItr = timeProps.iterator();
         do {
             tmProperty = propsItr.next();
-            temporalExtent = this.dataSampler.getTemporalExtent(this.model, featureType, tmProperty);
+            temporalExtent = this.dataSampler.getTemporalExtentOfProperty(this.model, featureType, tmProperty);
             if (null != temporalExtent) {
                 break;
             }

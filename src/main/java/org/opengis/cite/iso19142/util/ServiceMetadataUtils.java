@@ -171,7 +171,7 @@ public class ServiceMetadataUtils {
      * @return A Map containing one or more entries where a feature type name
      *         (QName) is associated with a FeatureTypeInfo value object.
      */
-    public static Map<QName, FeatureTypeInfo> extractFeatureInfo(final Document wfsCapabilities) {
+    public static Map<QName, FeatureTypeInfo> extractFeatureTypeInfo(final Document wfsCapabilities) {
         Map<QName, FeatureTypeInfo> featureInfo = new HashMap<QName, FeatureTypeInfo>();
         NodeList featureTypes = wfsCapabilities.getElementsByTagNameNS(Namespaces.WFS, "FeatureType");
         for (int i = 0; i < featureTypes.getLength(); i++) {

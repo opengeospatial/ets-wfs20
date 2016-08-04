@@ -3,10 +3,7 @@ package org.opengis.cite.iso19142;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.logging.Level;
 
 import javax.xml.namespace.QName;
@@ -34,11 +31,10 @@ public class FeatureTypeInfo {
     private boolean instantiated;
     private List<String> supportedCRSList;
     private File sampleData;
-    private Map<QName, Period> temporalExtents;
+    private Period temporalExtent;
 
     public FeatureTypeInfo() {
         this.supportedCRSList = new ArrayList<String>();
-        this.temporalExtents = new HashMap<>();
     }
 
     /**
@@ -190,41 +186,33 @@ public class FeatureTypeInfo {
         sb.append("',\n supportedCRS: '").append(supportedCRSList);
         sb.append("',\n instantiated: ").append(instantiated);
         sb.append(",\n spatial extent: '").append(Envelopes.toWKT(getSpatialExtent()));
-        sb.append(",\n temporal extent: [");
-        for (Entry<QName, Period> entry : temporalExtents.entrySet()) {
-            sb.append("\n  ").append(entry.getKey()).append(" : ");
-            sb.append(TemporalUtils.temporalGeometricPrimitiveToString(entry.getValue()));
-        }
-        sb.append("]");
+        sb.append("',\n temporal extent: '");
+        sb.append(TemporalUtils.temporalGeometricPrimitiveToString(temporalExtent));
         if (sampleData != null && sampleData.exists()) {
-            sb.append(",\n data: '").append(sampleData.toString());
+            sb.append("',\n data: '").append(sampleData.toString());
         }
         sb.append("'\n}");
         return sb.toString();
     }
 
     /**
-     * Gets the temporal extent of the specified feature property.
+     * Gets the temporal extent for the instances of this feature type.
      * 
-     * @param propertyName
-     *            The qualified name of a (temporal) feature property.
-     * @return A period representing a time interval that contains the property
-     *         values, or null if the property has no temporal values.
+     * @return A period representing a time interval, or null if the feature has
+     *         no temporal properties.
      */
-    public Period getTemporalExtent(QName propertyName) {
-        return this.temporalExtents.get(propertyName);
+    public Period getTemporalExtent() {
+        return this.temporalExtent;
     }
 
     /**
-     * Sets the temporal extent of the specified temporal property.
+     * Sets the temporal extent of the feature instances.
      * 
-     * @param propertyName
-     *            The qualified name of a (temporal) feature property.
      * @param period
      *            A period representing a time interval.
      */
-    public void setTemporalExtent(QName propertyName, Period period) {
-        this.temporalExtents.put(propertyName, period);
+    public void setTemporalExtent(Period period) {
+        this.temporalExtent = period;
     }
 
     /**

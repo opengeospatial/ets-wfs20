@@ -92,7 +92,7 @@ public class SuiteFixtureListener implements ISuiteListener {
         }
         if (null != doc) {
             suite.setAttribute(SuiteAttribute.TEST_SUBJECT.getName(), doc);
-            Map<QName, FeatureTypeInfo> featureInfo = ServiceMetadataUtils.extractFeatureInfo(doc);
+            Map<QName, FeatureTypeInfo> featureInfo = ServiceMetadataUtils.extractFeatureTypeInfo(doc);
             suite.setAttribute(SuiteAttribute.FEATURE_INFO.getName(), featureInfo);
             LOGR.log(Level.FINER, "Parsed resource from {0}\n{1}",
                     new Object[] { wfsURI, XMLUtils.writeNodeToString(doc) });

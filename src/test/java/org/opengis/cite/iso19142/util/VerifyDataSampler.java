@@ -91,7 +91,7 @@ public class VerifyDataSampler {
         FeatureTypeInfo typeInfo = iut.getFeatureTypeInfo().get(simpleFeature);
         typeInfo.setInstantiated(true);
         typeInfo.setSampleData(dataFile);
-        Period period = iut.getTemporalExtent(model, simpleFeature, tmProp);
+        Period period = iut.getTemporalExtentOfProperty(model, simpleFeature, tmProp);
         assertNotNull("Period is null.", period);
         assertTrue("Expected duration P8M", period.length().toString().startsWith("P8M"));
     }

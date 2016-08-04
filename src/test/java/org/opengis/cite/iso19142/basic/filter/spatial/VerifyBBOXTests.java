@@ -1,4 +1,4 @@
-package org.opengis.cite.iso19142.basic.filter;
+package org.opengis.cite.iso19142.basic.filter.spatial;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -12,6 +12,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opengis.cite.iso19142.CommonTestFixture;
 import org.opengis.cite.iso19142.Namespaces;
+import org.opengis.cite.iso19142.basic.filter.spatial.BBOXTests;
 import org.opengis.cite.iso19142.util.WFSMessage;
 import org.opengis.cite.iso19142.util.XMLUtils;
 import org.testng.ISuite;

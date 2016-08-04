@@ -78,7 +78,7 @@ public class AfterTests extends QueryFilterFixture {
             throw new SkipException("Feature type has no temporal properties: " + featureType);
         }
         XSElementDeclaration timeProperty = timeProps.get(0);
-        Period temporalExtent = this.dataSampler.getTemporalExtent(this.model, featureType, timeProperty);
+        Period temporalExtent = this.dataSampler.getTemporalExtentOfProperty(this.model, featureType, timeProperty);
         List<Period> subIntervals = TemporalUtils.splitInterval(temporalExtent, 2);
         Period firstSubInterval = subIntervals.get(0);
         Document gmlTimeLiteral = TimeUtils.periodAsGML(firstSubInterval);
@@ -111,7 +111,7 @@ public class AfterTests extends QueryFilterFixture {
             throw new SkipException("Feature type has no temporal properties: " + featureType);
         }
         XSElementDeclaration timeProperty = timeProps.get(0);
-        Period temporalExtent = this.dataSampler.getTemporalExtent(this.model, featureType, timeProperty);
+        Period temporalExtent = this.dataSampler.getTemporalExtentOfProperty(this.model, featureType, timeProperty);
         List<Period> subIntervals = TemporalUtils.splitInterval(temporalExtent, 2);
         // end of first sub-interval
         Instant instant = subIntervals.get(0).getEnding();
@@ -146,7 +146,7 @@ public class AfterTests extends QueryFilterFixture {
             throw new SkipException("Feature type has no temporal properties: " + featureType);
         }
         XSElementDeclaration timeProperty = timeProps.get(0);
-        Period temporalExtent = this.dataSampler.getTemporalExtent(this.model, featureType, timeProperty);
+        Period temporalExtent = this.dataSampler.getTemporalExtentOfProperty(this.model, featureType, timeProperty);
         List<Period> subIntervals = TemporalUtils.splitInterval(temporalExtent, 2);
         // end of first sub-interval with UTC offset +09:00 (Japan)
         Instant instant = subIntervals.get(0).getEnding();

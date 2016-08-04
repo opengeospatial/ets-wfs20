@@ -75,7 +75,7 @@ public class BeforeTests extends QueryFilterFixture {
             throw new SkipException("Feature type has no temporal properties: " + featureType);
         }
         XSElementDeclaration timeProperty = timeProps.get(0);
-        Period temporalExtent = this.dataSampler.getTemporalExtent(this.model, featureType, timeProperty);
+        Period temporalExtent = this.dataSampler.getTemporalExtentOfProperty(this.model, featureType, timeProperty);
         List<Period> subIntervals = TemporalUtils.splitInterval(temporalExtent, 2);
         Period lastSubInterval = subIntervals.get(1);
         Document gmlTimeLiteral = TimeUtils.periodAsGML(lastSubInterval);

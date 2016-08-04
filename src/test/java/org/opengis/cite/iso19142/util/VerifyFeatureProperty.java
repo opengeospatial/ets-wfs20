@@ -22,44 +22,33 @@ import org.opengis.cite.validation.XmlSchemaCompiler;
 
 public class VerifyFeatureProperty {
 
-	private static final String EX_NS = "http://example.org/ns1";
-	private static XSModel model;
+    private static final String EX_NS = "http://example.org/ns1";
+    private static XSModel model;
 
-	@BeforeClass
-	public static void setUpClass() throws Exception {
-		URL entityCatalog = VerifyAppSchemaUtils.class
-				.getResource("/schema-catalog.xml");
-		XmlSchemaCompiler xsdCompiler = new XmlSchemaCompiler(entityCatalog);
-		InputStream xis = VerifyAppSchemaUtils.class
-				.getResourceAsStream("/xsd/simple.xsd");
-		Schema schema = xsdCompiler.compileXmlSchema(new StreamSource(xis));
-		model = XSModelBuilder.buildXMLSchemaModel(schema, EX_NS);
-	}
+    @BeforeClass
+    public static void setUpClass() throws Exception {
+        URL entityCatalog = VerifyAppSchemaUtils.class.getResource("/schema-catalog.xml");
+        XmlSchemaCompiler xsdCompiler = new XmlSchemaCompiler(entityCatalog);
+        InputStream xis = VerifyAppSchemaUtils.class.getResourceAsStream("/xsd/simple.xsd");
+        Schema schema = xsdCompiler.compileXmlSchema(new StreamSource(xis));
+        model = XSModelBuilder.buildXMLSchemaModel(schema, EX_NS);
+    }
 
-	@Test
-	public void curveProperty() {
-		QName featureTypeName = new QName(EX_NS, "SimpleFeature");
-		XSTypeDefinition typeDef = model.getTypeDefinition("AbstractCurveType",
-				Namespaces.GML);
-		List<XSElementDeclaration> props = AppSchemaUtils
-				.getFeaturePropertiesByType(model, featureTypeName, typeDef);
-		FeatureProperty prop = new FeatureProperty(featureTypeName,
-				props.get(0));
-		assertEquals(new QName(Namespaces.GML, "LineString"),
-				prop.getValueType());
-	}
+    @Test
+    public void curveProperty() {
+        QName featureTypeName = new QName(EX_NS, "SimpleFeature");
+        XSTypeDefinition typeDef = model.getTypeDefinition("AbstractCurveType", Namespaces.GML);
+        List<XSElementDeclaration> props = AppSchemaUtils.getFeaturePropertiesByType(model, featureTypeName, typeDef);
+        FeatureProperty prop = new FeatureProperty(featureTypeName, props.get(0));
+        assertEquals(new QName(Namespaces.GML, "LineString"), prop.getValueType());
+    }
 
-	@Test
-	public void decimalProperty() {
-		QName featureTypeName = new QName(EX_NS, "SimpleFeature");
-		XSTypeDefinition typeDef = model.getTypeDefinition("decimal",
-				XMLConstants.W3C_XML_SCHEMA_NS_URI);
-		List<XSElementDeclaration> props = AppSchemaUtils
-				.getFeaturePropertiesByType(model, featureTypeName, typeDef);
-		FeatureProperty prop = new FeatureProperty();
-		prop.setFeatureType(featureTypeName);
-		prop.setDeclaration(props.get(0));
-		assertEquals(new QName(Namespaces.XSD.toString(), "integer"),
-				prop.getValueType());
-	}
+    @Test
+    public void decimalProperty() {
+        QName featureTypeName = new QName(EX_NS, "SimpleFeature");
+        XSTypeDefinition typeDef = model.getTypeDefinition("decimal", XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        List<XSElementDeclaration> props = AppSchemaUtils.getFeaturePropertiesByType(model, featureTypeName, typeDef);
+        FeatureProperty prop = new FeatureProperty(featureTypeName, props.get(0));
+        assertEquals(new QName(Namespaces.XSD.toString(), "integer"), prop.getValueType());
+    }
 }

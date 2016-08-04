@@ -73,7 +73,7 @@ public class VerifyServiceMetadataUtils {
     @Test
     public void acquireFeatureTypeInfo() throws SAXException, IOException {
         File xmlFile = new File("src/test/resources/capabilities-simple.xml");
-        Map<QName, FeatureTypeInfo> typeInfo = ServiceMetadataUtils.extractFeatureInfo(docBuilder.parse(xmlFile));
+        Map<QName, FeatureTypeInfo> typeInfo = ServiceMetadataUtils.extractFeatureTypeInfo(docBuilder.parse(xmlFile));
         assertEquals("Unexpected size of type info collection.", 1, typeInfo.size());
         QName qName = new QName("http://example.org/ns1", "Alpha");
         assertEquals("Unexpected default CRS.", "urn:ogc:def:crs:EPSG::4326", typeInfo.get(qName).getDefaultCRS());

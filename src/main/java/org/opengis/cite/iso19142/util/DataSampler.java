@@ -66,6 +66,8 @@ public class DataSampler {
     private int maxFeatures = 25;
     private Document serviceDescription;
     private Map<QName, FeatureTypeInfo> featureInfo;
+    private Map<QName, Envelope> spatialExtents;
+    private Map<FeatureProperty, Period> temporalPropertyExtents;
 
     /**
      * Constructs a new DataSampler for a particular WFS implementation.
@@ -80,7 +82,9 @@ public class DataSampler {
             throw new IllegalArgumentException("Did not supply a WFS capabilities document");
         }
         this.serviceDescription = wfsCapabilities;
-        this.featureInfo = ServiceMetadataUtils.extractFeatureInfo(wfsCapabilities);
+        this.featureInfo = ServiceMetadataUtils.extractFeatureTypeInfo(wfsCapabilities);
+        this.spatialExtents = new HashMap<>();
+        this.temporalPropertyExtents = new HashMap<>();
     }
 
     /**
@@ -343,7 +347,7 @@ public class DataSampler {
     /**
      * Determines the spatial extent of the feature instances in the sample
      * data. If a feature type defines more than one geometry property, the
-     * envelope is calculated using the first property for which a value exists.
+     * envelope is calculated using the first non-empty property.
      * 
      * @param model
      *            A model representing the supported GML application schema.
@@ -353,6 +357,10 @@ public class DataSampler {
      *         has no geometry properties defined.
      */
     public Envelope getSpatialExtent(XSModel model, QName featureType) {
+        Envelope envelope = this.spatialExtents.get(featureType);
+        if (null != envelope) {
+            return envelope;
+        }
         List<XSElementDeclaration> geomProps = AppSchemaUtils.getFeaturePropertiesByType(model, featureType,
                 model.getTypeDefinition("AbstractGeometryType", Namespaces.GML));
         if (geomProps.isEmpty()) {
@@ -380,16 +388,16 @@ public class DataSampler {
                 break;
             }
         } while (itr.hasNext());
-        Envelope extent = null;
         if (null != geomNodes && geomNodes.getLength() > 0) {
             try {
-                extent = Extents.calculateEnvelope(geomNodes);
+                envelope = Extents.calculateEnvelope(geomNodes);
             } catch (JAXBException e) {
                 LOGR.log(Level.WARNING,
                         String.format("Failed to create envelope from geometry nodes.", e.getMessage()));
             }
         }
-        return extent;
+        this.spatialExtents.put(featureType, envelope);
+        return envelope;
     }
 
     /**
@@ -400,14 +408,14 @@ public class DataSampler {
      *            A model representing the relevant GML application schema.
      * @param featureType
      *            The name of the feature type.
-     * @param tmProp
+     * @param tmPropDecl
      *            A declaration of a temporal property.
      * @return A Period, or null if the property does not occur or has no
      *         values.
      */
-    public Period getTemporalExtent(XSModel model, QName featureType, XSElementDeclaration tmProp) {
-        QName propertyName = new QName(tmProp.getNamespace(), tmProp.getName());
-        Period period = this.featureInfo.get(featureType).getTemporalExtent(propertyName);
+    public Period getTemporalExtentOfProperty(XSModel model, QName featureType, XSElementDeclaration tmPropDecl) {
+        FeatureProperty tmProp = new FeatureProperty(featureType, tmPropDecl);
+        Period period = this.temporalPropertyExtents.get(tmProp);
         if (null != period) {
             return period;
         }
@@ -422,10 +430,10 @@ public class DataSampler {
                     String.format("Failed to parse data file at %s.\n %s", dataFile.getAbsolutePath(), e.getMessage()));
         }
         TreeSet<TemporalGeometricPrimitive> tmSet = new TreeSet<>(new TemporalComparator());
-        NodeList propNodes = data.getElementsByTagNameNS(tmProp.getNamespace(), tmProp.getName());
+        NodeList propNodes = data.getElementsByTagNameNS(tmPropDecl.getNamespace(), tmPropDecl.getName());
         for (int i = 0; i < propNodes.getLength(); i++) {
             TemporalGeometricPrimitive tVal;
-            XSTypeDefinition propType = tmProp.getTypeDefinition();
+            XSTypeDefinition propType = tmPropDecl.getTypeDefinition();
             Node prop = propNodes.item(i);
             try {
                 if (propType.getTypeCategory() == XSTypeDefinition.SIMPLE_TYPE) {
@@ -440,7 +448,7 @@ public class DataSampler {
             }
         }
         period = TemporalUtils.temporalExtent(tmSet);
-        this.featureInfo.get(featureType).setTemporalExtent(propertyName, period);
+        this.temporalPropertyExtents.put(tmProp, period);
         return period;
     }
 }
