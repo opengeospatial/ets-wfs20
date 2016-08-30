@@ -26,6 +26,7 @@ import org.opengis.cite.iso19142.util.AppSchemaUtils;
 import org.opengis.cite.iso19142.util.ServiceMetadataUtils;
 import org.opengis.cite.iso19142.util.WFSMessage;
 import org.opengis.cite.iso19142.util.XMLUtils;
+import org.opengis.geometry.Envelope;
 import org.testng.Assert;
 import org.testng.SkipException;
 import org.testng.annotations.BeforeClass;
@@ -84,8 +85,9 @@ public class BBOXTests extends QueryFilterFixture {
         if (geomProps.isEmpty()) {
             throw new SkipException("Feature type has no geometry properties: " + featureType);
         }
+        Envelope extent = this.dataSampler.getSpatialExtent(this.model, featureType);
+        Document gmlEnv = Extents.envelopeAsGML(extent);
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
-        Document gmlEnv = Extents.envelopeAsGML(featureInfo.get(featureType).getSpatialExtent());
         addBBOXPredicate(this.reqEntity, gmlEnv.getDocumentElement(), null);
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.GET_FEATURE, binding);
         ClientResponse rsp = wfsClient.submitRequest(new DOMSource(reqEntity), binding, endpoint);
@@ -138,7 +140,8 @@ public class BBOXTests extends QueryFilterFixture {
         XSElementDeclaration geomProp = geomProps.get(0);
         Element valueRef = WFSMessage.createValueReference(geomProp);
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
-        Document gmlEnv = Extents.envelopeAsGML(featureInfo.get(featureType).getSpatialExtent());
+        Envelope extent = this.dataSampler.getSpatialExtent(this.model, featureType);
+        Document gmlEnv = Extents.envelopeAsGML(extent);
         addBBOXPredicate(this.reqEntity, gmlEnv.getDocumentElement(), valueRef);
         ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
         this.rspEntity = extractBodyAsDocument(rsp);
@@ -204,7 +207,6 @@ public class BBOXTests extends QueryFilterFixture {
         ETSAssert.assertXPath(xpath, this.rspEntity, null);
     }
 
-    // bboxCoversSampleData
     // bboxWithOtherCRS
     // bboxWithUnsupportedCRS
 

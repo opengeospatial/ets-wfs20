@@ -27,6 +27,7 @@ import org.opengis.cite.iso19142.util.AppSchemaUtils;
 import org.opengis.cite.iso19142.util.ServiceMetadataUtils;
 import org.opengis.cite.iso19142.util.WFSMessage;
 import org.opengis.cite.iso19142.util.XMLUtils;
+import org.opengis.geometry.Envelope;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.SkipException;
@@ -121,7 +122,8 @@ public class IntersectsTests extends QueryFilterFixture {
             throw new SkipException("Feature type has no geometry properties: " + featureType);
         }
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
-        Document gmlEnv = Extents.envelopeAsGML(featureInfo.get(featureType).getSpatialExtent());
+        Envelope extent = this.dataSampler.getSpatialExtent(this.model, featureType);
+        Document gmlEnv = Extents.envelopeAsGML(extent);
         Element gmlPolygon = XMLUtils
                 .transform(new StreamSource(getClass().getResourceAsStream(XSLT_ENV2POLYGON)), gmlEnv)
                 .getDocumentElement();
@@ -158,6 +160,9 @@ public class IntersectsTests extends QueryFilterFixture {
                     XMLUtils.writeNodeToString(gmlPolygon), XMLUtils.writeNodeToString(geom)));
         }
     }
+    
+    // intersectsCurve (corner points of bbox) - other CRS
+    // intersectsCircle (corner points of bbox) - default CRS
 
     /**
      * Adds a spatial predicate to a GetFeature request entity. If the given
