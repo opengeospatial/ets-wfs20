@@ -186,8 +186,10 @@ public class FeatureTypeInfo {
         sb.append("',\n supportedCRS: '").append(supportedCRSList);
         sb.append("',\n instantiated: ").append(instantiated);
         sb.append(",\n spatial extent: '").append(Envelopes.toWKT(getSpatialExtent()));
-        sb.append("',\n temporal extent: '");
-        sb.append(TemporalUtils.temporalGeometricPrimitiveToString(temporalExtent));
+        if (temporalExtent != null) {
+            sb.append("',\n temporal extent: '");
+            sb.append(TemporalUtils.temporalGeometricPrimitiveToString(temporalExtent));
+        }
         if (sampleData != null && sampleData.exists()) {
             sb.append("',\n data: '").append(sampleData.toString());
         }

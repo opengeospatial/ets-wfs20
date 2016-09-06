@@ -83,8 +83,13 @@ public class DataSampler {
         }
         this.serviceDescription = wfsCapabilities;
         this.featureInfo = ServiceMetadataUtils.extractFeatureTypeInfo(wfsCapabilities);
+        if (this.featureInfo.isEmpty()) {
+            throw new RuntimeException("No feature type info available.");
+        }
         this.spatialExtents = new HashMap<>();
         this.temporalPropertyExtents = new HashMap<>();
+        LOGR.config("Created DataSampler - GetCapabilities (GET) endpoint is " + ServiceMetadataUtils
+                .getOperationEndpoint(wfsCapabilities, WFS2.GET_CAPABILITIES, ProtocolBinding.GET));
     }
 
     /**
@@ -242,12 +247,12 @@ public class DataSampler {
                             File file = File.createTempFile(typeName.getLocalPart() + "-", ".xml");
                             FileOutputStream fos = new FileOutputStream(file);
                             XMLUtils.writeNode(rspEntity, fos);
-                            LOGR.log(Level.FINE, this.getClass().getName() + " - wrote response entity to "
-                                    + file.getAbsolutePath());
+                            LOGR.log(Level.CONFIG,
+                                    this.getClass().getName() + " - wrote feature data to " + file.getAbsolutePath());
                             entry.getValue().setSampleData(file);
                             fos.close();
-                        } catch (IOException iox) {
-                            LOGR.log(Level.WARNING, "Failed to save feature data.", iox);
+                        } catch (Exception e) {
+                            LOGR.log(Level.WARNING, "Failed to save feature data.", e);
                         }
                         break;
                     }

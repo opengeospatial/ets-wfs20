@@ -14,7 +14,6 @@
       <class name="org.opengis.cite.iso19142.SuitePreconditions"/>
     </classes>
   </test>
-
   <test name="All GML application schemas">
     <classes>
       <class name="org.opengis.cite.iso19136.general.XMLSchemaTests" />

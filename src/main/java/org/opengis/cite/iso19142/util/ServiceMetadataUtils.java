@@ -41,6 +41,18 @@ public class ServiceMetadataUtils {
     private static final Logger LOGR = Logger.getLogger(ServiceMetadataUtils.class.getPackage().getName());
 
     /**
+     * Gets the title of the service.
+     * 
+     * @param wfsMetadata
+     *            The service capabilities document.
+     * @return The actual title or "Not specified" if no title appears.
+     */
+    public static String getServiceTitle(final Document wfsMetadata) {
+        Node titleNode = wfsMetadata.getElementsByTagNameNS(Namespaces.OWS, "Title").item(0);
+        return (null != titleNode) ? titleNode.getTextContent() : "Not specified";
+    }
+
+    /**
      * Extracts a request endpoint from a WFS capabilities document. If the
      * request URI contains a query component it is removed (but not from the
      * source document).
