@@ -345,7 +345,6 @@ public class ETSAssert {
             Assert.assertEquals(features.getLength(), expectedCount,
                     "Unexpected number of feature members in response.");
         }
-
     }
 
     /**
@@ -408,5 +407,28 @@ public class ETSAssert {
             Assert.assertEquals(attr.getValue(), crsId, String.format("Unexpected @srsName value on element %s",
                     new QName(attr.getNamespaceURI(), attr.getLocalName())));
         }
+    }
+
+    /**
+     * Asserts that the given response entity contains at least one feature
+     * instance of the specified type.
+     * 
+     * @param entity
+     *            A Document representing a GetFeature response entity
+     *            (wfs:FeatureCollection).
+     * @param featureType
+     *            A QName that identifies the expected feature type; if null,
+     *            any type is acceptable.
+     */
+    public static void assertResultSetNotEmpty(Document entity, QName featureType) {
+        NodeList features;
+        if (null != featureType) {
+            features = entity.getElementsByTagNameNS(featureType.getNamespaceURI(), featureType.getLocalPart());
+        } else {
+            features = entity.getElementsByTagNameNS(WFS2.NS_URI, "member");
+        }
+        Assert.assertTrue(features.getLength() > 0,
+                String.format("Expected one or more feature instances in response (type: %s).",
+                        (null != featureType) ? featureType : "any"));
     }
 }

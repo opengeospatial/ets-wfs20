@@ -17,7 +17,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opengis.cite.geomatics.Extents;
-import org.opengis.cite.geomatics.SpatialRelationship;
+import org.opengis.cite.geomatics.SpatialOperator;
 import org.opengis.cite.iso19142.ConformanceClass;
 import org.opengis.cite.iso19142.FeatureTypeInfo;
 import org.opengis.cite.iso19142.ProtocolBinding;
@@ -127,10 +127,14 @@ public class VerifyServiceMetadataUtils {
     }
 
     @Test
-    public void implementedSpatialOperators() throws SAXException, IOException {
+    public void simpleSpatialCapabilities() throws SAXException, IOException {
         Document wfsDescr = docBuilder.parse(getClass().getResourceAsStream("/capabilities-simple.xml"));
-        Set<SpatialRelationship> spatialOps = ServiceMetadataUtils.getImplementedSpatialOperators(wfsDescr);
-        assertEquals("Unexpected number of spatial operators.", 2, spatialOps.size());
-        assertTrue("Expected INTERSECTS in set.", spatialOps.contains(SpatialRelationship.INTERSECTS));
+        Map<SpatialOperator, Set<QName>> capabilities = ServiceMetadataUtils.getSpatialCapabilities(wfsDescr);
+        Set<SpatialOperator> operators = capabilities.keySet();
+        assertEquals("Unexpected number of spatial operators.", 3, operators.size());
+        assertTrue("Expected INTERSECTS in set.", operators.contains(SpatialOperator.INTERSECTS));
+        Set<QName> geomOperands = capabilities.get(SpatialOperator.INTERSECTS);
+        assertEquals("Unexpected number of geometry operands (INTERSECTS).", 6, geomOperands.size());
     }
+
 }

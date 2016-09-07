@@ -13,7 +13,7 @@ import javax.xml.xpath.XPathExpressionException;
 import org.apache.xerces.xs.XSElementDeclaration;
 import org.apache.xerces.xs.XSTypeDefinition;
 import org.opengis.cite.geomatics.Extents;
-import org.opengis.cite.geomatics.SpatialRelationship;
+import org.opengis.cite.geomatics.SpatialOperator;
 import org.opengis.cite.geomatics.TopologicalRelationships;
 import org.opengis.cite.iso19142.ETSAssert;
 import org.opengis.cite.iso19142.ErrorMessage;
@@ -172,7 +172,7 @@ public class BBOXTests extends QueryFilterFixture {
                 // gml:Surface comprised of one or more PolygonPatch elements
                 geometry = surfaceToPolygon(geometry);
             }
-            boolean intersects = TopologicalRelationships.isSpatiallyRelated(SpatialRelationship.INTERSECTS,
+            boolean intersects = TopologicalRelationships.isSpatiallyRelated(SpatialOperator.INTERSECTS,
                     gmlPolygon.getDocumentElement(), geometry);
             Assert.assertTrue(intersects, ErrorMessage.format(ErrorMessageKeys.PREDICATE_NOT_SATISFIED, "BBOX",
                     XMLUtils.writeNodeToString(gmlPolygon), XMLUtils.writeNodeToString(geometry)));

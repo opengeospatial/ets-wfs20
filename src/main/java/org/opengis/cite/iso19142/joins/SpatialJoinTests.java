@@ -14,7 +14,7 @@ import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.xerces.xs.XSElementDeclaration;
 import org.apache.xerces.xs.XSTypeDefinition;
-import org.opengis.cite.geomatics.SpatialRelationship;
+import org.opengis.cite.geomatics.SpatialOperator;
 import org.opengis.cite.iso19142.ConformanceClass;
 import org.opengis.cite.iso19142.ErrorMessage;
 import org.opengis.cite.iso19142.ErrorMessageKeys;
@@ -90,7 +90,7 @@ public class SpatialJoinTests extends QueryFilterFixture {
     private Map<QName, List<XSElementDeclaration>> surfaceProps;
     private Map<QName, List<XSElementDeclaration>> curveProps;
     private Map<QName, List<XSElementDeclaration>> pointProps;
-    private Set<SpatialRelationship> implementedSpatialOps;
+    private Map<SpatialOperator, Set<QName>> spatialCapabilities;
 
     /**
      * Searches the application schema for geometry properties where the value
@@ -147,7 +147,7 @@ public class SpatialJoinTests extends QueryFilterFixture {
      */
     @BeforeClass
     public void initFixture() {
-        this.implementedSpatialOps = ServiceMetadataUtils.getImplementedSpatialOperators(this.wfsMetadata);
+        this.spatialCapabilities = ServiceMetadataUtils.getSpatialCapabilities(this.wfsMetadata);
         this.surfaceProps = findGeometryProperties("AbstractSurfaceType");
         if (this.surfaceProps.isEmpty()) {
             this.surfaceProps = findGeometryProperties("MultiSurfaceType");
@@ -173,9 +173,8 @@ public class SpatialJoinTests extends QueryFilterFixture {
      */
     @Test(description = "See OGC 09-025r2: 7.9.2.5.3, A.1.12")
     public void joinWithIntersects() {
-        if (!this.implementedSpatialOps.contains(SpatialRelationship.INTERSECTS)) {
-            throw new SkipException(
-                    ErrorMessage.format(ErrorMessageKeys.NOT_IMPLEMENTED, SpatialRelationship.INTERSECTS));
+        if (!this.spatialCapabilities.keySet().contains(SpatialOperator.INTERSECTS)) {
+            throw new SkipException(ErrorMessage.format(ErrorMessageKeys.NOT_IMPLEMENTED, SpatialOperator.INTERSECTS));
         }
         List<FeatureProperty> joinProperties = new ArrayList<FeatureProperty>();
         if (this.surfaceProps.size() > 1) {

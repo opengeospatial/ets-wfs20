@@ -151,7 +151,7 @@
         </fes:Constraint>
       </fes:Conformance>
       <fes:Spatial_Capabilities>
-        <fes:GeometryOperands xmlns:gml="http://www.opengis.net/gml">
+        <fes:GeometryOperands xmlns:gml="http://www.opengis.net/gml/3.2">
           <fes:GeometryOperand name="gml:Envelope"/>
           <fes:GeometryOperand name="gml:Point"/>
           <fes:GeometryOperand name="gml:LineString"/>

@@ -2,7 +2,7 @@ package org.opengis.cite.iso19142.util;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,7 +20,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.opengis.cite.geomatics.Extents;
-import org.opengis.cite.geomatics.SpatialRelationship;
+import org.opengis.cite.geomatics.SpatialOperator;
 import org.opengis.cite.iso19142.ConformanceClass;
 import org.opengis.cite.iso19142.FeatureTypeInfo;
 import org.opengis.cite.iso19142.Namespaces;
@@ -380,25 +380,57 @@ public class ServiceMetadataUtils {
     }
 
     /**
-     * Returns the set of spatial operators (other than BBOX, DWithin, Beyond)
-     * listed in a WFS service description.
+     * Gets the spatial capabilities supported by a WFS: specifically, the set
+     * of implemented spatial operators and their associated geometry operands
+     * (some of which may be common to all operators).
      * 
      * @param wfsMetadata
      *            A WFS capabilities document.
-     * @return A set containing all implemented spatial predicates.
+     * @return A Map with one entry for each implemented spatial operator (the
+     *         key); the value is a set of supported geometry type names
+     *         (represented as a QName).
      */
-    public static Set<SpatialRelationship> getImplementedSpatialOperators(final Document wfsMetadata) {
-        Set<SpatialRelationship> implementedOps = EnumSet.noneOf(SpatialRelationship.class);
-        NodeList spatialOps = wfsMetadata.getElementsByTagNameNS(Namespaces.FES, "SpatialOperator");
-        for (int i = 0; i < spatialOps.getLength(); i++) {
-            Element spatialOp = (Element) spatialOps.item(i);
-            String opName = spatialOp.getAttribute("name").toUpperCase();
-            if (Arrays.asList(new String[] { "BBOX", "DWITHIN", "BEYOND" }).contains(opName)) {
-                continue; // ignore analytic methods
-            }
-            implementedOps.add(SpatialRelationship.valueOf(opName));
+    public static Map<SpatialOperator, Set<QName>> getSpatialCapabilities(final Document wfsMetadata) {
+        NodeList nodeList = null;
+        try {
+            nodeList = XMLUtils.evaluateXPath(wfsMetadata,
+                    "//fes:Spatial_Capabilities/fes:GeometryOperands/fes:GeometryOperand", null);
+        } catch (XPathExpressionException e) {
+            // valid expression
         }
-        return implementedOps;
+        Set<QName> commonOperands = geometryOperands(nodeList);
+        Map<SpatialOperator, Set<QName>> spatialCapabilities = new EnumMap<>(SpatialOperator.class);
+        nodeList = wfsMetadata.getElementsByTagNameNS(Namespaces.FES, "SpatialOperator");
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            Element operator = (Element) nodeList.item(i);
+            SpatialOperator op = SpatialOperator.valueOf(operator.getAttribute("name").toUpperCase());
+            NodeList operands = operator.getElementsByTagNameNS(Namespaces.FES, "GeometryOperand");
+            Set<QName> specificOperands = geometryOperands(operands);
+            specificOperands.addAll(commonOperands);
+            spatialCapabilities.put(op, specificOperands);
+        }
+        return spatialCapabilities;
+    }
+
+    /**
+     * Returns a set of geometry type names identified in the given list of
+     * geometry operands.
+     * 
+     * @param operandList
+     *            A list of fes:GeometryOperand elements.
+     * @return A set of qualified names.
+     */
+    public static Set<QName> geometryOperands(NodeList operandList) {
+        Set<QName> operands = new HashSet<>();
+        for (int i = 0; i < operandList.getLength(); i++) {
+            Element operand = (Element) operandList.item(i);
+            // name attribute value is xsd:QName (e.g. gml:Point)
+            String[] geomType = operand.getAttribute("name").split(":");
+            if (geomType.length != 2)
+                continue; // missing name attribute or invalid QName
+            operands.add(new QName(operand.lookupNamespaceURI(geomType[0]), geomType[1]));
+        }
+        return operands;
     }
 
     /**

@@ -2,8 +2,10 @@ package org.opengis.cite.iso19142.basic.filter.spatial;
 
 import java.net.URI;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMSource;
@@ -13,9 +15,11 @@ import javax.xml.xpath.XPathExpressionException;
 import org.apache.xerces.xs.XSElementDeclaration;
 import org.apache.xerces.xs.XSTypeDefinition;
 import org.opengis.cite.geomatics.Extents;
-import org.opengis.cite.geomatics.SpatialRelationship;
+import org.opengis.cite.geomatics.SpatialOperator;
 import org.opengis.cite.geomatics.TopologicalRelationships;
+import org.opengis.cite.iso19136.GML32;
 import org.opengis.cite.iso19136.util.XMLSchemaModelUtils;
+import org.opengis.cite.iso19142.ETSAssert;
 import org.opengis.cite.iso19142.ErrorMessage;
 import org.opengis.cite.iso19142.ErrorMessageKeys;
 import org.opengis.cite.iso19142.Namespaces;
@@ -49,12 +53,16 @@ import com.sun.jersey.api.client.ClientResponse;
  * <pre>
  * a.Intersects(b) &#8660; ! a.Disjoint(b)
  * </pre>
+ * 
+ * @see "OGC 09-026r2, A.8: Test cases for spatial filter"
+ * @see "ISO 19125-1, 6.1.15.3"
  */
 public class IntersectsTests extends QueryFilterFixture {
 
     public final static String IMPL_SPATIAL_FILTER = "ImplementsSpatialFilter";
     private static final String INTERSECTS_OP = "Intersects";
-    private XSTypeDefinition gmlGeomBaseType;
+    private Map<QName, List<XSElementDeclaration>> allGeomProperties;
+    private Set<QName> geomOperands;
     private static final String XSLT_ENV2POLYGON = "/org/opengis/cite/iso19142/util/bbox2polygon.xsl";
 
     /**
@@ -82,54 +90,65 @@ public class IntersectsTests extends QueryFilterFixture {
     }
 
     /**
-     * Creates an XSTypeDefinition object representing the
-     * gml:AbstractGeometryType definition.
+     * Finds the geometry properties for all feature types recognized by the
+     * SUT.
      */
     @BeforeClass
-    public void createGeometryBaseType() {
-        this.gmlGeomBaseType = model.getTypeDefinition("AbstractGeometryType", Namespaces.GML);
+    public void findAllGeometryProperties() {
+        XSTypeDefinition geomBaseType = model.getTypeDefinition("AbstractGeometryType", Namespaces.GML);
+        this.allGeomProperties = new HashMap<>();
+        for (QName featureType : this.featureTypes) {
+            List<XSElementDeclaration> geomProps = AppSchemaUtils.getFeaturePropertiesByType(model, featureType,
+                    geomBaseType);
+            if (!geomProps.isEmpty()) {
+                this.allGeomProperties.put(featureType, geomProps);
+            }
+        }
     }
 
     /**
-     * Checks if the spatial operator "Intersects" is supported. If not, all
-     * tests for this operator are skipped.
+     * Checks if the spatial operator "Intersects" is implemented and which
+     * geometry operands are supported. If it's not implemented, all tests for
+     * this operator are skipped.
      */
     @BeforeClass
     public void implementsIntersectsOp() {
-        if (!ServiceMetadataUtils.implementsSpatialOperator(this.wfsMetadata, "Intersects")) {
-            throw new SkipException(ErrorMessage.format(ErrorMessageKeys.NOT_IMPLEMENTED, "Intersects operator"));
+        Map<SpatialOperator, Set<QName>> capabilities = ServiceMetadataUtils.getSpatialCapabilities(this.wfsMetadata);
+        if (!capabilities.containsKey(SpatialOperator.INTERSECTS)) {
+            throw new SkipException(ErrorMessage.format(ErrorMessageKeys.NOT_IMPLEMENTED, SpatialOperator.INTERSECTS));
         }
+        this.geomOperands = capabilities.get(SpatialOperator.INTERSECTS);
     }
 
     /**
      * [{@code Test}] Submits a GetFeature request containing an Intersects
      * predicate with a gml:Polygon operand. The response entity must be
-     * schema-valid and contain only instances of the requested type that
-     * intersect the given polygon.
+     * schema-valid and contain only matching instances.
      * 
      * @param binding
      *            The ProtocolBinding to use for this request.
      * @param featureType
      *            A QName representing the qualified name of some feature type.
-     * 
-     * @see "ISO 19143:2010, 7.8.3.2: BBOX operator"
      */
-    @Test(description = "See ISO 19143: 7.8.3.2", dataProvider = "protocol-featureType")
+    @Test(description = "See OGC 09-026r2, A.8", dataProvider = "protocol-featureType")
     public void intersectsPolygon(ProtocolBinding binding, QName featureType) {
-        List<XSElementDeclaration> geomProps = AppSchemaUtils.getFeaturePropertiesByType(model, featureType,
-                gmlGeomBaseType);
-        if (geomProps.isEmpty()) {
+        if (!this.allGeomProperties.keySet().contains(featureType)) {
             throw new SkipException("Feature type has no geometry properties: " + featureType);
         }
+        QName gmlPolygon = new QName(Namespaces.GML, GML32.POLYGON);
+        if (!this.geomOperands.contains(gmlPolygon)) {
+            throw new SkipException("Unsupported geometry operand: " + gmlPolygon);
+        }
+        List<XSElementDeclaration> geomProps = this.allGeomProperties.get(featureType);
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
         Envelope extent = this.dataSampler.getSpatialExtent(this.model, featureType);
         Document gmlEnv = Extents.envelopeAsGML(extent);
-        Element gmlPolygon = XMLUtils
+        Element gmlPolygonElem = XMLUtils
                 .transform(new StreamSource(getClass().getResourceAsStream(XSLT_ENV2POLYGON)), gmlEnv)
                 .getDocumentElement();
         XSElementDeclaration geomProperty = geomProps.get(0);
         Element valueRef = WFSMessage.createValueReference(geomProperty);
-        addSpatialPredicate(this.reqEntity, INTERSECTS_OP, gmlPolygon, valueRef);
+        addSpatialPredicate(this.reqEntity, INTERSECTS_OP, gmlPolygonElem, valueRef);
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.GET_FEATURE, binding);
         ClientResponse rsp = wfsClient.submitRequest(new DOMSource(reqEntity), binding, endpoint);
         this.rspEntity = extractBodyAsDocument(rsp);
@@ -154,13 +173,58 @@ public class IntersectsTests extends QueryFilterFixture {
         List<Node> geomNodes = WFSMessage.findMatchingElements(this.rspEntity, expectedValues);
         Assert.assertFalse(geomNodes.isEmpty(), String.format("No geometry elements found in response: %s", geomValue));
         for (Node geom : geomNodes) {
-            boolean intersects = TopologicalRelationships.isSpatiallyRelated(SpatialRelationship.INTERSECTS, gmlPolygon,
+            boolean intersects = TopologicalRelationships.isSpatiallyRelated(SpatialOperator.INTERSECTS, gmlPolygonElem,
                     geom);
             Assert.assertTrue(intersects, ErrorMessage.format(ErrorMessageKeys.PREDICATE_NOT_SATISFIED, INTERSECTS_OP,
-                    XMLUtils.writeNodeToString(gmlPolygon), XMLUtils.writeNodeToString(geom)));
+                    XMLUtils.writeNodeToString(gmlPolygonElem), XMLUtils.writeNodeToString(geom)));
         }
     }
-    
+
+    /**
+     * [{@code Test}] Submits a GetFeature request containing an Intersects
+     * predicate with a gml:LineString operand. The response entity must be
+     * schema-valid and contain only matching instances.
+     * 
+     * @param binding
+     *            The ProtocolBinding to use for this request.
+     * @param featureType
+     *            A QName representing the qualified name of some feature type.
+     */
+    @Test(description = "See OGC 09-026r2, A.8", dataProvider = "protocol-featureType")
+    public void intersectsLineString(ProtocolBinding binding, QName featureType) {
+        if (!this.allGeomProperties.keySet().contains(featureType)) {
+            throw new SkipException("Feature type has no geometry properties: " + featureType);
+        }
+        QName gmlLineString = new QName(Namespaces.GML, GML32.LINE_STRING);
+        if (!this.geomOperands.contains(gmlLineString)) {
+            throw new SkipException("Unsupported geometry operand: " + gmlLineString);
+        }
+        WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
+        Envelope extent = this.dataSampler.getSpatialExtent(this.model, featureType);
+        Document gmlEnvelope = Extents.envelopeAsGML(extent);
+        Element gmlLineStringElem = XMLUtils
+                .transform(new StreamSource(getClass().getResourceAsStream("envelopeToline.xsl")), gmlEnvelope)
+                .getDocumentElement();
+        List<XSElementDeclaration> geomProps = this.allGeomProperties.get(featureType);
+        Iterator<XSElementDeclaration> itr = geomProps.iterator();
+        XSElementDeclaration geomProperty = null;
+        while (itr.hasNext()) {
+            geomProperty = itr.next();
+            XSElementDeclaration value = AppSchemaUtils.getComplexPropertyValue(geomProperty);
+            if (!value.getName().equals(GML32.POINT))
+                break; // ignore point property--unlikely to intersect line
+        }
+        Element valueRef = WFSMessage.createValueReference(geomProperty);
+        addSpatialPredicate(this.reqEntity, INTERSECTS_OP, gmlLineStringElem, valueRef);
+        URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.GET_FEATURE, binding);
+        ClientResponse rsp = wfsClient.submitRequest(new DOMSource(reqEntity), binding, endpoint);
+        this.rspEntity = extractBodyAsDocument(rsp);
+        Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
+                ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
+        ETSAssert.assertResultSetNotEmpty(this.rspEntity, featureType);
+        // TODO: verify intersects relationship
+    }
+
     // intersectsCurve (corner points of bbox) - other CRS
     // intersectsCircle (corner points of bbox) - default CRS
 

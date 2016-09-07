@@ -16,7 +16,7 @@ import static org.junit.Assert.*;
 import org.apache.xerces.xs.XSModel;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opengis.cite.iso19136.general.GML32;
+import org.opengis.cite.iso19136.GML32;
 import org.opengis.cite.validation.XSModelBuilder;
 import org.opengis.cite.validation.XmlSchemaCompiler;
 import org.w3c.dom.Document;
