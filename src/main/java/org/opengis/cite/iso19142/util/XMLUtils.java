@@ -5,6 +5,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -35,6 +36,7 @@ import net.sf.saxon.s9api.Processor;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XPathCompiler;
 import net.sf.saxon.s9api.XPathSelector;
+import net.sf.saxon.s9api.XdmAtomicValue;
 import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.s9api.XdmValue;
 import net.sf.saxon.s9api.XsltCompiler;
@@ -291,11 +293,16 @@ public class XMLUtils {
      * @param source
      *            A Node representing the XML source. If it is an Element node
      *            it will be imported into a new DOM Document.
+     * @param params
+     *            A Map containing global stylesheet parameters (name-value
+     *            pairs).
      * @return A DOM Document containing the result of the transformation.
      */
-    public static Document transform(Source xslt, Node source) {
+    public static Document transform(Source xslt, Node source, Map<String, String> params) {
         Document sourceDoc = null;
         Document resultDoc = null;
+        if (null == params)
+            params = Collections.emptyMap();
         try {
             resultDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
             if (source.getNodeType() == Node.DOCUMENT_NODE) {
@@ -314,6 +321,11 @@ public class XMLUtils {
             XsltTransformer transformer = exec.load();
             transformer.setSource(new DOMSource(sourceDoc));
             transformer.setDestination(new DOMDestination(resultDoc));
+            for (Map.Entry<String, String> entry : params.entrySet()) {
+                net.sf.saxon.s9api.QName paramName = new net.sf.saxon.s9api.QName(entry.getKey());
+                XdmValue paramValue = new XdmAtomicValue(entry.getValue());
+                transformer.setParameter(paramName, paramValue);
+            }
             transformer.transform();
         } catch (SaxonApiException e) {
             throw new RuntimeException(e);

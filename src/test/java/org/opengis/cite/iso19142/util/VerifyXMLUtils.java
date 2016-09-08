@@ -108,7 +108,7 @@ public class VerifyXMLUtils {
                 "/Envelope.xml"));
         Source xslt = new StreamSource(this.getClass().getResourceAsStream(
                 "/xslt/bbox2polygon.xsl"));
-        Document result = XMLUtils.transform(xslt, source);
+        Document result = XMLUtils.transform(xslt, source, null);
         Assert.assertEquals("Document element has unexpected [local name].",
                 "Polygon", result.getDocumentElement().getLocalName());
         String posList = result

@@ -165,7 +165,7 @@ public class BBOXTests extends QueryFilterFixture {
         Assert.assertTrue(geometryNodes.getLength() > 0, ErrorMessage.format(ErrorMessageKeys.XPATH_RESULT,
                 this.rspEntity.getDocumentElement().getNodeName(), xpath));
         Document gmlPolygon = XMLUtils.transform(new StreamSource(getClass().getResourceAsStream(XSLT_ENV2POLYGON)),
-                gmlEnv);
+                gmlEnv, null);
         for (int i = 0; i < geometryNodes.getLength(); i++) {
             Element geometry = (Element) geometryNodes.item(i);
             if (geometry.getElementsByTagNameNS(Namespaces.GML, "PolygonPatch").getLength() > 0) {
@@ -225,7 +225,7 @@ public class BBOXTests extends QueryFilterFixture {
      */
     Element surfaceToPolygon(Element geometry) {
         Document result = XMLUtils.transform(new StreamSource(getClass().getResourceAsStream("surface2polygon.xsl")),
-                geometry);
+                geometry, null);
         return result.getDocumentElement();
     }
 

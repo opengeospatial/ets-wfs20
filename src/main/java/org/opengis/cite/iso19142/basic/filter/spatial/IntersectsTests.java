@@ -1,11 +1,13 @@
 package org.opengis.cite.iso19142.basic.filter.spatial;
 
 import java.net.URI;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 
 import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMSource;
@@ -18,8 +20,6 @@ import org.opengis.cite.geomatics.Extents;
 import org.opengis.cite.geomatics.SpatialOperator;
 import org.opengis.cite.geomatics.TopologicalRelationships;
 import org.opengis.cite.iso19136.GML32;
-import org.opengis.cite.iso19136.util.XMLSchemaModelUtils;
-import org.opengis.cite.iso19142.ETSAssert;
 import org.opengis.cite.iso19142.ErrorMessage;
 import org.opengis.cite.iso19142.ErrorMessageKeys;
 import org.opengis.cite.iso19142.Namespaces;
@@ -29,6 +29,7 @@ import org.opengis.cite.iso19142.WFS2;
 import org.opengis.cite.iso19142.basic.filter.QueryFilterFixture;
 import org.opengis.cite.iso19142.util.AppSchemaUtils;
 import org.opengis.cite.iso19142.util.ServiceMetadataUtils;
+import org.opengis.cite.iso19142.util.TestSuiteLogger;
 import org.opengis.cite.iso19142.util.WFSMessage;
 import org.opengis.cite.iso19142.util.XMLUtils;
 import org.opengis.geometry.Envelope;
@@ -139,39 +140,24 @@ public class IntersectsTests extends QueryFilterFixture {
         if (!this.geomOperands.contains(gmlPolygon)) {
             throw new SkipException("Unsupported geometry operand: " + gmlPolygon);
         }
-        List<XSElementDeclaration> geomProps = this.allGeomProperties.get(featureType);
-        WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
         Envelope extent = this.dataSampler.getSpatialExtent(this.model, featureType);
         Document gmlEnv = Extents.envelopeAsGML(extent);
         Element gmlPolygonElem = XMLUtils
-                .transform(new StreamSource(getClass().getResourceAsStream(XSLT_ENV2POLYGON)), gmlEnv)
+                .transform(new StreamSource(getClass().getResourceAsStream(XSLT_ENV2POLYGON)), gmlEnv, null)
                 .getDocumentElement();
+        List<XSElementDeclaration> geomProps = this.allGeomProperties.get(featureType);
         XSElementDeclaration geomProperty = geomProps.get(0);
-        Element valueRef = WFSMessage.createValueReference(geomProperty);
-        addSpatialPredicate(this.reqEntity, INTERSECTS_OP, gmlPolygonElem, valueRef);
+        this.reqEntity = buildGetFeatureRequest(featureType, INTERSECTS_OP, geomProperty, gmlPolygonElem);
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.GET_FEATURE, binding);
         ClientResponse rsp = wfsClient.submitRequest(new DOMSource(reqEntity), binding, endpoint);
         this.rspEntity = extractBodyAsDocument(rsp);
         Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
-        Map<String, String> nsBindings = new HashMap<String, String>();
-        nsBindings.put(Namespaces.WFS, "wfs");
-        XSElementDeclaration geomValue = AppSchemaUtils.getComplexPropertyValue(geomProperty);
-        XSElementDeclaration[] expectedValues = new XSElementDeclaration[1];
-        if (geomValue.getAbstract()) {
-            List<XSElementDeclaration> allowedValues = XMLSchemaModelUtils.getElementsByAffiliation(this.model,
-                    geomValue);
-            if (allowedValues.isEmpty()) {
-                throw new AssertionError(
-                        String.format("For property %s, no substitutable elements found for abstract property value: ",
-                                geomProperty, geomValue));
-            }
-            expectedValues = allowedValues.toArray(expectedValues);
-        } else {
-            expectedValues[0] = geomValue;
+        List<Node> geomNodes = WFSMessage.findPropertyValues(this.rspEntity, geomProperty, this.model);
+        if (geomNodes.isEmpty()) {
+            TestSuiteLogger.log(Level.INFO, String.format(
+                    "intersectsPolygon: No values found for geometry property %s (in %s)", geomProperty, featureType));
         }
-        List<Node> geomNodes = WFSMessage.findMatchingElements(this.rspEntity, expectedValues);
-        Assert.assertFalse(geomNodes.isEmpty(), String.format("No geometry elements found in response: %s", geomValue));
         for (Node geom : geomNodes) {
             boolean intersects = TopologicalRelationships.isSpatiallyRelated(SpatialOperator.INTERSECTS, gmlPolygonElem,
                     geom);
@@ -181,9 +167,10 @@ public class IntersectsTests extends QueryFilterFixture {
     }
 
     /**
-     * [{@code Test}] Submits a GetFeature request containing an Intersects
-     * predicate with a gml:LineString operand. The response entity must be
-     * schema-valid and contain only matching instances.
+     * [{@code Test}] Submits a GetFeature request containing an
+     * <strong>Intersects</strong> predicate with a gml:LineString or gml:Curve
+     * (LineStringSegment) operand. The response entity must be schema-valid and
+     * contain only matching instances.
      * 
      * @param binding
      *            The ProtocolBinding to use for this request.
@@ -191,19 +178,22 @@ public class IntersectsTests extends QueryFilterFixture {
      *            A QName representing the qualified name of some feature type.
      */
     @Test(description = "See OGC 09-026r2, A.8", dataProvider = "protocol-featureType")
-    public void intersectsLineString(ProtocolBinding binding, QName featureType) {
+    public void intersectsCurve(ProtocolBinding binding, QName featureType) {
         if (!this.allGeomProperties.keySet().contains(featureType)) {
             throw new SkipException("Feature type has no geometry properties: " + featureType);
         }
-        QName gmlLineString = new QName(Namespaces.GML, GML32.LINE_STRING);
-        if (!this.geomOperands.contains(gmlLineString)) {
-            throw new SkipException("Unsupported geometry operand: " + gmlLineString);
+        QName gmlCurve = new QName(Namespaces.GML, GML32.LINE_STRING);
+        if (!this.geomOperands.contains(gmlCurve)) {
+            gmlCurve = new QName(Namespaces.GML, GML32.CURVE);
+            if (!this.geomOperands.contains(gmlCurve)) {
+                throw new SkipException("Unsupported geometry operands: gml:LineString, gml:Curve");
+            }
         }
-        WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
         Envelope extent = this.dataSampler.getSpatialExtent(this.model, featureType);
         Document gmlEnvelope = Extents.envelopeAsGML(extent);
-        Element gmlLineStringElem = XMLUtils
-                .transform(new StreamSource(getClass().getResourceAsStream("envelopeToline.xsl")), gmlEnvelope)
+        Element gmlCurveElem = XMLUtils
+                .transform(new StreamSource(getClass().getResourceAsStream("envelopeTocurve.xsl")), gmlEnvelope,
+                        Collections.singletonMap("curveType", gmlCurve.getLocalPart()))
                 .getDocumentElement();
         List<XSElementDeclaration> geomProps = this.allGeomProperties.get(featureType);
         Iterator<XSElementDeclaration> itr = geomProps.iterator();
@@ -214,19 +204,51 @@ public class IntersectsTests extends QueryFilterFixture {
             if (!value.getName().equals(GML32.POINT))
                 break; // ignore point property--unlikely to intersect line
         }
-        Element valueRef = WFSMessage.createValueReference(geomProperty);
-        addSpatialPredicate(this.reqEntity, INTERSECTS_OP, gmlLineStringElem, valueRef);
+        this.reqEntity = buildGetFeatureRequest(featureType, INTERSECTS_OP, geomProperty, gmlCurveElem);
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.GET_FEATURE, binding);
-        ClientResponse rsp = wfsClient.submitRequest(new DOMSource(reqEntity), binding, endpoint);
+        ClientResponse rsp = wfsClient.submitRequest(new DOMSource(this.reqEntity), binding, endpoint);
         this.rspEntity = extractBodyAsDocument(rsp);
         Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
-        ETSAssert.assertResultSetNotEmpty(this.rspEntity, featureType);
-        // TODO: verify intersects relationship
+        List<Node> geomNodes = WFSMessage.findPropertyValues(this.rspEntity, geomProperty, this.model);
+        if (geomNodes.isEmpty()) {
+            TestSuiteLogger.log(Level.INFO, String.format(
+                    "intersectsCurve: No values found for geometry property %s (in %s)", geomProperty, featureType));
+        }
+        for (Node geom : geomNodes) {
+            boolean intersects = TopologicalRelationships.isSpatiallyRelated(SpatialOperator.INTERSECTS, gmlCurveElem,
+                    geom);
+            Assert.assertTrue(intersects, ErrorMessage.format(ErrorMessageKeys.PREDICATE_NOT_SATISFIED, INTERSECTS_OP,
+                    XMLUtils.writeNodeToString(gmlCurveElem), XMLUtils.writeNodeToString(geom)));
+        }
     }
 
     // intersectsCurve (corner points of bbox) - other CRS
     // intersectsCircle (corner points of bbox) - default CRS
+
+    /**
+     * Builds a simple GetFeature request entity that contains a basic filter
+     * expression.
+     * 
+     * @param featureType
+     *            The name of the feature type.
+     * @param operator
+     *            The name of the filter predicate (operator).
+     * @param propertyDecl
+     *            The declaration of the feature property to be queried.
+     * @param literal
+     *            An element representing the literal value to match.
+     * @return A Document containing a request entity with wfs:GetFeature as the
+     *         document element.
+     */
+    Document buildGetFeatureRequest(QName featureType, String operator, XSElementDeclaration propertyDecl,
+            Element literal) {
+        Document entity = WFSMessage.createRequestEntity(GET_FEATURE_MINIMAL, this.wfsVersion);
+        WFSMessage.appendSimpleQuery(entity, featureType);
+        Element valueRef = WFSMessage.createValueReference(propertyDecl);
+        addSpatialPredicate(entity, operator, literal, valueRef);
+        return entity;
+    }
 
     /**
      * Adds a spatial predicate to a GetFeature request entity. If the given

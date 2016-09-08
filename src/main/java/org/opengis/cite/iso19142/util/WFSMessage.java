@@ -23,6 +23,8 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.xerces.xs.XSElementDeclaration;
+import org.apache.xerces.xs.XSModel;
+import org.opengis.cite.iso19136.util.XMLSchemaModelUtils;
 import org.opengis.cite.iso19142.Namespaces;
 import org.opengis.cite.iso19142.ProtocolBinding;
 import org.opengis.cite.iso19142.WFS2;
@@ -459,10 +461,10 @@ public class WFSMessage {
      * of element declarations.
      * 
      * @param doc
-     *            A Document node.
+     *            A Document node containing an XML entity.
      * @param elemDeclarations
      *            A collection of element declarations.
-     * @return A list of matching element nodes. It may be empty.
+     * @return A list of matching element nodes (it may be empty).
      */
     public static List<Node> findMatchingElements(Document doc, XSElementDeclaration... elemDeclarations) {
         LOGR.log(Level.FINE, String.format("In %s, find %s", doc.getDocumentElement().getNodeName(),
@@ -470,14 +472,44 @@ public class WFSMessage {
         List<Node> nodes = new ArrayList<>();
         for (XSElementDeclaration decl : elemDeclarations) {
             NodeList matches = doc.getElementsByTagNameNS(decl.getNamespace(), decl.getName());
-            if (matches.getLength() > 0) {
-                LOGR.log(Level.FINE, String.format("Found %d instances of %s", matches.getLength(), decl));
-            }
+            LOGR.log(Level.FINE, String.format("Found %d instances of %s", matches.getLength(), decl));
             for (int i = 0; i < matches.getLength(); i++) {
                 nodes.add(matches.item(i));
             }
         }
         return nodes;
+    }
+
+    /**
+     * Finds elements in a DOM Document that occur as values of the specified
+     * feature property.
+     * 
+     * @param doc
+     *            A Document node containing a WFS response entity.
+     * @param propertyDecl
+     *            An element declaration that defines a feature property.
+     * @param schema
+     *            A representation of an application schema.
+     * @return A list of matching element nodes (it may be empty).
+     */
+    public static List<Node> findPropertyValues(Document doc, XSElementDeclaration propertyDecl, XSModel schema) {
+        LOGR.log(Level.FINE,
+                String.format("In %s, find values of %s", doc.getDocumentElement().getNodeName(), propertyDecl));
+        XSElementDeclaration propValue = AppSchemaUtils.getComplexPropertyValue(propertyDecl);
+        XSElementDeclaration[] expectedValues = new XSElementDeclaration[1];
+        if (propValue.getAbstract()) {
+            List<XSElementDeclaration> allowedValues = XMLSchemaModelUtils.getElementsByAffiliation(schema, propValue);
+            if (allowedValues.isEmpty()) {
+                throw new AssertionError(String.format(
+                        "For property %s, no substitutable elements found for abstract property value: %s",
+                        propertyDecl, propValue));
+            }
+            expectedValues = allowedValues.toArray(expectedValues);
+        } else {
+            expectedValues[0] = propValue;
+        }
+        List<Node> valueNodes = findMatchingElements(doc, expectedValues);
+        return valueNodes;
     }
 
     /**
