@@ -69,4 +69,19 @@
       <class name="org.opengis.cite.iso19142.locking.GetFeatureWithLockTests" />
     </classes>
   </test>
+  <test name="Response paging">
+    <packages>
+      <package name="org.opengis.cite.iso19142.paging" />
+    </packages>
+  </test>
+  <test name="Manage stored queries">
+    <packages>
+      <package name="org.opengis.cite.iso19142.querymgmt" />
+    </packages>
+  </test>
+  <test name="Feature versions">
+    <packages>
+      <package name="org.opengis.cite.iso19142.versioning" />
+    </packages>
+  </test>
 </suite>

@@ -5,7 +5,6 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.xerces.xs.XSElementDeclaration;
 import org.apache.xerces.xs.XSTypeDefinition;
@@ -14,23 +13,18 @@ import org.opengis.cite.geomatics.time.TemporalUtils;
 import org.opengis.cite.iso19142.ErrorMessage;
 import org.opengis.cite.iso19142.ErrorMessageKeys;
 import org.opengis.cite.iso19142.ProtocolBinding;
-import org.opengis.cite.iso19142.SuiteAttribute;
 import org.opengis.cite.iso19142.basic.filter.QueryFilterFixture;
 import org.opengis.cite.iso19142.util.TimeUtils;
 import org.opengis.cite.iso19142.util.WFSMessage;
-import org.opengis.cite.iso19142.util.XMLUtils;
 import org.opengis.temporal.Period;
 import org.opengis.temporal.RelativePosition;
 import org.opengis.temporal.TemporalGeometricPrimitive;
 import org.testng.Assert;
-import org.testng.ITestContext;
 import org.testng.SkipException;
-import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import com.sun.jersey.api.client.ClientResponse;
 
@@ -69,31 +63,6 @@ import com.sun.jersey.api.client.ClientResponse;
 public class DuringTests extends QueryFilterFixture {
 
     private static final String DURING_OP = "During";
-    public final static String IMPL_MIN_TEMPORAL_FILTER = "ImplementsMinTemporalFilter";
-
-    /**
-     * Checks the value of the filter constraint
-     * {@value #IMPL_MIN_TEMPORAL_FILTER} in the capabilities document. All
-     * tests are skipped if this is not "TRUE".
-     * 
-     * @param testContext
-     *            Information about the test run environment.
-     */
-    @BeforeTest
-    public void implementsTemporalFilter(ITestContext testContext) {
-        this.wfsMetadata = (Document) testContext.getSuite().getAttribute(SuiteAttribute.TEST_SUBJECT.getName());
-        String xpath = String.format("//fes:Constraint[@name='%s' and (ows:DefaultValue = 'TRUE')]",
-                IMPL_MIN_TEMPORAL_FILTER);
-        NodeList result;
-        try {
-            result = XMLUtils.evaluateXPath(this.wfsMetadata, xpath, null);
-        } catch (XPathExpressionException e) {
-            throw new AssertionError(e.getMessage());
-        }
-        if (result.getLength() == 0) {
-            throw new SkipException(ErrorMessage.format(ErrorMessageKeys.NOT_IMPLEMENTED, IMPL_MIN_TEMPORAL_FILTER));
-        }
-    }
 
     /**
      * [{@code Test}] Submits a GetFeature request containing a During temporal

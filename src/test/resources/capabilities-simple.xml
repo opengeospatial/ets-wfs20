@@ -147,7 +147,7 @@
       <fes:Conformance>
 		<fes:Constraint name="ImplementsQuery">
 		  <ValuesReference ows:reference="http://www.w3.org/2001/XMLSchema#boolean" />
-		  <DefaultValue>true</DefaultValue>
+		  <DefaultValue>TRUE</DefaultValue>
         </fes:Constraint>
       </fes:Conformance>
       <fes:Spatial_Capabilities>

@@ -154,8 +154,14 @@
 	<fes:Filter_Capabilities>
 		<fes:Conformance>
 			<fes:Constraint name="ImplementsQuery">
-				<ValuesReference ows:reference="http://www.w3.org/2001/XMLSchema#boolean" />
-				<DefaultValue>true</DefaultValue>
+				<AllowedValues>
+					<Value>TRUE</Value>
+				</AllowedValues>
+			</fes:Constraint>
+			<fes:Constraint name="ImplementsMinTemporalFilter">
+				<AllowedValues>
+					<Value>TRUE</Value>
+				</AllowedValues>
 			</fes:Constraint>
 		</fes:Conformance>
 	</fes:Filter_Capabilities>

@@ -467,4 +467,31 @@ public class ServiceMetadataUtils {
         }
         return results.getLength() > 0;
     }
+
+    /**
+     * Indicates whether or not the given service description claims that the
+     * specified conformance class has been implemented.
+     * 
+     * @param wfsMetadata
+     *            A WFS capabilities document.
+     * @param conformanceClass
+     *            The name of a constraint that identifies a WFS or FES
+     *            conformance class.
+     * @return true if the conformance class is implemented; false if not.
+     * 
+     * @see <a target="_blank" href=
+     *      "http://docs.opengeospatial.org/is/09-025r2/09-025r2.html#139">Service
+     *      and operation constraints</a>
+     */
+    public static boolean implementsConformanceClass(final Document wfsMetadata, String conformanceClass) {
+        String expr = String.format(
+                "(//ows:Constraint | //fes:Constraint)[@name='%s' and (//ows:Value = 'TRUE' or ows:DefaultValue = 'TRUE')]",
+                conformanceClass);
+        NodeList result = null;
+        try {
+            result = XMLUtils.evaluateXPath(wfsMetadata, expr, null);
+        } catch (XPathExpressionException e) { // valid expression
+        }
+        return result.getLength() > 0;
+    }
 }
