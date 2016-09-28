@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CreateStoredQuery version="2.0.0" service="WFS"
+  xmlns="http://www.opengis.net/wfs/2.0">
+  <StoredQueryDefinition id="urn:example:wfs2-query:GetFeatureByTypeName" 
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <Title>GetFeatureByTypeName</Title>
+    <Abstract>Returns feature representations by type name.</Abstract>
+    <Parameter name="typeName" type="xsd:QName">
+      <Abstract>Qualified name of feature type (required).</Abstract>
+    </Parameter>
+    <QueryExpressionText returnFeatureTypes="" 
+      language="urn:ogc:def:queryLanguage:OGC-WFS::WFSQueryExpression" isPrivate="false">
+      <Query typeNames="${typeName}" />
+    </QueryExpressionText>
+  </StoredQueryDefinition>
+</CreateStoredQuery>

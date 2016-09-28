@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CreateStoredQuery version="2.0.0" service="WFS"
+  xmlns="http://www.opengis.net/wfs/2.0">
+  <StoredQueryDefinition id="urn:example:wfs2-query:GetFeatureByName" 
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <Title>GetFeatureByName</Title>
+    <Abstract>Returns feature representations by name. The name value must occur in a gml:name property.</Abstract>
+    <Parameter name="name" type="xsd:string">
+      <Abstract>Name of feature instance (required)</Abstract>
+    </Parameter>
+    <QueryExpressionText xmlns:fes="http://www.opengis.net/fes/2.0" xmlns:gml="http://www.opengis.net/gml/3.2"
+      returnFeatureTypes="" 
+      language="urn:ogc:def:queryLanguage:OGC-WFS::WFSQueryExpression" isPrivate="false">
+      <Query typeNames="gml:AbstractFeature">
+        <fes:Filter>
+          <fes:PropertyIsLike wildCard="*" singleChar="?" escapeChar="\">
+            <fes:ValueReference>gml:name</fes:ValueReference>
+            <fes:Literal>*${name}*</fes:Literal>
+          </fes:PropertyIsLike>
+        </fes:Filter>
+      </Query>
+    </QueryExpressionText>
+  </StoredQueryDefinition>
+</CreateStoredQuery>

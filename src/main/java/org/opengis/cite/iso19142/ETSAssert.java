@@ -9,8 +9,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
+import javax.xml.transform.Result;
 import javax.xml.transform.Source;
-import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Validator;
@@ -19,9 +19,6 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import javax.xml.xpath.XPathFactoryConfigurationException;
-
-import net.sf.saxon.s9api.SaxonApiException;
-import net.sf.saxon.s9api.XdmValue;
 
 import org.apache.xerces.xs.XSComplexTypeDefinition;
 import org.apache.xerces.xs.XSElementDeclaration;
@@ -40,6 +37,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import net.sf.saxon.s9api.SaxonApiException;
+import net.sf.saxon.s9api.XdmValue;
 
 /**
  * Provides a set of custom assertion methods.
@@ -190,9 +190,9 @@ public class ETSAssert {
             msg.append(e.getMessage());
             throw new AssertionError(msg);
         }
-        DOMResult result = validator.validate(xmlSource);
+        Result result = validator.validate(xmlSource);
         Assert.assertFalse(validator.ruleViolationsDetected(), ErrorMessage.format(ErrorMessageKeys.NOT_SCHEMA_VALID,
-                validator.getRuleViolationCount(), XMLUtils.writeNodeToString(result.getNode())));
+                validator.getRuleViolationCount(), XMLUtils.resultToString(result)));
     }
 
     /**
@@ -315,9 +315,9 @@ public class ETSAssert {
     public static void assertSimpleWFSCapabilities(Document doc) {
         SchematronValidator validator = ValidationUtils.buildSchematronValidator("wfs-capabilities-2.0.sch",
                 "SimpleWFSPhase");
-        DOMResult result = validator.validate(new DOMSource(doc, doc.getDocumentURI()));
+        Result result = validator.validate(new DOMSource(doc, doc.getDocumentURI()), false);
         Assert.assertFalse(validator.ruleViolationsDetected(), ErrorMessage.format(ErrorMessageKeys.NOT_SCHEMA_VALID,
-                validator.getRuleViolationCount(), XMLUtils.writeNodeToString(result.getNode())));
+                validator.getRuleViolationCount(), XMLUtils.resultToString(result)));
     }
 
     /**

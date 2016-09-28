@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<svrl:schematron-output xmlns:schold="http://www.ascc.net/xml/schematron"
+   xmlns:iso="http://purl.oclc.org/dsdl/schematron"
+   xmlns:saxon="http://saxon.sf.net/"
+   xmlns:xs="http://www.w3.org/2001/XMLSchema"
+   xmlns:xhtml="http://www.w3.org/1999/xhtml"
+   xmlns:sch="http://purl.oclc.org/dsdl/schematron"
+   xmlns:gml="http://www.opengis.net/gml/3.2"
+   xmlns:xsd="http://www.w3.org/2001/XMLSchema"  
+   xmlns:svrl="http://purl.oclc.org/dsdl/svrl"
+   title="Deprecated infoset items in GML 3.2 (ISO 19136, Annex I)."
+   schemaVersion="3.2.1">
+  <svrl:ns-prefix-in-attribute-values uri="http://purl.oclc.org/dsdl/schematron" prefix="sch"/>
+  <svrl:ns-prefix-in-attribute-values uri="http://www.opengis.net/gml/3.2" prefix="gml"/>
+  <svrl:ns-prefix-in-attribute-values uri="http://www.w3.org/1999/xlink" prefix="xlink"/>
+  <svrl:active-pattern document="file:/W:/xml/schematron/resources/SimpleFeature-1.xml"
+                        id="DeprecatedItems"
+                        name="DeprecatedItems">
+    <svrl:text>Reports the occurrence of deprecated element and attribute information items.</svrl:text>
+  </svrl:active-pattern>
+  <svrl:fired-rule context="*[@gml:id]"/>
+  <svrl:fired-rule context="gml:boundedBy"/>
+  <svrl:fired-rule context="gml:Envelope"/>
+  <svrl:successful-report test="gml:pos"
+                           location="/*:SimpleFeature[namespace-uri()='http://example.org/ns1'][1]/*:boundedBy[namespace-uri()='http://www.opengis.net/gml/3.2'][1]/*:Envelope[namespace-uri()='http://www.opengis.net/gml/3.2'][1]">
+    <svrl:text>The gml:pos element is deprecated (cl. 10.1.4.6).</svrl:text>
+  </svrl:successful-report>
+</svrl:schematron-output>

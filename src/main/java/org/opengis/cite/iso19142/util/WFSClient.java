@@ -473,4 +473,21 @@ public class WFSClient {
         return rspEntity;
     }
 
+    /**
+     * Submits a request to delete a stored query.
+     * 
+     * @param queryId
+     *            A URI value that identifies the query to be dropped.
+     * @return The HTTP status code.
+     */
+    public int deleteQuery(String queryId) {
+        Document req = WFSMessage.createRequestEntity("DropStoredQuery", this.wfsVersion);
+        req.getDocumentElement().setAttribute("id", queryId);
+        ProtocolBinding binding = ProtocolBinding.POST;
+        URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata,
+                req.getDocumentElement().getLocalName(), binding);
+        ClientResponse rsp = submitRequest(new DOMSource(req), binding, endpoint);
+        return rsp.getStatus();
+    }
+
 }

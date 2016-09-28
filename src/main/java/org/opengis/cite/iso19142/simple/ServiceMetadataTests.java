@@ -1,6 +1,6 @@
 package org.opengis.cite.iso19142.simple;
 
-import javax.xml.transform.dom.DOMResult;
+import javax.xml.transform.Result;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.Validator;
@@ -37,10 +37,8 @@ public class ServiceMetadataTests extends BaseFixture {
      */
     @BeforeClass(alwaysRun = true)
     public void obtainWFSSchema(ITestContext testContext) {
-        this.wfsSchema = (Schema) testContext.getSuite().getAttribute(
-                SuiteAttribute.WFS_SCHEMA.getName());
-        Assert.assertNotNull(this.wfsSchema,
-                "WFS schema not found in suite fixture.");
+        this.wfsSchema = (Schema) testContext.getSuite().getAttribute(SuiteAttribute.WFS_SCHEMA.getName());
+        Assert.assertNotNull(this.wfsSchema, "WFS schema not found in suite fixture.");
     }
 
     /**
@@ -52,8 +50,7 @@ public class ServiceMetadataTests extends BaseFixture {
     @Test(description = "See ISO 19142: 8.3.2")
     public void capabilitiesDocIsXmlSchemaValid() {
         Validator validator = this.wfsSchema.newValidator();
-        ETSAssert.assertSchemaValid(validator, new DOMSource(this.wfsMetadata,
-                this.wfsMetadata.getDocumentURI()));
+        ETSAssert.assertSchemaValid(validator, new DOMSource(this.wfsMetadata, this.wfsMetadata.getDocumentURI()));
     }
 
     /**
@@ -67,14 +64,10 @@ public class ServiceMetadataTests extends BaseFixture {
      */
     @Test(description = "See ISO 19142: A.1.1, A.2.23")
     public void capabilitiesDocCorrespondsToWfsSimple() {
-        SchematronValidator validator = ValidationUtils
-                .buildSchematronValidator("wfs-capabilities-2.0.sch",
-                        SIMPLE_WFS_PHASE);
-        DOMResult result = validator.validate(new DOMSource(this.wfsMetadata,
-                this.wfsMetadata.getDocumentURI()));
-        Assert.assertFalse(validator.ruleViolationsDetected(), ErrorMessage
-                .format(ErrorMessageKeys.NOT_SCHEMA_VALID,
-                        validator.getRuleViolationCount(),
-                        XMLUtils.writeNodeToString(result.getNode())));
+        SchematronValidator validator = ValidationUtils.buildSchematronValidator("wfs-capabilities-2.0.sch",
+                SIMPLE_WFS_PHASE);
+        Result result = validator.validate(new DOMSource(this.wfsMetadata, this.wfsMetadata.getDocumentURI()), false);
+        Assert.assertFalse(validator.ruleViolationsDetected(), ErrorMessage.format(ErrorMessageKeys.NOT_SCHEMA_VALID,
+                validator.getRuleViolationCount(), XMLUtils.resultToString(result)));
     }
 }

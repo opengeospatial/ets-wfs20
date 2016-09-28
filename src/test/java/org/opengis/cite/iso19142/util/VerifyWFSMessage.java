@@ -127,16 +127,6 @@ public class VerifyWFSMessage {
     }
 
     @Test
-    public void setStoredQueryParameterAsQName() {
-        Document doc = WFSMessage.createRequestEntity("GetFeature", null);
-        QName qName = new QName("http://example.org/ns1", "Alpha");
-        WFSMessage.appendStoredQuery(doc, WFS2.QRY_GET_FEATURE_BY_TYPE,
-                Collections.singletonMap("typeName", (Object) qName));
-        Element param = (Element) doc.getElementsByTagNameNS(Namespaces.WFS, WFS2.PARAM_ELEM).item(0);
-        assertEquals("Unexpected parameter value.", "tns:Alpha", param.getTextContent());
-    }
-
-    @Test
     public void setStoredQueryParameterAsString() throws SAXException, IOException {
         Document doc = WFSMessage.createRequestEntity("GetFeature", null);
         WFSMessage.appendStoredQuery(doc, "q1", Collections.singletonMap("p1", (Object) "v1"));
@@ -206,18 +196,6 @@ public class VerifyWFSMessage {
         Element query2 = (Element) queries.item(1);
         assertTrue("Expected Query[2]/@typeNames to end with " + typeName2.getLocalPart(),
                 query2.getAttribute("typeNames").endsWith(typeName2.getLocalPart()));
-    }
-
-    @Test
-    public void appendStoredQuery() throws SAXException, IOException {
-        Document doc = docBuilder.parse(this.getClass().getResourceAsStream("/GetFeature/GetFeature-Minimal.xml"));
-        QName typeName1 = new QName(NS1, "Type1");
-        WFSMessage.appendStoredQuery(doc, WFS2.QRY_GET_FEATURE_BY_TYPE,
-                Collections.singletonMap("typeName", (Object) typeName1));
-        NodeList queries = doc.getElementsByTagNameNS(Namespaces.WFS, WFS2.STORED_QRY_ELEM);
-        assertEquals("Unexpected number of query expressions.", 1, queries.getLength());
-        Element query = (Element) queries.item(0);
-        assertEquals("Unexpected query id.", WFS2.QRY_GET_FEATURE_BY_TYPE, query.getAttribute("id"));
     }
 
     @Test

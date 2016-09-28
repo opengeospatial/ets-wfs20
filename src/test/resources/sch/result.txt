@@ -1,0 +1,7 @@
+# Deprecated infoset items in GML 3.2 (ISO 19136, Annex I).
+
+_____
+Severity: Error  
+Message: The gml:pos element is deprecated (cl. 10.1.4.6).  
+Test: gml:pos  
+Location: /*:SimpleFeature[namespace-uri()='http://example.org/ns1'][1]/*:boundedBy[namespace-uri()='http://www.opengis.net/gml/3.2'][1]/*:Envelope[namespace-uri()='http://www.opengis.net/gml/3.2'][1]  

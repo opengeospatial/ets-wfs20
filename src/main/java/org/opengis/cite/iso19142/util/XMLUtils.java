@@ -1,9 +1,14 @@
 package org.opengis.cite.iso19142.util;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -19,16 +24,25 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+
+import org.opengis.cite.iso19142.Namespaces;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import net.sf.saxon.s9api.DOMDestination;
 import net.sf.saxon.s9api.DocumentBuilder;
@@ -42,12 +56,6 @@ import net.sf.saxon.s9api.XdmValue;
 import net.sf.saxon.s9api.XsltCompiler;
 import net.sf.saxon.s9api.XsltExecutable;
 import net.sf.saxon.s9api.XsltTransformer;
-
-import org.opengis.cite.iso19142.Namespaces;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * Provides various utility methods for accessing or manipulating XML
@@ -94,6 +102,55 @@ public class XMLUtils {
             idTransformer.transform(new DOMSource(node), new StreamResult(writer));
         } catch (TransformerException ex) {
             LOGR.log(Level.WARNING, "Failed to serialize DOM node: " + node.getNodeName(), ex);
+        }
+        return writer.toString();
+    }
+
+    /**
+     * Writes the result of a transformation to a String. An XML declaration is
+     * always omitted.
+     * 
+     * @param result
+     *            An object (DOMResult or StreamResult) that holds the result of
+     *            a transformation, which may be XML or plain text.
+     * @return A String representing the content of the result; it may be empty
+     *         if the content could not be read.
+     */
+    public static String resultToString(Result result) {
+        if (null == result) {
+            throw new IllegalArgumentException("Result is null.");
+        }
+        StringWriter writer = new StringWriter();
+        if (result instanceof DOMResult) {
+            Node node = DOMResult.class.cast(result).getNode();
+            Properties outProps = new Properties();
+            outProps.setProperty(OutputKeys.ENCODING, "UTF-8");
+            outProps.setProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            outProps.setProperty(OutputKeys.INDENT, "yes");
+            Transformer idTransformer;
+            try {
+                idTransformer = TransformerFactory.newInstance().newTransformer();
+                idTransformer.setOutputProperties(outProps);
+                idTransformer.transform(new DOMSource(node), new StreamResult(writer));
+            } catch (TransformerFactoryConfigurationError | TransformerException e) {
+                LOGR.warning(e.getMessage());
+            }
+        } else if (result instanceof StreamResult) {
+            StreamResult streamResult = StreamResult.class.cast(result);
+            OutputStream os = streamResult.getOutputStream();
+            if (null != os) {
+                writer.write(os.toString()); // probably ByteArrayOutputStream
+            } else { // try system id or writer
+                Path path = Paths.get(URI.create(streamResult.getSystemId()));
+                try {
+                    byte[] data = Files.readAllBytes(path);
+                    writer.write(new String(data));
+                } catch (IOException e) {
+                    LOGR.warning(e.getMessage());
+                }
+            }
+        } else {
+            throw new IllegalArgumentException("Unsupported Result type:" + result.getClass());
         }
         return writer.toString();
     }

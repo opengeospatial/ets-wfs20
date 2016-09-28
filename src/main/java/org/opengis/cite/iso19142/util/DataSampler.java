@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
@@ -455,5 +456,36 @@ public class DataSampler {
         period = TemporalUtils.temporalExtent(tmSet);
         this.temporalPropertyExtents.put(tmProp, period);
         return period;
+    }
+
+    /**
+     * Evaluates the given XPath expression over all sample data. The first
+     * non-empty result is returned.
+     * 
+     * @param expr
+     *            An XPath 2.0 expression.
+     * @param nsBindings
+     *            A collection of namespace bindings required to evaluate the
+     *            XPath expression, where each entry maps a namespace URI (key)
+     *            to a prefix (value).
+     * @return An XdmValue object containing a sequence of zero or more matching
+     *         items.
+     */
+    XdmValue evaluateXPath2(String expr, Map<String, String> nsBindings) {
+        XdmValue results = null;
+        for (Entry<QName, FeatureTypeInfo> entry : this.featureInfo.entrySet()) {
+            if (!entry.getValue().isInstantiated())
+                continue;
+            File dataFile = entry.getValue().getSampleData();
+            try {
+                results = XMLUtils.evaluateXPath2(new StreamSource(dataFile), expr, nsBindings);
+                if (results.size() > 0) {
+                    break;
+                }
+            } catch (SaxonApiException e) {
+                LOGR.log(Level.WARNING, e.getMessage());
+            }
+        }
+        return results;
     }
 }
