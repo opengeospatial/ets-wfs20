@@ -36,7 +36,6 @@ import com.sun.jersey.api.client.ClientResponse;
  */
 public class CreateStoredQueryTests extends BaseFixture {
 
-    public final static String LANG_WFS_QUERY = "urn:ogc:def:queryLanguage:OGC-WFS::WFSQueryExpression";
     public final static String QRY_GET_FEATURE_BY_TYPE = "urn:example:wfs2-query:GetFeatureByTypeName";
     public final static String QRY_GET_FEATURE_BY_NAME = "urn:example:wfs2-query:GetFeatureByName";
     private List<String> createdStoredQueries = new ArrayList<>(2);
@@ -67,7 +66,8 @@ public class CreateStoredQueryTests extends BaseFixture {
      */
     @Test(description = "See OGC 09-025: 14.2, 14.5.2")
     public void createGetFeatureByTypeName() {
-        this.reqEntity = WFSMessage.createRequestEntity("CreateStoredQuery-GetFeatureByTypeName.xml", this.wfsVersion);
+        this.reqEntity = WFSMessage.createRequestEntity(ETS_PKG + "/querymgmt/CreateStoredQuery-GetFeatureByTypeName",
+                this.wfsVersion);
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.CREATE_STORED_QRY,
                 ProtocolBinding.POST);
         ClientResponse rsp = this.wfsClient.submitRequest(new DOMSource(this.reqEntity), ProtocolBinding.POST,
@@ -95,7 +95,8 @@ public class CreateStoredQueryTests extends BaseFixture {
      */
     @Test(description = "See OGC 09-025: 14.2.2.5.3, 14.7")
     public void createStoredQueryWithUnsupportedQueryLanguage() {
-        this.reqEntity = WFSMessage.createRequestEntity("CreateStoredQuery-GetFeatureByTypeName.xml", this.wfsVersion);
+        this.reqEntity = WFSMessage.createRequestEntity(ETS_PKG + "/querymgmt/CreateStoredQuery-GetFeatureByTypeName",
+                this.wfsVersion);
         Element qryExpr = (Element) this.reqEntity.getElementsByTagNameNS(WFS2.NS_URI, "QueryExpressionText").item(0);
         qryExpr.setAttribute("language", "http://qry.example.org");
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.CREATE_STORED_QRY,
@@ -116,7 +117,8 @@ public class CreateStoredQueryTests extends BaseFixture {
     public void duplicateQuery() {
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.CREATE_STORED_QRY,
                 ProtocolBinding.POST);
-        this.reqEntity = WFSMessage.createRequestEntity("CreateStoredQuery-GetFeatureByName.xml", this.wfsVersion);
+        this.reqEntity = WFSMessage.createRequestEntity(ETS_PKG + "/querymgmt/CreateStoredQuery-GetFeatureByName",
+                this.wfsVersion);
         ClientResponse rsp = this.wfsClient.submitRequest(new DOMSource(this.reqEntity), ProtocolBinding.POST,
                 endpoint);
         this.rspEntity = rsp.getEntity(Document.class);

@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMSource;
 
 import org.opengis.cite.iso19142.BaseFixture;
@@ -38,11 +39,13 @@ public class DropStoredQueryTests extends BaseFixture {
     public void dropStoredQuery() {
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.CREATE_STORED_QRY,
                 ProtocolBinding.POST);
-        Document doc = WFSMessage.createRequestEntity("CreateStoredQuery-GetFeatureByName.xml", this.wfsVersion);
-        ClientResponse rsp = this.wfsClient.submitRequest(new DOMSource(doc), ProtocolBinding.POST, endpoint);
+        this.reqEntity = WFSMessage.createRequestEntity(ETS_PKG + "/querymgmt/CreateStoredQuery-GetFeatureByName",
+                this.wfsVersion);
+        ClientResponse rsp = this.wfsClient.submitRequest(new DOMSource(this.reqEntity), ProtocolBinding.POST,
+                endpoint);
         assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
-        this.reqEntity = WFSMessage.createRequestEntity("DropStoredQuery.xml", this.wfsVersion);
+        this.reqEntity = WFSMessage.createRequestEntity("DropStoredQuery", this.wfsVersion);
         this.reqEntity.getDocumentElement().setAttribute("id", CreateStoredQueryTests.QRY_GET_FEATURE_BY_NAME);
         endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.DROP_STORED_QRY,
                 ProtocolBinding.POST);
@@ -50,9 +53,11 @@ public class DropStoredQueryTests extends BaseFixture {
         this.rspEntity = rsp.getEntity(Document.class);
         assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
+        ETSAssert.assertQualifiedName(this.rspEntity.getDocumentElement(),
+                new QName(WFS2.NS_URI, "DropStoredQueryResponse"));
         Map<String, Object> params = Collections.singletonMap("name", "Irrelevant");
-        doc = this.wfsClient.invokeStoredQuery(CreateStoredQueryTests.QRY_GET_FEATURE_BY_NAME, params);
-        ETSAssert.assertExceptionReport(doc, "InvalidParameterValue", "id");
+        this.rspEntity = this.wfsClient.invokeStoredQuery(CreateStoredQueryTests.QRY_GET_FEATURE_BY_NAME, params);
+        ETSAssert.assertExceptionReport(this.rspEntity, "InvalidParameterValue", "id");
     }
 
     /**
@@ -62,7 +67,7 @@ public class DropStoredQueryTests extends BaseFixture {
      */
     @Test(description = "See OGC 09-025: 14.6.1, 14.7")
     public void dropNonexistentQuery() {
-        this.reqEntity = WFSMessage.createRequestEntity("DropStoredQuery.xml", this.wfsVersion);
+        this.reqEntity = WFSMessage.createRequestEntity("DropStoredQuery", this.wfsVersion);
         this.reqEntity.getDocumentElement().setAttribute("id", "urn:uuid:" + UUID.randomUUID().toString());
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.DROP_STORED_QRY,
                 ProtocolBinding.POST);
