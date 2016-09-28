@@ -31,8 +31,9 @@ import com.sun.jersey.api.client.ClientResponse;
 /**
  * Provides test methods that verify the creation of stored queries. A
  * conforming implementation must support the query language
- * {@value #LANG_WFS_QUERY}. Other query languages may be listed in the
- * capabilities document.
+ * {@value org.opengis.cite.iso19142.querymgmt.StoredQueryManagement#LANG_WFS_QUERY}.
+ * Other query languages may be listed in the capabilities document in the
+ * context of the <code>CreateStoredQuery</code> request.
  */
 public class CreateStoredQueryTests extends BaseFixture {
 
