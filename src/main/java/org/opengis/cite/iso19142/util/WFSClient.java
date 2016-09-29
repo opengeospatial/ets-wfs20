@@ -83,8 +83,22 @@ public class WFSClient {
         this.globalBindings = ServiceMetadataUtils.getGlobalBindings(wfsMetadata);
     }
 
+    /**
+     * Returns the WFS service description set for this client.
+     * 
+     * @return A WFS capabilities document (wfs:WFS_Capabilities).
+     */
     public Document getServiceDescription() {
         return wfsMetadata;
+    }
+
+    /**
+     * Returns the underlying JAX-RS client.
+     * 
+     * @return A JAX-RS client component.
+     */
+    public Client getClient() {
+        return client;
     }
 
     /**

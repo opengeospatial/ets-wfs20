@@ -4,6 +4,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -510,6 +511,30 @@ public class WFSMessage {
         }
         List<Node> valueNodes = findMatchingElements(doc, expectedValues);
         return valueNodes;
+    }
+
+    /**
+     * Returns the set of feature identifiers found in the given WFS response
+     * entity.
+     * 
+     * @param doc
+     *            A WFS response entity that may contain feature instances.
+     * @param featureType
+     *            The feature type of interest.
+     * @return A set of feature identifiers (gml:id attribute values); it may be
+     *         empty.
+     */
+    public static Set<String> extractFeatureIdentifiers(Document doc, QName featureType) {
+        Set<String> idSet = new HashSet<>();
+        if (null == featureType) { // alternative: use XPath if null
+            throw new IllegalArgumentException("featureType is null");
+        }
+        NodeList features = doc.getElementsByTagNameNS(featureType.getNamespaceURI(), featureType.getLocalPart());
+        for (int i = 0; i < features.getLength(); i++) {
+            Element feature = (Element) features.item(i);
+            idSet.add(feature.getAttributeNS(Namespaces.GML, "id"));
+        }
+        return idSet;
     }
 
     /**

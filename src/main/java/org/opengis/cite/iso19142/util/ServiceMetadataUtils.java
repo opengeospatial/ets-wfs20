@@ -494,4 +494,35 @@ public class ServiceMetadataUtils {
         }
         return result.getLength() > 0;
     }
+
+    /**
+     * Gets the effective value of the specified service or operation
+     * constraint. The default value or the first allowed value is returned.
+     * 
+     * @param wfsMetadata
+     *            A WFS capabilities document.
+     * @param constraintName
+     *            The name of the constraint.
+     * @return A String denoting the effective constraint value; this is an
+     *         empty string if the constraint does not occur in the capabilities
+     *         document.
+     */
+    public static String getConstraintValue(final Document wfsMetadata, String constraintName) {
+        String xpath = " (//ows:Value[1] | //ows:DefaultValue)[ancestor::ows:Constraint[@name='%s']]";
+        NodeList items = null;
+        try {
+            items = XMLUtils.evaluateXPath(wfsMetadata, String.format(xpath, constraintName), null);
+        } catch (XPathExpressionException e) { // valid expression
+        }
+        String value = "";
+        for (int i = 0; i < items.getLength(); i++) {
+            Node valueNode = items.item(i);
+            if (valueNode.getLocalName().equals("DefaultValue")) {
+                value = valueNode.getTextContent().trim();
+                break;
+            }
+            value = valueNode.getTextContent().trim();
+        }
+        return value;
+    }
 }
