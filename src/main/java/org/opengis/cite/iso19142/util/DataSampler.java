@@ -50,10 +50,8 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import net.sf.saxon.dom.ElementOverNodeInfo;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmItem;
-import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.s9api.XdmValue;
 
 /**
@@ -286,29 +284,28 @@ public class DataSampler {
      * 
      * @param id
      *            The feature identifier (@gml:id).
-     * @return An Element representing a feature instance, or {@code null} if no
+     * @return An Element representing a feature instance, or null if no
      *         matching feature is found.
      */
     public Element getFeatureById(String id) {
+        XPath xpath = XPathFactory.newInstance().newXPath();
+        xpath.setNamespaceContext(NamespaceBindings.withStandardBindings());
+        String expr = String.format("//wfs:member/*[@gml:id='%s']", id);
         Element feature = null;
         for (FeatureTypeInfo featureInfo : this.featureInfo.values()) {
             if (!featureInfo.isInstantiated())
                 continue;
             File dataFile = featureInfo.getSampleData();
-            String xpath = "//wfs:member/*[@gml:id='" + id + "']";
-            Map<String, String> nsBindings = new HashMap<String, String>();
-            nsBindings.put(Namespaces.GML, "gml");
-            nsBindings.put(Namespaces.WFS, "wfs");
-            XdmValue result = null;
+            NodeList result = null;
             try {
-                result = XMLUtils.evaluateXPath2(new StreamSource(dataFile), xpath, nsBindings);
-            } catch (SaxonApiException e) {
-                LOGR.log(Level.WARNING, String.format("Failed to evaluate XPath %s against data file at %s", xpath,
+                result = (NodeList) xpath.evaluate(expr, new InputSource(new FileInputStream(dataFile)),
+                        XPathConstants.NODESET);
+            } catch (XPathExpressionException | FileNotFoundException e) {
+                LOGR.log(Level.WARNING, String.format("Failed to evaluate XPath %s against data file at %s", expr,
                         dataFile.getAbsolutePath()));
             }
-            if ((null != result) && result.size() > 0) {
-                XdmNode node = (XdmNode) result.itemAt(0);
-                feature = (Element) ElementOverNodeInfo.wrap(node.getUnderlyingNode());
+            if (result.getLength() > 0) {
+                feature = (Element) result.item(0);
                 break;
             }
         }
@@ -459,8 +456,25 @@ public class DataSampler {
     }
 
     /**
-     * Evaluates the given XPath expression over all sample data. The first
-     * non-empty result is returned.
+     * Randomly selects a feature instance from the sample data obtained from
+     * the IUT.
+     * 
+     * @return An Element node representing a feature instance.
+     */
+    public Element randomlySelectFeatureInstance() {
+        Element feature = null;
+        for (Entry<QName, FeatureTypeInfo> entry : this.featureInfo.entrySet()) {
+            if (!entry.getValue().isInstantiated())
+                continue;
+            Set<String> idSet = selectRandomFeatureIdentifiers(entry.getKey(), 1);
+            feature = getFeatureById(idSet.iterator().next());
+        }
+        return feature;
+    }
+
+    /**
+     * Evaluates the given XPath expression against all sample data sets. The
+     * first non-empty result is returned.
      * 
      * @param expr
      *            An XPath 2.0 expression.
@@ -471,7 +485,7 @@ public class DataSampler {
      * @return An XdmValue object containing a sequence of zero or more matching
      *         items.
      */
-    XdmValue evaluateXPath2(String expr, Map<String, String> nsBindings) {
+    public XdmValue evaluateXPathAgainstSampleData(String expr, Map<String, String> nsBindings) {
         XdmValue results = null;
         for (Entry<QName, FeatureTypeInfo> entry : this.featureInfo.entrySet()) {
             if (!entry.getValue().isInstantiated())

@@ -11,17 +11,24 @@ public class FES2 {
     private FES2() {
     }
 
-    /** PropertyIsEqualTo operator */
+    /** PropertyIsEqualTo operator. */
     public static final String EQUAL = "PropertyIsEqualTo";
-    /** PropertyIsNotEqualTo operator */
+    /** PropertyIsNotEqualTo operator. */
     public static final String NOT_EQUAL = "PropertyIsNotEqualTo";
-    /** PropertyIsLessThan operator */
+    /** PropertyIsLessThan operator. */
     public static final String LESS_THAN = "PropertyIsLessThan";
-    /** PropertyIsGreaterThan operator */
+    /** PropertyIsGreaterThan operator. */
     public static final String GREATER_THAN = "PropertyIsGreaterThan";
-    /** PropertyIsLessThanOrEqualTo operator */
+    /** PropertyIsLessThanOrEqualTo operator. */
     public static final String LESS_THAN_OR_EQUAL = "PropertyIsLessThanOrEqualTo";
-    /** PropertyIsGreaterThanOrEqualTo operator */
+    /** PropertyIsGreaterThanOrEqualTo operator. */
     public static final String GREATER_THAN_OR_EQUAL = "PropertyIsGreaterThanOrEqualTo";
+    /** ResourceId operator. */
+    public static final String RESOURCE_ID = "ResourceId";
+
+    /** VersionAction is used to filter the version chain in ResourceId. */
+    public enum VersionAction {
+        FIRST, LAST, PREVIOUS, NEXT, ALL
+    }
 
 }

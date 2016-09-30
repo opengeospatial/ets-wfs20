@@ -89,7 +89,7 @@ public class DeleteTests extends TransactionFixture {
                 gmlId,
                 new QName(originalFeature.getNamespaceURI(), originalFeature
                         .getLocalName()));
-        this.rspEntity = wfsClient.delete(featuresToDelete, binding);
+        this.rspEntity = wfsClient.deleteFeatures(featuresToDelete, binding);
         ETSAssert
                 .assertXPath("//wfs:TransactionResponse", this.rspEntity, null);
         String xpath = String.format("//wfs:totalDeleted = '%d'",

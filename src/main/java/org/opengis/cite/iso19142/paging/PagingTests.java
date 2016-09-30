@@ -1,8 +1,6 @@
 package org.opengis.cite.iso19142.paging;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;

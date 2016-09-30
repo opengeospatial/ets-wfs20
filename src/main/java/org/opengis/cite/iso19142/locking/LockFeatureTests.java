@@ -135,7 +135,7 @@ public class LockFeatureTests extends LockingFixture {
 		String xpath = String.format(
 				"//wfs:FeaturesLocked/fes:ResourceId/@rid = '%s'", gmlId);
 		ETSAssert.assertXPath(xpath, lockRsp, null);
-		Document trxResponse = wfsClient.delete(featureId, ProtocolBinding.ANY);
+		Document trxResponse = wfsClient.deleteFeatures(featureId, ProtocolBinding.ANY);
 		String xpath2 = "//ows:Exception[@exceptionCode = 'MissingParameterValue']";
 		ETSAssert.assertXPath(xpath2, trxResponse.getDocumentElement(), null);
 	}

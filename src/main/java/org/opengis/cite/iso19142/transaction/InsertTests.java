@@ -18,6 +18,7 @@ import org.opengis.cite.iso19142.ErrorMessageKeys;
 import org.opengis.cite.iso19142.Namespaces;
 import org.opengis.cite.iso19142.ProtocolBinding;
 import org.opengis.cite.iso19142.WFS2;
+import org.opengis.cite.iso19142.basic.filter.ResourceId;
 import org.opengis.cite.iso19142.util.XMLUtils;
 import org.opengis.cite.iso19142.util.ServiceMetadataUtils;
 import org.opengis.cite.iso19142.util.TestSuiteLogger;
@@ -45,28 +46,24 @@ public class InsertTests extends TransactionFixture {
      * features that were successfully inserted by test methods in this class.
      */
     @AfterClass
-    public void removeNewFeatures() {
+    public void deleteInsertedFeatures() {
         if (createdFeatures.isEmpty()) {
             return;
         }
-        Document rspEntity = this.wfsClient.delete(createdFeatures,
-                ProtocolBinding.ANY);
-        String xpath = String.format("//wfs:totalDeleted = '%d'",
-                createdFeatures.size());
+        Document rspEntity = this.wfsClient.deleteFeatures(createdFeatures, ProtocolBinding.ANY);
+        String xpath = String.format("//wfs:totalDeleted = '%d'", createdFeatures.size());
         Boolean result;
         try {
-            result = (Boolean) XMLUtils.evaluateXPath(rspEntity, xpath, null,
-                    XPathConstants.BOOLEAN);
+            result = (Boolean) XMLUtils.evaluateXPath(rspEntity, xpath, null, XPathConstants.BOOLEAN);
         } catch (XPathExpressionException xpe) {
             throw new RuntimeException(xpe);
         }
         if (!result) {
-            String msg = String.format(
-                    "%s: Failed to remove all new features:\n %s \n%s",
-                    getClass().getName(), this.createdFeatures,
-                    XMLUtils.writeNodeToString(rspEntity));
+            String msg = String.format("%s: Failed to remove all new features:\n %s \n%s", getClass().getName(),
+                    this.createdFeatures, XMLUtils.writeNodeToString(rspEntity));
             TestSuiteLogger.log(Level.WARNING, msg);
         }
+        this.createdFeatures.clear();
     }
 
     /**
@@ -85,24 +82,19 @@ public class InsertTests extends TransactionFixture {
      * @see "ISO 19142:2010, cl. 15.3.4: InsertResults element"
      */
     @Test(description = "See ISO 19142: 15.2.4, 15.3.4", dataProvider = "binding+availFeatureType")
-    public void insertSupportedFeature(ProtocolBinding binding,
-            QName featureType) {
+    public void insertSupportedFeature(ProtocolBinding binding, QName featureType) {
         Node feature = createFeatureInstance(featureType);
         WFSMessage.addInsertStatement(this.reqEntity, feature);
-        URI endpoint = ServiceMetadataUtils.getOperationEndpoint(
-                this.wfsMetadata, WFS2.TRANSACTION, binding);
-        ClientResponse rsp = this.wfsClient.submitRequest(new DOMSource(
-                this.reqEntity), binding, endpoint);
+        URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.TRANSACTION, binding);
+        ClientResponse rsp = this.wfsClient.submitRequest(new DOMSource(this.reqEntity), binding, endpoint);
         this.rspEntity = rsp.getEntity(Document.class);
-        Assert.assertEquals(rsp.getStatus(),
-                ClientResponse.Status.OK.getStatusCode(),
+        Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
-        ETSAssert.assertXPath("//wfs:TransactionResponse/wfs:InsertResults",
-                this.rspEntity, null);
-        List<String> newFeatureIDs = extractFeatureIdentifiers(this.rspEntity);
-        String id = newFeatureIDs.get(0);
-        createdFeatures.put(id, featureType);
-        ETSAssert.assertFeatureAvailability(id, true, this.wfsClient);
+        ETSAssert.assertXPath("//wfs:TransactionResponse/wfs:InsertResults", this.rspEntity, null);
+        List<ResourceId> newFeatureIDs = extractFeatureIdentifiers(this.rspEntity);
+        String rid = newFeatureIDs.get(0).getRid();
+        createdFeatures.put(rid, featureType);
+        ETSAssert.assertFeatureAvailability(rid, true, this.wfsClient);
     }
 
     /**
@@ -116,20 +108,14 @@ public class InsertTests extends TransactionFixture {
     @Test(description = "See ISO 19142: 7.5, 15.4")
     public void insertInvalidFeature() {
         try {
-            this.reqEntity = docBuilder.parse(getClass().getResourceAsStream(
-                    "InsertUnrecognizedFeature.xml"));
+            this.reqEntity = docBuilder.parse(getClass().getResourceAsStream("InsertUnrecognizedFeature.xml"));
         } catch (Exception e) {
-            throw new RuntimeException(
-                    "Failed to parse InsertUnrecognizedFeature.xml from classpath",
-                    e);
+            throw new RuntimeException("Failed to parse InsertUnrecognizedFeature.xml from classpath", e);
         }
         ProtocolBinding binding = wfsClient.getAnyTransactionBinding();
-        URI endpoint = ServiceMetadataUtils.getOperationEndpoint(
-                this.wfsMetadata, WFS2.TRANSACTION, binding);
-        ClientResponse rsp = wfsClient.submitRequest(new DOMSource(
-                this.reqEntity), binding, endpoint);
-        Assert.assertEquals(rsp.getStatus(),
-                ClientResponse.Status.BAD_REQUEST.getStatusCode(),
+        URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.TRANSACTION, binding);
+        ClientResponse rsp = wfsClient.submitRequest(new DOMSource(this.reqEntity), binding, endpoint);
+        Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.BAD_REQUEST.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
         this.rspEntity = rsp.getEntity(Document.class);
         String xpath = "//ows:Exception[@exceptionCode = 'InvalidValue']";
@@ -137,32 +123,38 @@ public class InsertTests extends TransactionFixture {
     }
 
     /**
-     * Extracts a list of identifiers for features that were successfully
-     * inserted. The identifiers are accessed using this XPath expression:
-     * "//wfs:InsertResults/wfs:Feature/fes:ResourceId/@rid".
+     * Extracts a list of resource identifiers for features that were
+     * successfully inserted. The identifiers are found using this XPath
+     * expression: "//wfs:InsertResults/wfs:Feature/fes:ResourceId".
      * 
      * @param entity
      *            A Document representing a transaction response entity
      *            (wfs:TransactionResponse).
-     * @return A List containing one or more feature identifiers (gml:id
-     *         attribute values).
+     * @return A List containing one or more feature identifiers.
      */
-    List<String> extractFeatureIdentifiers(Document entity) {
-        List<String> resourceIDs = new ArrayList<String>();
-        String xpath = "//wfs:InsertResults/wfs:Feature/fes:ResourceId/@rid";
+    public static List<ResourceId> extractFeatureIdentifiers(Document entity) {
+        List<ResourceId> idList = new ArrayList<>();
+        String xpath = "//wfs:InsertResults/wfs:Feature/fes:ResourceId";
         Map<String, String> nsBindings = new HashMap<String, String>();
         nsBindings.put(Namespaces.WFS, "wfs");
         nsBindings.put(Namespaces.FES, "fes");
         try {
-            NodeList ridNodes = XMLUtils.evaluateXPath(entity, xpath,
-                    nsBindings);
-            for (int i = 0; i < ridNodes.getLength(); i++) {
-                resourceIDs.add(ridNodes.item(i).getTextContent());
+            NodeList idNodes = XMLUtils.evaluateXPath(entity, xpath, nsBindings);
+            for (int i = 0; i < idNodes.getLength(); i++) {
+                Element idElem = (Element) idNodes.item(i);
+                ResourceId id = new ResourceId(idElem.getAttribute("rid"));
+                if (!idElem.getAttribute("previousRid").isEmpty()) {
+                    id.setPreviousRid(idElem.getAttribute("previousRid"));
+                }
+                if (!idElem.getAttribute("version").isEmpty()) {
+                    id.setVersion(idElem.getAttribute("version"));
+                }
+                idList.add(id);
             }
         } catch (XPathExpressionException e) {
             throw new RuntimeException(e);
         }
-        return resourceIDs;
+        return idList;
     }
 
     /**
@@ -178,16 +170,13 @@ public class InsertTests extends TransactionFixture {
      */
     Node createFeatureInstance(QName featureType) {
         Document entity = wfsClient.getFeatureByType(featureType, 1, null);
-        NodeList features = entity.getElementsByTagNameNS(
-                featureType.getNamespaceURI(), featureType.getLocalPart());
+        NodeList features = entity.getElementsByTagNameNS(featureType.getNamespaceURI(), featureType.getLocalPart());
         if (features.getLength() == 0) {
             // TODO: try generating minimal instance from schema
-            throw new NullPointerException(
-                    "Unable to obtain feature instance of type " + featureType);
+            throw new NullPointerException("Unable to obtain feature instance of type " + featureType);
         }
         Element feature = (Element) features.item(0);
-        feature.setAttributeNS(Namespaces.GML, "gml:id",
-                "id-" + System.currentTimeMillis());
+        feature.setAttributeNS(Namespaces.GML, "gml:id", "id-" + System.currentTimeMillis());
         insertRandomIdentifier(feature);
         return feature.cloneNode(true);
     }
@@ -198,12 +187,15 @@ public class InsertTests extends TransactionFixture {
      * 
      * @param feature
      *            An Element node representing a GML feature.
+     * @return The UUID that was assigned to the feature instance.
      */
-    void insertRandomIdentifier(Element feature) {
+    public static UUID insertRandomIdentifier(Element feature) {
         QName propName = new QName(Namespaces.GML, "identifier");
         Element identifier = XMLUtils.createElement(propName);
         identifier.setAttribute("codeSpace", "http://cite.opengeospatial.org/");
-        identifier.setTextContent(UUID.randomUUID().toString());
+        UUID uuid = UUID.randomUUID();
+        identifier.setTextContent(uuid.toString());
         WFSMessage.insertGMLProperty(feature, identifier);
+        return uuid;
     }
 }

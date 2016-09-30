@@ -127,8 +127,10 @@ public class WFSMessage {
      * @param qNames
      *            A sequence of QName objects representing (qualified) feature
      *            type names recognized by the IUT.
+     * @return The Element representing the query expression (wfs:Query); it
+     *         will be empty.
      */
-    public static void appendSimpleQuery(Document doc, QName... qNames) {
+    public static Element appendSimpleQuery(Document doc, QName... qNames) {
         Element docElement = doc.getDocumentElement();
         Element newQuery = doc.createElementNS(Namespaces.WFS, "wfs:Query");
         StringBuilder typeNames = new StringBuilder();
@@ -144,6 +146,7 @@ public class WFSMessage {
         }
         newQuery.setAttribute("typeNames", typeNames.toString().trim());
         docElement.appendChild(newQuery);
+        return newQuery;
     }
 
     /**

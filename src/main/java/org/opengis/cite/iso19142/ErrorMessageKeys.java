@@ -27,4 +27,5 @@ public class ErrorMessageKeys {
     public static final String NOT_IMPLEMENTED = "CapabilityNotImplemented";
     public static final String QRY_LANG_NOT_SUPPORTED = "QueryLangNotSupported";
     public static final String NUM_RETURNED = "UnexpectedNumReturned";
+    public static final String VERSION_STATE = "UnexpectedVersionState";
 }

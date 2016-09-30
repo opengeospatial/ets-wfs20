@@ -470,13 +470,12 @@ public class ServiceMetadataUtils {
 
     /**
      * Indicates whether or not the given service description claims that the
-     * specified conformance class has been implemented.
+     * specified WFS or FES conformance class has been implemented.
      * 
      * @param wfsMetadata
      *            A WFS capabilities document.
      * @param conformanceClass
-     *            The name of a constraint that identifies a WFS or FES
-     *            conformance class.
+     *            The name of a constraint that identifies a conformance class.
      * @return true if the conformance class is implemented; false if not.
      * 
      * @see <a target="_blank" href=

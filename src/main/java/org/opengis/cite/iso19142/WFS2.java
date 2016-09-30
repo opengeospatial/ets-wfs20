@@ -105,4 +105,13 @@ public class WFS2 {
     public static final String CREATE_STORED_QRY = "CreateStoredQuery";
     /** DropStoredQuery request. */
     public static final String DROP_STORED_QRY = "DropStoredQuery";
+
+    /** VersionState indicates the state of a feature version. */
+    public enum VersionState {
+        VALID, SUPERSEDED, RETIRED, FUTURE;
+        @Override
+        public String toString() {
+            return this.name().toLowerCase();
+        }
+    }
 }

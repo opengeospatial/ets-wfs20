@@ -3,6 +3,7 @@ package org.opengis.cite.iso19142.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -23,9 +24,11 @@ import javax.xml.transform.dom.DOMSource;
 import org.opengis.cite.iso19142.Namespaces;
 import org.opengis.cite.iso19142.ProtocolBinding;
 import org.opengis.cite.iso19142.WFS2;
+import org.opengis.cite.iso19142.basic.filter.ResourceId;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.sun.jersey.api.client.Client;
@@ -204,7 +207,7 @@ public class WFSClient {
      * @return A Document representing the XML response entity, or {@code null}
      *         if the response doesn't contain one.
      */
-    public Document delete(Map<String, QName> features, ProtocolBinding binding) {
+    public Document deleteFeatures(Map<String, QName> features, ProtocolBinding binding) {
         Document req = WFSMessage.createRequestEntity(WFS2.TRANSACTION, this.wfsVersion);
         for (Map.Entry<String, QName> entry : features.entrySet()) {
             QName typeName = entry.getValue();
@@ -223,6 +226,26 @@ public class WFSClient {
             TestSuiteLogger.log(Level.FINE, XMLUtils.writeNodeToString(req));
         }
         return executeTransaction(req, binding);
+    }
+
+    /**
+     * Submits a request to retrieve one or more feature versions as specified
+     * by the given resource identifier.
+     * 
+     * @param rid
+     *            A resource identifier that selects members of the version
+     *            chain to which this identified version belongs.
+     * @param typeName
+     *            The name of a feature type.
+     * @return The (JAX-RS) client response message.
+     */
+    public ClientResponse GetFeatureVersion(ResourceId rid, QName typeName) {
+        Document req = WFSMessage.createRequestEntity("GetFeature-Minimal", this.wfsVersion);
+        Element qry = WFSMessage.appendSimpleQuery(req, typeName);
+        Element filter = req.createElementNS(Namespaces.FES, "Filter");
+        filter.appendChild(rid.toElement());
+        qry.appendChild(filter);
+        return submitRequest(req, ProtocolBinding.ANY);
     }
 
     /**
@@ -494,7 +517,7 @@ public class WFSClient {
      *            A URI value that identifies the query to be dropped.
      * @return The HTTP status code.
      */
-    public int deleteQuery(String queryId) {
+    public int deleteStoredQuery(String queryId) {
         Document req = WFSMessage.createRequestEntity("DropStoredQuery", this.wfsVersion);
         req.getDocumentElement().setAttribute("id", queryId);
         ProtocolBinding binding = ProtocolBinding.POST;
@@ -502,6 +525,27 @@ public class WFSClient {
                 req.getDocumentElement().getLocalName(), binding);
         ClientResponse rsp = submitRequest(new DOMSource(req), binding, endpoint);
         return rsp.getStatus();
+    }
+
+    /**
+     * Requests a list of stored queries.
+     * 
+     * @return A list of query identifiers.
+     */
+    public List<String> listStoredQueries() {
+        Document req = WFSMessage.createRequestEntity(WFS2.LIST_STORED_QUERIES, this.wfsVersion);
+        // use any supported HTTP method
+        ProtocolBinding binding = ServiceMetadataUtils.getOperationBindings(wfsMetadata, WFS2.LIST_STORED_QUERIES)
+                .iterator().next();
+        URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.LIST_STORED_QUERIES, binding);
+        ClientResponse rsp = submitRequest(new DOMSource(req), binding, endpoint);
+        Document rspEntity = rsp.getEntity(Document.class);
+        NodeList qryList = rspEntity.getElementsByTagNameNS(Namespaces.WFS, "StoredQuery");
+        List<String> idList = new ArrayList<>();
+        for (int i = 0; i < qryList.getLength(); i++) {
+            idList.add(Element.class.cast(qryList.item(i)).getAttribute("id"));
+        }
+        return idList;
     }
 
 }

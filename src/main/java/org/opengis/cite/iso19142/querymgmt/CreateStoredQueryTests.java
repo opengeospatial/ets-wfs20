@@ -21,7 +21,9 @@ import org.opengis.cite.iso19142.WFS2;
 import org.opengis.cite.iso19142.util.ServiceMetadataUtils;
 import org.opengis.cite.iso19142.util.TestSuiteLogger;
 import org.opengis.cite.iso19142.util.WFSMessage;
-import org.testng.annotations.AfterMethod;
+import org.testng.SkipException;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -39,16 +41,43 @@ public class CreateStoredQueryTests extends BaseFixture {
 
     public final static String QRY_GET_FEATURE_BY_TYPE = "urn:example:wfs2-query:GetFeatureByTypeName";
     public final static String QRY_GET_FEATURE_BY_NAME = "urn:example:wfs2-query:GetFeatureByName";
+    public final static String QRY_INVALID_LANG = "urn:example:wfs2-query:InvalidLang";
     private List<String> createdStoredQueries = new ArrayList<>(2);
+
+    /**
+     * This configuration method deletes specific stored queries that may
+     * already be known to the IUT; specifically:
+     * <ul>
+     * <li>{@value #QRY_GET_FEATURE_BY_TYPE}</li>
+     * <li>{@value #QRY_GET_FEATURE_BY_NAME}</li>
+     * <li>{@value #QRY_INVALID_LANG}</li>
+     * </ul>
+     * 
+     * The remaining tests are skipped if this fails because a precondition
+     * cannot be met.
+     */
+    @BeforeClass
+    public void deleteQueriesAtStart() {
+        List<String> knownQueries = this.wfsClient.listStoredQueries();
+        for (String queryId : new String[] { QRY_GET_FEATURE_BY_TYPE, QRY_GET_FEATURE_BY_NAME, QRY_INVALID_LANG }) {
+            if (!knownQueries.contains(queryId))
+                continue;
+            int status = this.wfsClient.deleteStoredQuery(queryId);
+            if (status >= 400) {
+                throw new SkipException(String.format("[%s] Error dropping stored query: %s (status code was %d)",
+                        getClass().getName(), queryId, status));
+            }
+        }
+    }
 
     /**
      * This configuration method drops any stored queries that may have been
      * created by a test method. If an error occurs a WARNING message is logged.
      */
-    @AfterMethod
-    public void deleteQuery() {
+    @AfterClass
+    public void deleteQueriesAtEnd() {
         for (String queryId : this.createdStoredQueries) {
-            int status = this.wfsClient.deleteQuery(queryId);
+            int status = this.wfsClient.deleteStoredQuery(queryId);
             if (status >= 400) {
                 TestSuiteLogger.log(Level.WARNING,
                         String.format("[%s] Error dropping stored query: %s (status code was %d)", getClass().getName(),
@@ -98,6 +127,8 @@ public class CreateStoredQueryTests extends BaseFixture {
     public void createStoredQueryWithUnsupportedQueryLanguage() {
         this.reqEntity = WFSMessage.createRequestEntity(ETS_PKG + "/querymgmt/CreateStoredQuery-GetFeatureByTypeName",
                 this.wfsVersion);
+        Element qryDefn = (Element) this.reqEntity.getElementsByTagNameNS(WFS2.NS_URI, "StoredQueryDefinition").item(0);
+        qryDefn.setAttribute("id", QRY_INVALID_LANG);
         Element qryExpr = (Element) this.reqEntity.getElementsByTagNameNS(WFS2.NS_URI, "QueryExpressionText").item(0);
         qryExpr.setAttribute("language", "http://qry.example.org");
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.CREATE_STORED_QRY,
