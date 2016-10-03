@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Alpha xmlns="http://www.example.net/alpha" 
-    xmlns:gml32="http://www.opengis.net/gml/3.2"
+    xmlns:gml="http://www.opengis.net/gml/3.2"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.example.net/alpha xsd/alpha.xsd">
-    <gml32:description>Description</gml32:description>
-    <gml32:name>Name 1</gml32:name>
+    <gml:description>Description</gml:description>
+    <gml:name>Name A</gml:name>
+    <gml:name>Name B</gml:name>
     <uriProperty>urn:uuid:191985c0-098c-11e1-be50-0800200c9a66</uriProperty>
     <betaProp>
         <nsb:Beta xmlns:nsb="http://www.example.net/beta">

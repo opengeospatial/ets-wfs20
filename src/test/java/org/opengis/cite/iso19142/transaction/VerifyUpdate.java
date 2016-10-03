@@ -1,13 +1,18 @@
 package org.opengis.cite.iso19142.transaction;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
@@ -22,10 +27,6 @@ import org.opengis.cite.iso19142.util.AppSchemaUtils;
 import org.opengis.cite.iso19142.util.DataSampler;
 import org.opengis.cite.validation.XSModelBuilder;
 import org.opengis.cite.validation.XmlSchemaCompiler;
-
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import org.testng.ISuite;
 import org.testng.ITestContext;
 import org.xml.sax.SAXException;
@@ -48,9 +49,6 @@ public class VerifyUpdate {
         when(testContext.getSuite()).thenReturn(suite);
         dataSampler = mock(DataSampler.class);
         when(suite.getAttribute(SuiteAttribute.SAMPLER.getName())).thenReturn(dataSampler);
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-        dbf.newDocumentBuilder();
     }
 
     @BeforeClass

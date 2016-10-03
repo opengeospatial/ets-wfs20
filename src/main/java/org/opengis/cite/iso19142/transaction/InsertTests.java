@@ -91,7 +91,7 @@ public class InsertTests extends TransactionFixture {
         Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
         ETSAssert.assertXPath("//wfs:TransactionResponse/wfs:InsertResults", this.rspEntity, null);
-        List<ResourceId> newFeatureIDs = extractFeatureIdentifiers(this.rspEntity);
+        List<ResourceId> newFeatureIDs = extractFeatureIdentifiers(this.rspEntity, WFS2.Transaction.INSERT);
         String rid = newFeatureIDs.get(0).getRid();
         createdFeatures.put(rid, featureType);
         ETSAssert.assertFeatureAvailability(rid, true, this.wfsClient);
@@ -123,18 +123,21 @@ public class InsertTests extends TransactionFixture {
     }
 
     /**
-     * Extracts a list of resource identifiers for features that were
-     * successfully inserted. The identifiers are found using this XPath
-     * expression: "//wfs:InsertResults/wfs:Feature/fes:ResourceId".
+     * Extracts a list of resource identifiers for features that were affected
+     * by a successful transaction request. The identifiers are found using this
+     * XPath expression: "//{wfs:ActionResultsType}/wfs:Feature/fes:ResourceId",
+     * where {@literal wfs:ActionResultsType} denotes an element of this type.
      * 
      * @param entity
-     *            A Document representing a transaction response entity
-     *            (wfs:TransactionResponse).
-     * @return A List containing one or more feature identifiers.
+     *            A Document representing a successful transaction response
+     *            entity (wfs:TransactionResponse).
+     * @param action
+     *            The transaction results of interest.
+     * @return A List containing zero or more feature identifiers.
      */
-    public static List<ResourceId> extractFeatureIdentifiers(Document entity) {
+    public static List<ResourceId> extractFeatureIdentifiers(Document entity, WFS2.Transaction action) {
         List<ResourceId> idList = new ArrayList<>();
-        String xpath = "//wfs:InsertResults/wfs:Feature/fes:ResourceId";
+        String xpath = String.format("//wfs:%sResults/wfs:Feature/fes:ResourceId", action.toString());
         Map<String, String> nsBindings = new HashMap<String, String>();
         nsBindings.put(Namespaces.WFS, "wfs");
         nsBindings.put(Namespaces.FES, "fes");
@@ -183,7 +186,7 @@ public class InsertTests extends TransactionFixture {
 
     /**
      * Inserts a user-assigned gml:identifier element having a random UUID
-     * value.
+     * value. An existing identifier is replaced.
      * 
      * @param feature
      *            An Element node representing a GML feature.
@@ -197,5 +200,23 @@ public class InsertTests extends TransactionFixture {
         identifier.setTextContent(uuid.toString());
         WFSMessage.insertGMLProperty(feature, identifier);
         return uuid;
+    }
+
+    /**
+     * Adds a gml:name element to the given feature representation. The first
+     * name will be replaced if one or more are already present.
+     * 
+     * @param feature
+     *            An Element node representing a GML feature.
+     * @return The name that was assigned to the feature instance.
+     */
+    public static String addRandomName(Element feature) {
+        QName gmlName = new QName(Namespaces.GML, "name");
+        Element name = XMLUtils.createElement(gmlName);
+        name.setAttribute("codeSpace", "http://cite.opengeospatial.org/");
+        String value = UUID.randomUUID().toString().replaceAll("-", "");
+        name.setTextContent(value.toString());
+        WFSMessage.insertGMLProperty(feature, name);
+        return value;
     }
 }

@@ -79,6 +79,12 @@ public class WFS2 {
     public static final String TRANSACTION_RSP = "TransactionResponse";
     /** TransactionResponse/TransactionSummary element. */
     public static final String TRANSACTION_SUMMARY = "TransactionSummary";
+    /** TransactionSummary/totalInserted element. */
+    public static final String TOTAL_INS = "totalInserted";
+    /** TransactionSummary/totalReplaced element. */
+    public static final String TOTAL_REPL = "totalReplaced";
+    /** TransactionSummary/totalUpdated element. */
+    public static final String TOTAL_UPD = "totalUpdated";
     /** TransactionSummary/totalDeleted element. */
     public static final String TOTAL_DEL = "totalDeleted";
     /** Media type for SOAP 1.2 message envelopes (RFC 3902). */
@@ -112,6 +118,17 @@ public class WFS2 {
         @Override
         public String toString() {
             return this.name().toLowerCase();
+        }
+    }
+
+    /** The action embodied by a transaction. */
+    public enum Transaction {
+        INSERT, UPDATE, DELETE, REPLACE, NATIVE;
+        @Override
+        public String toString() {
+            StringBuilder action = new StringBuilder(this.name().toLowerCase());
+            action.setCharAt(0, Character.toUpperCase(action.charAt(0)));
+            return action.toString();
         }
     }
 }

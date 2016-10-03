@@ -229,6 +229,32 @@ public class WFSClient {
     }
 
     /**
+     * Submits a request to delete a feature. A wfs:Delete element is appended
+     * to the given transaction request entity.
+     * 
+     * @param reqEntity
+     *            A WFS transaction request entity (wfs:Transaction).
+     * @param id
+     *            A feature identifier.
+     * @param typeName
+     *            The type name of the feature.
+     * @return A representation of the HTTP response.
+     */
+    public ClientResponse deleteFeature(Document reqEntity, String id, QName typeName) {
+        Element delete = reqEntity.createElementNS(Namespaces.WFS, "Delete");
+        delete.setPrefix("wfs");
+        delete.setAttribute(XMLConstants.XMLNS_ATTRIBUTE + ":tns", typeName.getNamespaceURI());
+        delete.setAttribute("typeName", "tns:" + typeName.getLocalPart());
+        reqEntity.getDocumentElement().appendChild(delete);
+        Element filter = reqEntity.createElementNS(Namespaces.FES, "Filter");
+        delete.appendChild(filter);
+        Element resourceId = reqEntity.createElementNS(Namespaces.FES, "ResourceId");
+        resourceId.setAttribute("rid", id);
+        filter.appendChild(resourceId);
+        return submitRequest(reqEntity, ProtocolBinding.POST);
+    }
+
+    /**
      * Submits a request to retrieve one or more feature versions as specified
      * by the given resource identifier.
      * 
@@ -319,6 +345,7 @@ public class WFSClient {
             ProtocolBinding binding) {
         Element update = req.createElementNS(Namespaces.WFS, "Update");
         update.setPrefix("wfs");
+        update.setAttribute("handle", "Update");
         req.getDocumentElement().appendChild(update);
         WFSMessage.setTypeName(update, featureType);
         for (Map.Entry<String, Object> property : properties.entrySet()) {
