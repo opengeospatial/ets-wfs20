@@ -2,26 +2,29 @@
 
 ### Scope
 
-This test suite checks Web Feature Service (WFS) 2.0 implementations for conformance 
-to ISO 19142:2010, _Geographic information -- Web Feature Service_ (also published as 
-[OGC 09-025r1](http://portal.opengeospatial.org/files/?artifact_id=39967)).
-Four fundamental conformance levels are implemented in the test suite:</p>
+This test suite checks Web Feature Service (WFS) 2.0.x implementations for conformance 
+to ISO 19142, _Geographic information -- Web Feature Service_ (also published as 
+[OGC 09-025r2](http://docs.opengeospatial.org/is/09-025r2/09-025r2.html)). Tests for 
+the conformance classes listed below have been implemented:</p>
 
-1. **Simple WFS**: Implements the following operations: `GetCapabilities`, `DescribeFeatureType`, 
+- **Simple WFS**: Implements the following operations: `GetCapabilities`, `DescribeFeatureType`, 
 `ListStoredQueries`, `DescribeStoredQueries`, and the `GetFeature` operation with at least the 
 StoredQuery action (GetFeatureById).
-2. **Basic WFS**: As for **Simple WFS**, plus the `GetFeature` operation with the Query 
+- **Basic WFS**: As for **Simple WFS**, plus the `GetFeature` operation with the Query 
 action and the `GetPropertyValue` operation.
-3. **Transactional WFS**: As for **Basic WFS**, plus the `Transaction` operation.
-4. **Locking WFS**: As for **Transactional WFS**, plus at least one of the `GetFeatureWithLock` 
+- **Transactional WFS**: As for **Basic WFS**, plus the `Transaction` operation.
+- **Locking WFS**: As for **Transactional WFS**, plus at least one of the `GetFeatureWithLock` 
 or `LockFeature` operations.
+- **Response paging**
+- **Manage stored queries**
+- **Feature versions**
 
 The tests for WFS capabilities are supplemented by tests imported from the 
 [GML 3.2 test suite](https://github.com/opengeospatial/ets-gml32); these GML 
 conformance classes apply to all WFS 2.0 implementations:
 
-* _All GML application schemas_
-* _GML application schemas defining features and feature collections_
+- _All GML application schemas_
+- _GML application schemas defining features and feature collections_
 
 The WFS 2.0 test suite is schema-aware in the sense that the WFS under test does not 
 need to support any particular application schemas or to be loaded with special test 
@@ -34,15 +37,15 @@ document.
 * The service capabilities description contains all required elements in accord 
 with the "Simple WFS" conformance class.
 
-Which tests are actually run is determined by the content of the WFS capabilities 
-document; in particular, the conformance classes the implementation claims to support. 
-There is a service constraint defined for each conformance class, except for the 
-mandatory "Simple WFS" conformance class (see ISO 19142, Table 13). The boolean-valued 
-service constraints are listed in the OperationsMetadata section of the capabilities 
-document as shown below.
+Which tests are actually executed is determined by the content of the WFS capabilities 
+document that is submitted; in particular, the test run is driven by the conformance 
+classes the implementation under test (IUT) claims to support. There is a service constraint 
+defined for each conformance class, except for the mandatory "Simple WFS" conformance class 
+(see ISO 19142, Table 13). The boolean-valued service constraints are listed in the 
+OperationsMetadata section of the capabilities document as shown below.
 
     <OperationsMetadata xmlns="http://www.opengis.net/ows/1.1">
-      <!-- Operation and common Parameter definitions omitted -->
+      <!-- Operation and common Parameter definitions are omitted -->
       <Constraint name="ImplementsBasicWFS">
         <AllowedValues>
           <Value>TRUE</Value>
@@ -71,12 +74,9 @@ test suite:
 
 * Inheritance
 * Remote resolve
-* Response paging
 * Standard joins
 * Spatial joins
 * Temporal joins
-* Feature versions
-* Manage stored queries
 
 Visit the [project documentation website](http://opengeospatial.github.io/ets-wfs20/) 
 for more information, including the API documentation.
@@ -85,25 +85,25 @@ for more information, including the API documentation.
 ### How to run the tests
 
 #### Integrated development environment (IDE)
-You can use a Java IDE such as Eclipse, NetBeans, or IntelliJ to run the test 
-suite. Clone the repository and build the project. The runtime configuration 
-is summarized below.
+You can use a Java IDE such as Eclipse, NetBeans, or IntelliJ to run the test suite. 
+Clone the repository and build the project. The runtime configuration is summarized below.
 
 __Main class__: `org.opengis.cite.iso19142.TestNGController`
 
-__Arguments__: The first argument must refer to an XML properties file containing 
-the required test run argument (a reference to a WFSv2 capabilities document). If 
-not specified, the default location at `${user.home}/test-run-props.xml` will be used.
+__Arguments__: The first argument must refer to an XML properties file containing the 
+required test run argument (a reference to a WFS 2.0 capabilities document). If not 
+specified, the default location at `${user.home}/test-run-props.xml` will be used.
 
 You can modify the default settings in the sample [test-run-props.xml](src/main/config/test-run-props.xml) 
-file:
+file. The value of the `wfs` argument must be an absolute URI that adheres to the 'http' 
+or 'file' schemes.
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties version="1.0">
     <comment>Test run arguments (ets-wfs20)</comment>
-	<entry key="wfs">wfs2-capabilities.xml</entry>
+	<entry key="wfs">http://localhost:9090/wfs2/capabilities.xml</entry>
 </properties>
 ```
 

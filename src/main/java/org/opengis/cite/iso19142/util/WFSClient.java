@@ -269,7 +269,7 @@ public class WFSClient {
         Document req = WFSMessage.createRequestEntity("GetFeature-Minimal", this.wfsVersion);
         Element qry = WFSMessage.appendSimpleQuery(req, typeName);
         Element filter = req.createElementNS(Namespaces.FES, "Filter");
-        filter.appendChild(rid.toElement());
+        filter.appendChild(req.importNode(rid.toElement(), true));
         qry.appendChild(filter);
         return submitRequest(req, ProtocolBinding.ANY);
     }
