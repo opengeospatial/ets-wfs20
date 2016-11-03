@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wfs:DescribeFeatureTypeResponse xmlns:wfs="http://www.opengis.net/wfs/2.0">
+PHNjaGVtYSB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMS9YTUxTY2hlbWEiIGF0dHJpYnV0ZUZvcm1EZWZhdWx0PSJ1bnF1YWxpZmllZCIgZWxlbWVudEZvcm1EZWZhdWx0PSJxdWFsaWZpZWQiIHRhcmdldE5hbWVzcGFjZT0iaHR0cDovL3d3dy5kZWVncmVlLm9yZy9hcHAiPjxpbmNsdWRlIHNjaGVtYUxvY2F0aW9uPSJodHRwOi8vb2djdGVzdGJlZDEyLmxhdC1sb24uZGUvZGVlZ3JlZS9yZXNvdXJjZXMvYXBwc2NoZW1hcy9pY2VsYW5kLnhzZCIvPjwvc2NoZW1hPg==
+</wfs:DescribeFeatureTypeResponse>
