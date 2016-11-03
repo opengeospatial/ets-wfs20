@@ -11,6 +11,8 @@ public class FES2 {
     private FES2() {
     }
 
+    /** Namespace name. */
+    public static final String NS = "http://www.opengis.net/fes/2.0";
     /** PropertyIsEqualTo operator. */
     public static final String EQUAL = "PropertyIsEqualTo";
     /** PropertyIsNotEqualTo operator. */

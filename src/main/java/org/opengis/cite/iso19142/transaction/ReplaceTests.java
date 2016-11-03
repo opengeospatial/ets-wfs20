@@ -15,12 +15,16 @@ import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.xerces.xs.XSElementDeclaration;
 import org.opengis.cite.iso19142.ETSAssert;
+import org.opengis.cite.iso19142.ErrorMessage;
+import org.opengis.cite.iso19142.ErrorMessageKeys;
+import org.opengis.cite.iso19142.FES2;
 import org.opengis.cite.iso19142.Namespaces;
 import org.opengis.cite.iso19142.ProtocolBinding;
 import org.opengis.cite.iso19142.WFS2;
 import org.opengis.cite.iso19142.util.XMLUtils;
 import org.opengis.cite.iso19142.util.TestSuiteLogger;
 import org.opengis.cite.iso19142.util.WFSMessage;
+import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
@@ -99,7 +103,10 @@ public class ReplaceTests extends TransactionFixture {
         String xpath = String.format("//wfs:totalReplaced = '%d'", replacements.size());
         ETSAssert.assertXPath(xpath, this.rspEntity, null);
         originalFeatures.add(originalFeature);
-        String gmlId = originalFeature.getAttributeNS(Namespaces.GML, "id");
+        // feature versioning may be enabled, so check fes:ResourceId/@rid
+        Element resourceId = (Element) this.rspEntity.getElementsByTagNameNS(FES2.NS, FES2.RESOURCE_ID).item(0);
+        Assert.assertNotNull(resourceId, ErrorMessage.format(ErrorMessageKeys.MISSING_INFOSET_ITEM, FES2.RESOURCE_ID));
+        String gmlId = resourceId.getAttribute("rid");
         @SuppressWarnings("unchecked")
         Map<XSElementDeclaration, Object> replProps = (Map<XSElementDeclaration, Object>) replacement
                 .getUserData(REPL_PROPS);
