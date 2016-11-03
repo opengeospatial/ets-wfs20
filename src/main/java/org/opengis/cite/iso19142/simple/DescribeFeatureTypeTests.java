@@ -1,6 +1,9 @@
 package org.opengis.cite.iso19142.simple;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.net.URI;
+import java.util.Base64;
 import java.util.logging.Level;
 
 import javax.xml.XMLConstants;
@@ -28,6 +31,7 @@ import org.testng.annotations.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 import com.sun.jersey.api.client.ClientResponse;
 
@@ -41,6 +45,8 @@ import com.sun.jersey.api.client.ClientResponse;
  */
 public class DescribeFeatureTypeTests extends BaseFixture {
 
+    DocumentBuilder docBuilder;
+
     /**
      * Builds a DOM Document node representing the request entity
      * (/wfs:DescribeFeatureType).
@@ -50,8 +56,8 @@ public class DescribeFeatureTypeTests extends BaseFixture {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(true);
         try {
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            this.reqEntity = builder.parse(getClass().getResourceAsStream("DescribeFeatureType.xml"));
+            this.docBuilder = factory.newDocumentBuilder();
+            this.reqEntity = docBuilder.parse(getClass().getResourceAsStream("DescribeFeatureType.xml"));
         } catch (Exception e) {
             TestSuiteLogger.log(Level.WARNING, "Failed to parse request entity from classpath", e);
         }
@@ -118,6 +124,12 @@ public class DescribeFeatureTypeTests extends BaseFixture {
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
         Assert.assertTrue(rsp.hasEntity(), ErrorMessage.get(ErrorMessageKeys.MISSING_XML_ENTITY));
         Element docElem = this.rspEntity.getDocumentElement();
+        if (docElem.getLocalName().equals("DescribeFeatureTypeResponse")) {
+            // special case for SOAP response
+            Document appSchema = decodeSchema(this.rspEntity);
+            Assert.assertNotNull(appSchema, "Base64-encoded schema could not be read.");
+            docElem = appSchema.getDocumentElement();
+        }
         Assert.assertEquals(docElem.getLocalName(), "schema", "Document element has unexpected [local name].");
         // TODO: compile schema
     }
@@ -149,5 +161,29 @@ public class DescribeFeatureTypeTests extends BaseFixture {
         Result result = validator.validate(new DOMSource(this.rspEntity), false);
         Assert.assertFalse(validator.ruleViolationsDetected(), ErrorMessage.format(ErrorMessageKeys.NOT_SCHEMA_VALID,
                 validator.getRuleViolationCount(), XMLUtils.resultToString(result)));
+    }
+
+    /**
+     * The body of a SOAP response contains a DescribeFeatureTypeResponse
+     * element. Its content is a Base64-encoded application schema.
+     * 
+     * @param doc
+     *            A Document containing a wfs:DescribeFeatureTypeResponse
+     *            element.
+     * @return A Document representing an XML Schema.
+     * 
+     * @see "ISO 19142, D.4.5: Encoding XML Schema in a SOAP Body"
+     */
+    Document decodeSchema(Document doc) {
+        String base64Schema = doc.getDocumentElement().getTextContent().trim();
+        byte[] schema = Base64.getDecoder().decode(base64Schema);
+        Document appSchema = null;
+        try {
+            appSchema = this.docBuilder.parse(new ByteArrayInputStream(schema), doc.getDocumentURI());
+        } catch (SAXException | IOException e) {
+            TestSuiteLogger.log(Level.WARNING, String.format("Failed to parse decoded schema from %s.\n%s ",
+                    doc.getDocumentURI(), e.getMessage()));
+        }
+        return appSchema;
     }
 }
