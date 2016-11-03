@@ -193,7 +193,6 @@ public class VersioningTests extends BaseFixture {
         this.reqEntity = WFSMessage.createRequestEntity(WFS2.TRANSACTION, this.wfsVersion);
         Element feature = this.dataSampler.randomlySelectFeatureInstance();
         QName typeName = new QName(feature.getNamespaceURI(), feature.getLocalName());
-        feature.setAttributeNS(Namespaces.GML, "id", "id-" + System.currentTimeMillis());
         InsertTests.insertRandomIdentifier(feature);
         InsertTests.addRandomName(feature);
         WFSMessage.addReplaceStatements(this.reqEntity, Collections.singletonList(feature));
