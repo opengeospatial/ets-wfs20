@@ -240,8 +240,8 @@ public class VersioningTests extends BaseFixture {
         assertEquals(totalDeleted, 1, ErrorMessage.format(ErrorMessageKeys.UNEXPECTED_VALUE, WFS2.TOTAL_DEL));
         // get LAST version and check that state attribute is "superseded"
         ResourceId qryId = new ResourceId(gmlId);
-        rsp = this.wfsClient.GetFeatureVersion(qryId, typeName);
         qryId.setVersion(FES2.VersionAction.LAST.name());
+        rsp = this.wfsClient.GetFeatureVersion(qryId, typeName);
         this.rspEntity = rsp.getEntity(Document.class);
         int numReturned = Integer.parseInt(this.rspEntity.getDocumentElement().getAttribute("numberReturned"));
         assertEquals(numReturned, 1, ErrorMessage.get(ErrorMessageKeys.NUM_RETURNED));
