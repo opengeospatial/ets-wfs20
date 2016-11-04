@@ -44,10 +44,10 @@ public class VerifyBBOXTests extends CommonTestFixture {
 
 	@Test
 	public void addBBOX() throws SAXException, IOException {
-		Document req = docBuilder.parse(this.getClass().getResourceAsStream(
+		Document req = BUILDER.parse(this.getClass().getResourceAsStream(
 				"/GetFeature/GetFeature-Minimal.xml"));
 		WFSMessage.appendSimpleQuery(req, new QName(NS1, "Type1"));
-		Document env = docBuilder.parse(this.getClass().getResourceAsStream(
+		Document env = BUILDER.parse(this.getClass().getResourceAsStream(
 				"/Envelope.xml"));
 		BBOXTests iut = new BBOXTests();
 		iut.addBBOXPredicate(req, env.getDocumentElement(), null);
@@ -59,10 +59,10 @@ public class VerifyBBOXTests extends CommonTestFixture {
 
 	@Test
 	public void addBBOXWithValueReference() throws SAXException, IOException {
-		Document req = docBuilder.parse(this.getClass().getResourceAsStream(
+		Document req = BUILDER.parse(this.getClass().getResourceAsStream(
 				"/GetFeature/GetFeature-Minimal.xml"));
 		WFSMessage.appendSimpleQuery(req, new QName(NS1, "Type1"));
-		Document env = docBuilder.parse(this.getClass().getResourceAsStream(
+		Document env = BUILDER.parse(this.getClass().getResourceAsStream(
 				"/Envelope.xml"));
 		BBOXTests iut = new BBOXTests();
 		Element valueRef = XMLUtils.createElement(new QName(Namespaces.FES,

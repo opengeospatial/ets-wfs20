@@ -60,7 +60,7 @@ public class VerifyETSAssert extends CommonTestFixture {
 
     @Test
     public void assertXPathWithNamespaceBindings() throws SAXException, IOException {
-        Document doc = docBuilder.parse(this.getClass().getResourceAsStream("/capabilities-simple.xml"));
+        Document doc = BUILDER.parse(this.getClass().getResourceAsStream("/capabilities-simple.xml"));
         Map<String, String> nsBindings = new HashMap<String, String>();
         nsBindings.put(WADL_NS, "ns1");
         String xpath = "//ns1:resources";
@@ -71,7 +71,7 @@ public class VerifyETSAssert extends CommonTestFixture {
     public void assertXPath_expectFalse() throws SAXException, IOException {
         thrown.expect(AssertionError.class);
         thrown.expectMessage("Unexpected result evaluating XPath expression");
-        Document doc = docBuilder.parse(this.getClass().getResourceAsStream("/capabilities-simple.xml"));
+        Document doc = BUILDER.parse(this.getClass().getResourceAsStream("/capabilities-simple.xml"));
         // using built-in namespace binding
         String xpath = "//ows:OperationsMetadata/ows:Constraint[@name='SOAPEncoding']/ows:DefaultValue = 'TRUE'";
         ETSAssert.assertXPath(xpath, doc, null);
@@ -84,7 +84,7 @@ public class VerifyETSAssert extends CommonTestFixture {
 
     @Test
     public void assertDateTimeProperty() throws SAXException, IOException {
-        Document gml = docBuilder.parse(this.getClass().getResourceAsStream("/wfs/SimpleFeature-SF01.xml"));
+        Document gml = BUILDER.parse(this.getClass().getResourceAsStream("/wfs/SimpleFeature-SF01.xml"));
         XSElementDeclaration propDecl = model.getElementDeclaration("dateTimeProperty", EX_NS);
         Map<XSElementDeclaration, Object> expectedValues = Collections.singletonMap(propDecl, "2016-07-21T14:47:51Z");
         ETSAssert.assertSimpleProperties(gml.getDocumentElement(), expectedValues,

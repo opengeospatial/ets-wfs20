@@ -13,7 +13,7 @@ import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSSerializer;
 
 public class CommonTestFixture {
-    protected static DocumentBuilder docBuilder;
+    protected static DocumentBuilder BUILDER;
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
@@ -22,7 +22,7 @@ public class CommonTestFixture {
     public static void initCommonTestFixture() throws ParserConfigurationException {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
-        docBuilder = dbf.newDocumentBuilder();
+        BUILDER = dbf.newDocumentBuilder();
 
     }
 

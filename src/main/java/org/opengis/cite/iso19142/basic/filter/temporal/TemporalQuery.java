@@ -63,7 +63,7 @@ public class TemporalQuery {
             List<XSElementDeclaration> expectedValues = XMLSchemaModelUtils.getElementsByAffiliation(model,
                     gmlAbstractTimePrimitive);
             temporalNodes = WFSMessage.findMatchingElements(rspEntity,
-                    (XSElementDeclaration[]) expectedValues.toArray());
+                    expectedValues.toArray(new XSElementDeclaration[expectedValues.size()]));
         }
         return temporalNodes;
     }
