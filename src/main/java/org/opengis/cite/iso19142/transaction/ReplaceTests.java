@@ -103,7 +103,7 @@ public class ReplaceTests extends TransactionFixture {
         String xpath = String.format("//wfs:totalReplaced = '%d'", replacements.size());
         ETSAssert.assertXPath(xpath, this.rspEntity, null);
         originalFeatures.add(originalFeature);
-        // feature versioning may be enabled, so check fes:ResourceId/@rid
+        // feature versioning may be enabled, so get fes:ResourceId/@rid
         Element resourceId = (Element) this.rspEntity.getElementsByTagNameNS(FES2.NS, FES2.RESOURCE_ID).item(0);
         Assert.assertNotNull(resourceId, ErrorMessage.format(ErrorMessageKeys.MISSING_INFOSET_ITEM, FES2.RESOURCE_ID));
         String gmlId = resourceId.getAttribute("rid");
