@@ -1,7 +1,7 @@
 package org.opengis.cite.iso19142.transaction;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -19,7 +19,6 @@ import javax.xml.validation.Schema;
 
 import org.apache.xerces.xs.XSElementDeclaration;
 import org.apache.xerces.xs.XSModel;
-import org.joda.time.DateTime;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opengis.cite.iso19142.SuiteAttribute;
@@ -69,17 +68,6 @@ public class VerifyUpdate {
         Update iut = new Update();
         String newVal = iut.newPropertyValue(simpleProps.get(simpleProps.size() - 1), propValues);
         assertEquals("CA-BC", newVal);
-    }
-
-    @Test
-    public void createNewDateTimeValue() throws SAXException, IOException {
-        QName featureType = new QName(NS1, "ComplexFeature");
-        List<XSElementDeclaration> simpleProps = AppSchemaUtils.getSimpleFeatureProperties(model, featureType);
-        List<String> propValues = new ArrayList<String>();
-        propValues.add("2010-03-20T13:32:00-04:00");
-        Update iut = new Update();
-        String newVal = iut.newPropertyValue(simpleProps.get(simpleProps.size() - 2), propValues);
-        assertTrue(String.format("Expected %s isBeforeNow", newVal), new DateTime(newVal).isBeforeNow());
     }
 
     @Test

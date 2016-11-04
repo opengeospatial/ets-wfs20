@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wfs:FeatureCollection xmlns:wfs="http://www.opengis.net/wfs/2.0"
+	xmlns="http://example.org/ns1" xmlns:gml="http://www.opengis.net/gml/3.2"
+	numberMatched="2" numberReturned="2" timeStamp="2016-11-03T23:49:00Z">
+	<wfs:member>
+		<ComplexFeature gml:id="CF01" xmlns="http://example.org/ns1">
+			<gml:description>Lorem ipsum dolor sit amet.</gml:description>
+			<gml:identifier codeSpace="https://tools.ietf.org/html/rfc4122">urn:uuid:f81d4fae-7dec-11d0-a765-00a0c91e6bf6</gml:identifier>
+			<gml:name>Donec Fermentum</gml:name>
+			<multiGeomProperty>
+				<gml:MultiPoint gml:id="MP01">
+					<gml:pointMembers>
+						<gml:Point gml:id="P01"
+							srsName="http://www.opengis.net/def/crs/EPSG/0/4326">
+							<gml:pos>49.25 -123.10</gml:pos>
+						</gml:Point>
+					</gml:pointMembers>
+				</gml:MultiPoint>
+			</multiGeomProperty>
+			<observation uom="m">900</observation>
+			<hexBinaryProperty mimeType="image/png">3f3c6d78206c657673726f693d6e3122302e20226e656f636964676e223d54552d4622383e3f
+			</hexBinaryProperty>
+			<typeCode codeSpace="http://example.org/types">ABC123</typeCode>
+			<validTime>
+				<gml:TimePeriod gml:id="TP01">
+					<gml:beginPosition>2016-01-01T12:00:00Z</gml:beginPosition>
+					<gml:endPosition>2016-07-01T12:00:00Z</gml:endPosition>
+				</gml:TimePeriod>
+			</validTime>
+		</ComplexFeature>
+	</wfs:member>
+	<wfs:member>
+		<ComplexFeature gml:id="CF02" xmlns="http://example.org/ns1">
+			<gml:description>Nulla facilisi.</gml:description>
+			<gml:identifier codeSpace="https://tools.ietf.org/html/rfc4122">urn:uuid:f81d4fae-7dec-11d0-a765-00a0c91e6bg7</gml:identifier>
+			<gml:name>Suspendisse Potenti</gml:name>
+			<multiGeomProperty>
+				<gml:MultiPoint gml:id="MP02">
+					<gml:pointMembers>
+						<gml:Point gml:id="P02"
+							srsName="http://www.opengis.net/def/crs/EPSG/0/4326">
+							<gml:pos>50.45 -122.36</gml:pos>
+						</gml:Point>
+					</gml:pointMembers>
+				</gml:MultiPoint>
+			</multiGeomProperty>
+			<observation uom="m">1120.1</observation>
+			<hexBinaryProperty mimeType="image/png">3f3c6d78206c657673726f693d6e3122302e20226e656f636964676e223d54552d4622383e3f
+			</hexBinaryProperty>
+			<typeCode codeSpace="http://example.org/types">ABC123</typeCode>
+			<validTime>
+				<gml:TimePeriod gml:id="TP01">
+					<gml:beginPosition>2015-08-01T00:00:00Z</gml:beginPosition>
+					<gml:endPosition>2016-05-01T00:00:00Z</gml:endPosition>
+				</gml:TimePeriod>
+			</validTime>
+		</ComplexFeature>
+	</wfs:member>
+</wfs:FeatureCollection>

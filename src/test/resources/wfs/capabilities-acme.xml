@@ -150,6 +150,15 @@
 				<ows:UpperCorner>71.96 32.19</ows:UpperCorner>
 			</ows:WGS84BoundingBox>
 		</wfs:FeatureType>
+		<wfs:FeatureType>
+			<wfs:Name>tns:ComplexFeature</wfs:Name>
+			<wfs:DefaultCRS>http://www.opengis.net/def/crs/EPSG/0/4326
+			</wfs:DefaultCRS>
+			<ows:WGS84BoundingBox>
+				<ows:LowerCorner>45 -130</ows:LowerCorner>
+				<ows:UpperCorner>55 -120</ows:UpperCorner>
+			</ows:WGS84BoundingBox>
+		</wfs:FeatureType>
 	</wfs:FeatureTypeList>
 	<fes:Filter_Capabilities>
 		<fes:Conformance>

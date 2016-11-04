@@ -56,7 +56,7 @@ public class VerifyDataSampler {
         Document capabilitiesDoc = docBuilder.parse(getClass().getResourceAsStream("/wfs/capabilities-acme.xml"));
         DataSampler iut = new DataSampler(capabilitiesDoc);
         Set<QName> featureTypes = iut.getFeatureTypeInfo().keySet();
-        assertEquals("Unexpected number of feature types.", featureTypes.size(), 1);
+        assertEquals("Unexpected number of feature types.", featureTypes.size(), 2);
         QName simpleFeature = new QName(TNS, "SimpleFeature");
         assertTrue("Expected type: " + simpleFeature, featureTypes.contains(simpleFeature));
     }
@@ -79,7 +79,7 @@ public class VerifyDataSampler {
     }
 
     @Test
-    public void getTemporalExtentOfSimpleFeature() throws URISyntaxException, SAXException, IOException {
+    public void getTemporalExtentOfSimpleFeatures() throws URISyntaxException, SAXException, IOException {
         URL dataURL = getClass().getResource("/wfs/FeatureCollection-SimpleFeature.xml");
         File dataFile = new File(dataURL.toURI());
         Document capabilitiesDoc = docBuilder.parse(getClass().getResourceAsStream("/wfs/capabilities-acme.xml"));
@@ -94,5 +94,23 @@ public class VerifyDataSampler {
         Period period = iut.getTemporalExtentOfProperty(model, simpleFeature, tmProp);
         assertNotNull("Period is null.", period);
         assertTrue("Expected duration P8M", period.length().toString().startsWith("P8M"));
+    }
+
+    @Test
+    public void getTemporalExtentOfComplexFeatures() throws URISyntaxException, SAXException, IOException {
+        URL dataURL = getClass().getResource("/wfs/FeatureCollection-ComplexFeature.xml");
+        File dataFile = new File(dataURL.toURI());
+        Document capabilitiesDoc = docBuilder.parse(getClass().getResourceAsStream("/wfs/capabilities-acme.xml"));
+        QName featureType = new QName(TNS, "ComplexFeature");
+        List<XSElementDeclaration> tmProps = AppSchemaUtils.getTemporalFeatureProperties(model, featureType);
+        XSElementDeclaration tmProp = tmProps.stream().filter(decl -> decl.getName().equals("validTime")).findAny()
+                .orElse(null);
+        DataSampler iut = new DataSampler(capabilitiesDoc);
+        FeatureTypeInfo typeInfo = iut.getFeatureTypeInfo().get(featureType);
+        typeInfo.setInstantiated(true);
+        typeInfo.setSampleData(dataFile);
+        Period period = iut.getTemporalExtentOfProperty(model, featureType, tmProp);
+        assertNotNull("Period is null.", period);
+        assertTrue("Expected duration P11M", period.length().toString().startsWith("P11M"));
     }
 }

@@ -26,7 +26,7 @@ public class VerifyAppSchemaUtils {
 
     private static final String EX_NS = "http://example.org/ns1";
     private static final QName DOUBLE_DT = new QName(XMLConstants.W3C_XML_SCHEMA_NS_URI, "double");
-    private static final QName DATETIME_DT = new QName(XMLConstants.W3C_XML_SCHEMA_NS_URI, "dateTime");
+    private static final QName TM_PERIOD_PROP = new QName(GML32.NS_NAME, "TimePeriodPropertyType");
     private static XSModel model;
 
     public VerifyAppSchemaUtils() {
@@ -143,12 +143,14 @@ public class VerifyAppSchemaUtils {
     }
 
     @Test
-    public void getBuiltInTypeOfValidTimeProperty() {
+    public void getTypeOfValidTimeProperty() {
         QName featureTypeName = new QName(EX_NS, "ComplexFeature");
-        List<XSElementDeclaration> simpleProps = AppSchemaUtils.getSimpleFeatureProperties(model, featureTypeName);
-        XSElementDeclaration timeProp = simpleProps.get(simpleProps.size() - 2);
-        QName qName = AppSchemaUtils.getBuiltInDatatype(timeProp);
-        assertEquals("Unexpected datatype.", DATETIME_DT, qName);
+        List<XSElementDeclaration> tmProps = AppSchemaUtils.getTemporalFeatureProperties(model, featureTypeName);
+        assertFalse("No temporal properties found for " + featureTypeName, tmProps.isEmpty());
+        XSElementDeclaration timeProp = tmProps.get(0);
+        XSTypeDefinition typeDefn = timeProp.getTypeDefinition();
+        QName qName = new QName(typeDefn.getNamespace(), typeDefn.getName());
+        assertEquals("Unexpected property type.", TM_PERIOD_PROP, qName);
     }
 
     @Test

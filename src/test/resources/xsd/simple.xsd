@@ -81,7 +81,7 @@
 					<xsd:element ref="tns:hexBinaryProperty" />
 					<xsd:element name="typeCode" type="gml:CodeType" />
 					<xsd:element ref="tns:b64BinaryProperty" minOccurs="0" />
-					<xsd:element name="validTime" type="xsd:dateTime" />
+					<xsd:element name="validTime" type="gml:TimePeriodPropertyType" />
 					<xsd:element name="locationCode" type="tns:LocationCodeType"
 						minOccurs="0" />
 					<xsd:element name="simpleFeature" minOccurs="0"

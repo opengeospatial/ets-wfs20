@@ -45,7 +45,6 @@ import org.opengis.temporal.Period;
 import org.opengis.temporal.TemporalGeometricPrimitive;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -437,12 +436,13 @@ public class DataSampler {
         for (int i = 0; i < propNodes.getLength(); i++) {
             TemporalGeometricPrimitive tVal;
             XSTypeDefinition propType = tmPropDecl.getTypeDefinition();
-            Node prop = propNodes.item(i);
+            Element propElem = (Element) propNodes.item(i);
             try {
                 if (propType.getTypeCategory() == XSTypeDefinition.SIMPLE_TYPE) {
-                    tVal = TemporalQuery.parseTemporalValue(prop.getTextContent(), propType);
+                    tVal = TemporalQuery.parseTemporalValue(propElem.getTextContent(), propType);
                 } else {
-                    tVal = GmlUtils.gmlToTemporalGeometricPrimitive((Element) prop.getFirstChild());
+                    Element propValue = (Element) propElem.getElementsByTagName("*").item(0);
+                    tVal = GmlUtils.gmlToTemporalGeometricPrimitive(propValue);
                 }
                 tmSet.add(tVal);
             } catch (RuntimeException re) {
