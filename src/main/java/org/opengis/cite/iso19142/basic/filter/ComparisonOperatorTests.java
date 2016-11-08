@@ -1,6 +1,7 @@
 package org.opengis.cite.iso19142.basic.filter;
 
 import java.math.BigDecimal;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
@@ -12,13 +13,11 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
-import java.util.logging.Level;
 import java.util.Set;
+import java.util.logging.Level;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.DatatypeConverter;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
 import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMSource;
 
@@ -538,7 +537,7 @@ public class ComparisonOperatorTests extends QueryFilterFixture {
             }
             Arrays.sort(objValues);
         } catch (NumberFormatException nfe) {
-            // try Calendar value
+            // use (Gregorian)Calendar to sort temporal values
             objValues = new Calendar[values.length];
             for (int i = 0; i < objValues.length; i++) {
                 if (values[i].indexOf('T') > 0) {
@@ -549,16 +548,12 @@ public class ComparisonOperatorTests extends QueryFilterFixture {
             }
             Arrays.sort(objValues);
         }
-        DatatypeFactory dtFactory;
-        try {
-            dtFactory = DatatypeFactory.newInstance();
-        } catch (DatatypeConfigurationException e) {
-            throw new RuntimeException(e);
-        }
+        DateTimeFormatter tmFormatter = (values[0].indexOf('T') > 0) ? DateTimeFormatter.ISO_OFFSET_DATE_TIME
+                : DateTimeFormatter.ISO_DATE;
         for (int i = 0; i < values.length; i++) {
             if (GregorianCalendar.class.isInstance(objValues[i])) {
-                GregorianCalendar gCal = (GregorianCalendar) objValues[i];
-                values[i] = dtFactory.newXMLGregorianCalendar(gCal).normalize().toString();
+                GregorianCalendar cal = (GregorianCalendar) objValues[i];
+                values[i] = tmFormatter.format(cal.toZonedDateTime());
             } else {
                 values[i] = DatatypeConverter.printDecimal(new BigDecimal(objValues[i].toString()));
             }

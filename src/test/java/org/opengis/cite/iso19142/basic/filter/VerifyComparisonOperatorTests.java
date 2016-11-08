@@ -3,6 +3,8 @@ package org.opengis.cite.iso19142.basic.filter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -123,7 +125,10 @@ public class VerifyComparisonOperatorTests {
                 "2012-12-12T17:00:00Z" };
         ComparisonOperatorTests iut = new ComparisonOperatorTests();
         iut.sortValues(values);
-        assertEquals("Unexpected min value.", "2012-12-12T13:00:00.000Z", values[0]);
+        String latestValue = values[values.length - 1];
+        ZonedDateTime latest = ZonedDateTime.parse(latestValue, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+        ZonedDateTime expected = ZonedDateTime.parse("2012-12-12T18:00:00Z", DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+        assertTrue("Expected latest to be 2012-12-12T18:00:00Z", latest.isEqual(expected));
     }
 
     @Test
@@ -131,7 +136,8 @@ public class VerifyComparisonOperatorTests {
         String[] values = new String[] { "2011-12-31Z", "2011-12-01Z", "2011-12-10Z" };
         ComparisonOperatorTests iut = new ComparisonOperatorTests();
         iut.sortValues(values);
-        assertTrue("Unexpected max value.", values[values.length - 1].startsWith("2011-12-31"));
+        String latestValue = values[values.length - 1];
+        assertEquals("2011-12-31Z", latestValue);
     }
 
     @Test
