@@ -81,6 +81,11 @@ public class AfterTests extends QueryFilterFixture {
         Period temporalExtent = this.dataSampler.getTemporalExtentOfProperty(this.model, featureType, timeProperty);
         List<Period> subIntervals = TemporalUtils.splitInterval(temporalExtent, 2);
         Period firstSubInterval = subIntervals.get(0);
+        if (!firstSubInterval.length().toString().contains("D")) {
+            // less than 1 day
+            throw new SkipException(String.format(
+                    ErrorMessage.format(ErrorMessageKeys.TM_EXTENT_LEN, timeProperty, firstSubInterval.length())));
+        }
         Document gmlTimeLiteral = TimeUtils.periodAsGML(firstSubInterval);
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
         Element valueRef = WFSMessage.createValueReference(timeProperty);

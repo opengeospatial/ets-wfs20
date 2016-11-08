@@ -30,4 +30,5 @@ public class ErrorMessageKeys {
     public static final String NUM_MATCHED = "UnexpectedNumMatched";
     public static final String VERSION_STATE = "UnexpectedVersionState";
     public static final String UNEXPECTED_VALUE = "UnexpectedValue";
+    public static final String TM_EXTENT_LEN = "TemporalExtentLength";
 }
