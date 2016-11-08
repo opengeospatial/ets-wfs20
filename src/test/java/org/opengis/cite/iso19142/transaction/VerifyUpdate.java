@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -100,6 +101,6 @@ public class VerifyUpdate {
         propValues.add("2010-01-01");
         Update iut = new Update();
         String newVal = iut.newPropertyValue(simpleProps.get(simpleProps.size() - 2), propValues);
-        assertEquals(LocalDate.now(), LocalDate.parse(newVal));
+        assertEquals(LocalDate.now(ZoneId.of("Z")), LocalDate.parse(newVal));
     }
 }

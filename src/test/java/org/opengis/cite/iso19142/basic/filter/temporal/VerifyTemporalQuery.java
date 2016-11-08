@@ -61,7 +61,7 @@ public class VerifyTemporalQuery extends CommonTestFixture {
         TemporalGeometricPrimitive result = TemporalQuery.parseTemporalValue("2016-05-15", typeDef);
         assertTrue("Expected result: " + Period.class.getName(), Period.class.isInstance(result));
         Period period = Period.class.cast(result);
-        assertTrue(period.getBeginning().getPosition().getDateTime().toString().startsWith("2016-05-15T00:00:00"));
+        assertTrue("Expected duration: PT23H59M59S", period.length().toString().equals("PT23H59M59S"));
     }
 
     @Test
