@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <iso:schema id="wfs-capabilities-2.0" 
-  schemaVersion="2.0"
+  schemaVersion="2016.11.09"
   xmlns:iso="http://purl.oclc.org/dsdl/schematron" 
   xml:lang="en"
   queryBinding="xslt2">
@@ -16,11 +16,11 @@
   the content of WFS 2.0 service capabilities descriptions.</iso:p>
 
   <iso:phase id="SimpleWFSPhase">
-    <iso:active pattern="EssentialCapabilitiesPattern"/>
     <iso:active pattern="TopLevelElementsPattern"/>
     <iso:active pattern="ConformanceStatementPattern"/>
     <iso:active pattern="ServiceIdentificationPattern"/>
     <iso:active pattern="SimpleWFSPattern"/>
+    <iso:active pattern="RequestParameters"/>
   </iso:phase>
 
   <iso:phase id="BasicWFSPhase">
@@ -30,25 +30,18 @@
   <iso:phase id="TransactionalWFSPhase">
     <iso:active pattern="TransactionalWFSPattern"/>
   </iso:phase>
-  
+
   <iso:phase id="LockingWFSPhase">
     <iso:active pattern="LockingWFSPattern"/>
   </iso:phase>
 
-  <iso:pattern id="EssentialCapabilitiesPattern">
-    <iso:rule context="/">
-      <iso:assert test="wfs:WFS_Capabilities" diagnostics="dmsg.root.en">
-	  The document element must have [local name] = "WFS_Capabilities" and [namespace name] = "http://www.opengis.net/wfs/2.0.
-      </iso:assert>
-      <iso:assert test="matches(wfs:WFS_Capabilities/@version, '2\.0\.\d')" diagnostics="dmsg.version.en">
-      The capabilities document must have @version = '2.0.[0-9]'.
-      </iso:assert>
-    </iso:rule>
-  </iso:pattern>
-
   <iso:pattern id="TopLevelElementsPattern">
     <iso:p>Rules regarding the inclusion of common service metadata elements.</iso:p>
     <iso:rule context="/*[1]">
+      <iso:assert test="namespace-uri(.) eq 'http://www.opengis.net/wfs/2.0'">
+      The document element must have [namespace name] = "http://www.opengis.net/wfs/2.0".
+      </iso:assert>
+      <iso:assert test="matches(./@version, '2\.0\.\d')" diagnostics="dmsg.version.en">The capabilities document must have @version = '2.0.[0-9]'.</iso:assert>
       <iso:assert test="ows:ServiceIdentification">The ows:ServiceIdentification element is missing.</iso:assert>
       <iso:assert test="ows:ServiceProvider">The ows:ServiceProvider element is missing.</iso:assert>
       <iso:assert test="ows:OperationsMetadata">The ows:OperationsMetadata element is missing.</iso:assert>
@@ -115,15 +108,28 @@
       The mandatory GetFeature operation is missing.
       </iso:assert>
     </iso:rule>
-    <iso:rule context="ows:Operation[@name='GetFeature']">
-      <iso:assert test="exists(index-of(ows:Parameter[@name='resolve']//ows:Value, 'local'))">
-        GetFeature: the 'resolve' parameter must contain 'local' as an allowed value.
-      </iso:assert>
-    </iso:rule>
     <iso:rule context="//fes:Filter_Capabilities/fes:Conformance">
       <iso:assert test="lower-case(fes:Constraint[@name='ImplementsQuery']/ows:DefaultValue) = 'true'">
       The filter constraint 'ImplementsQuery' must be 'true' for all conforming WFS implementations.
       </iso:assert>
+    </iso:rule>
+  </iso:pattern>
+
+  <iso:pattern id="RequestParameters">
+    <iso:p>Standard WFS request parameters. See OGC 09-025r2/ISO 19142, Table 12.</iso:p>
+    <iso:rule abstract="true" id="link-resolution">
+      <iso:assert test="exists(index-of((ows:Parameter[@name='resolve'] | following-sibling::ows:Parameter[@name='resolve'])//ows:Value, 'local'))">
+      <iso:value-of select="./@name"/>: the 'resolve' parameter must contain 'local' as an allowed value.
+      </iso:assert>
+    </iso:rule>
+    <iso:rule context="//ows:Operation[@name='GetFeature']">
+      <iso:extends rule="link-resolution" />
+    </iso:rule>
+    <iso:rule context="//ows:Operation[@name='GetFeatureWithLock']">
+      <iso:extends rule="link-resolution" />
+    </iso:rule>
+    <iso:rule context="//ows:Operation[@name='GetPropertyValue']">
+      <iso:extends rule="link-resolution" />
     </iso:rule>
   </iso:pattern>
 
@@ -200,8 +206,8 @@
   </iso:pattern>
 
   <iso:diagnostics>
-    <iso:diagnostic id="dmsg.root.en" xml:lang="en">
-    The root element has [local name] = '<iso:value-of select="local-name(/*[1])"/>' and [namespace name] = '<iso:value-of select="namespace-uri(/*[1])"/>'.
+    <iso:diagnostic id="dmsg.node-name" xml:lang="en">
+    The element has [local name] = '<iso:value-of select="local-name(.)"/>' and [namespace name] = '<iso:value-of select="namespace-uri(.)"/>'.
     </iso:diagnostic>
     <iso:diagnostic id="dmsg.version.en" xml:lang="en">
     The reported version is <iso:value-of select="/*[1]/@version"/>.
