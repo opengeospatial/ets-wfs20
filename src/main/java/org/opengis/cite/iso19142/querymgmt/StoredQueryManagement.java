@@ -75,11 +75,11 @@ public class StoredQueryManagement {
         NodeList result = null;
         try {
             result = XMLUtils.evaluateXPath(wfsMetadata,
-                    "//ows:Operation[name='CreateStoredQuery']/ows:Parameter[@name='language']", null);
+                    "//ows:Operation[@name='CreateStoredQuery']/ows:Parameter[@name='language']", null);
         } catch (XPathExpressionException e) { // valid expression
         }
         assertTrue(result.getLength() > 0, "Missing 'language' parameter for CreateStoredQuery.");
-        assertTrue(result.item(0).getTextContent().contains(LANG_WFS_QUERY),
+        assertTrue(result.item(0).getTextContent().trim().contains(LANG_WFS_QUERY),
                 ErrorMessage.format(ErrorMessageKeys.QRY_LANG_NOT_SUPPORTED, LANG_WFS_QUERY));
     }
 }
