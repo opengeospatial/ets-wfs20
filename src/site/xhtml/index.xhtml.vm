@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
   <head>
-    <title>WFS 2.0 (ISO 19142:2010) Conformance Test Suite</title>
+    <title>WFS 2.0 Conformance Test Suite</title>
     <meta charset="UTF-8" />
     <style type="text/css">
 body {
@@ -54,11 +54,11 @@ dt {
     </style>
   </head>
   <body>
-    <h1>WFS 2.0 (ISO 19142:2010) Conformance Test Suite</h1>
+    <h1>WFS 2.0 Conformance Test Suite</h1>
 
     <h2>Scope</h2>
-    <p>This executable test suite (ETS) checks WFS 2.0 implementations for conformance 
-    with respect to ISO 19142:2010 (<em>Geographic information -- Web feature service</em>) 
+    <p>This executable test suite (ETS) verifies that a WFS 2.0 implementation conforms 
+    to OGC 09-025r2/ISO 19142 (<em>Geographic information -- Web feature service</em>) 
     and related standards as depicted in Figure 1. Conformance testing is a kind of 
     "black box" testing that examines externally visible characteristics or behaviors 
     of the SUT and is independent of any implementation details.</p>
@@ -66,7 +66,8 @@ dt {
       <img src="./img/specifications.png" alt="Set of relevant specifications"/>
       <figcaption><p><strong>Figure 1</strong> - Relevant specifications</p></figcaption>
     </figure>
-    <p>Several fundamental conformance levels are defined in ISO 19142:</p>
+    <p>The fundamental conformance levels defined in the WFS 2.0 specification are covered by 
+    this test suite:</p>
     <dl>
       <dt><strong>Simple WFS</strong></dt>
       <dd>Implements the following operations: GetCapabilities, DescribeFeatureType, 
@@ -86,22 +87,17 @@ dt {
     <p>The documents listed below stipulate requirements that must be satisfied by a conforming 
     implementation.</p>
     <ul>
-      <li style="list-style:square">[ISO 19142:2010] <a 
-      href="http://www.iso.org/iso/iso_catalogue/catalogue_tc/catalogue_detail.htm?csnumber=42136" 
-      target="_blank">Geographic information -- Web Feature Service</a>. Also published as <a 
-      target="_blank" href="http://portal.opengeospatial.org/files/?artifact_id=39967">OGC 09-025r1</a>.
-      </li>
-      <li style="list-style:square">[ISO 19143:2010] <a 
-      href="http://www.iso.org/iso/iso_catalogue/catalogue_tc/catalogue_detail.htm?csnumber=42137" 
-      target="_blank">Geographic information -- Filter encoding</a>. Also published as <a target="_blank" 
-      href="http://portal.opengeospatial.org/files/?artifact_id=39968">OGC 09-026r1</a>.
-      </li>
+      <li style="list-style:square">[<a target="_blank" href="http://docs.opengeospatial.org/is/09-025r2/09-025r2.html">
+      OGC 09-025r2</a>] OpenGIS Web Feature Service 2.0 Interface Standard - With Corrigendum, Version 2.0.2</li>
+      <li style="list-style:square">[<a target="_blank" href="http://docs.opengeospatial.org/is/09-026r2/09-026r2.html">
+      OGC 09-026r2</a>] OGC Filter Encoding 2.0 Standard - With Corrigendum, Version 2.0.2</li>
+      <li style="list-style:square">[<a target="_blank" href="http://portal.opengeospatial.org/files/?artifact_id=20509">
+      OGC 07-036</a>] OpenGIS Geography Markup Language (GML) Encoding Standard, Version 3.2.1</li>
     </ul>
 
-    <p>The test suite is schema-aware in the sense that the WFS under test does not need 
-    to support any particular application schema or to be loaded with specialized test data. 
-    However, the following preconditions must be satisfied by the implementation under test 
-    (IUT):</p>
+    <p>The test suite is schema-aware in the sense that the WFS under test does not need to support 
+    any particular application schema or to be pre-loaded with specialized test data. However, the 
+    following preconditions must be satisfied by the implementation under test (IUT):</p>
     <ol>
       <li>The GML application schema meets the requirements of the GML conformance class 
       "GML application schemas defining features and feature collections" (ISO 19136, 
@@ -112,21 +108,14 @@ dt {
 
     <p>A feature identifier may be supplied for the purpose of verifying the behavior of the 
     <code>GetFeatureById</code> stored query. This identifier is required to test a "Simple WFS" 
-    implementation but it may be omitted if the WFS under test implements the "Basic WFS" 
-    conformance class.</p>
+    implementation but is ignored if the WFS under test implements the "Basic WFS" conformance class.</p>
 
     <h2>Test coverage</h2>
-    <p>Several optional conformance classes are not covered by the current test suite. The following 
-    capabilities are <strong>not</strong> tested:</p>
+    <p>Some optional conformance classes are not covered by the test suite. The following 
+    capabilities are not tested:</p>
     <ul>
       <li style="list-style:circle">Inheritance</li>
       <li style="list-style:circle">Remote resolve</li>
-      <li style="list-style:circle">Response paging</li>
-      <li style="list-style:circle">Standard joins</li>
-      <li style="list-style:circle">Spatial joins</li>
-      <li style="list-style:circle">Temporal joins</li>
-      <li style="list-style:circle">Feature versions</li>
-      <li style="list-style:circle">Manage stored queries</li>
     </ul>
 
     <h2>Test suite structure</h2>
@@ -145,6 +134,14 @@ dt {
         </tr>
       </thead>
       <tbody>
+        <tr style="vertical-align: top;">
+          <td>Preconditions</td>
+          <td>
+            <ul style="list-style: none;">
+              <li>org.opengis.cite.iso19142.SuitePreconditions</li>
+            </ul>
+          </td>
+        </tr>
         <tr style="vertical-align: top;">
           <td>All GML application schemas</td>
           <td>
@@ -168,12 +165,7 @@ dt {
           <td>Simple WFS</td>
           <td>
             <ul style="list-style: none;">
-              <li>org.opengis.cite.iso19142.simple.DescribeFeatureTypeTests</li>
-              <li>org.opengis.cite.iso19142.simple.DescribeStoredQueriesTests</li>
-              <li>org.opengis.cite.iso19142.simple.ListStoredQueriesTests</li>
-              <li>org.opengis.cite.iso19142.simple.ServiceMetadataTests</li>
-              <li>org.opengis.cite.iso19142.simple.SimpleCapabilitiesTests</li>
-              <li>org.opengis.cite.iso19142.simple.StoredQueryTests</li>
+              <li>org.opengis.cite.iso19142.simple.*</li>
             </ul>
           </td>
         </tr>
@@ -181,16 +173,24 @@ dt {
           <td>Basic WFS</td>
           <td>
             <ul style="list-style: none;">
-              <li>org.opengis.cite.iso19142.basic.BasicCapabilitiesTests</li>
-              <li>org.opengis.cite.iso19142.basic.GetPropertyValueTests</li>
-              <li>org.opengis.cite.iso19142.basic.BasicGetFeatureTests</li>
-              <li>org.opengis.cite.iso19142.basic.filter.PropertyIsNullOperatorTests</li>
-              <li>org.opengis.cite.iso19142.basic.filter.PropertyIsNilOperatorTests</li>
-              <li>org.opengis.cite.iso19142.basic.filter.PropertyIsEqualToOperatorTests</li>
-              <li>org.opengis.cite.iso19142.basic.filter.RelationalOperatorTests</li>
-              <li>org.opengis.cite.iso19142.basic.filter.PropertyIsLikeOperatorTests</li>
-              <li>org.opengis.cite.iso19142.basic.filter.ResourceIdOperatorTests</li>
-              <li>org.opengis.cite.iso19142.basic.filter.spatial.BBOXOperatorTests</li>
+              <li>org.opengis.cite.iso19142.basic.*</li>
+              <li>org.opengis.cite.iso19142.basic.filter.*</li>
+            </ul>
+          </td>
+        </tr>
+        <tr style="vertical-align: top;">
+          <td>Spatial filter</td>
+          <td>
+            <ul style="list-style: none;">
+              <li>org.opengis.cite.iso19142.basic.filter.spatial.*</li>
+            </ul>
+          </td>
+        </tr>
+        <tr style="vertical-align: top;">
+          <td>Temporal filter</td>
+          <td>
+            <ul style="list-style: none;">
+              <li>org.opengis.cite.iso19142.basic.filter.temporal.*</li>
             </ul>
           </td>
         </tr>
@@ -216,6 +216,38 @@ dt {
             </ul>
           </td>
         </tr>
+        <tr style="vertical-align: top;">
+          <td>Spatial joins</td>
+          <td>
+            <ul style="list-style: none;">
+              <li>org.opengis.cite.iso19142.joins.SpatialJoinTests</li>
+            </ul>
+          </td>
+        </tr>
+        <tr style="vertical-align: top;">
+          <td>Response paging</td>
+          <td>
+            <ul style="list-style: none;">
+              <li>org.opengis.cite.iso19142.paging.*</li>
+            </ul>
+          </td>
+        </tr>
+        <tr style="vertical-align: top;">
+          <td>Manage stored queries</td>
+          <td>
+            <ul style="list-style: none;">
+              <li>org.opengis.cite.iso19142.querymgmt.*</li>
+            </ul>
+          </td>
+        </tr>
+        <tr style="vertical-align: top;">
+          <td>Feature versions</td>
+          <td>
+            <ul style="list-style: none;">
+              <li>org.opengis.cite.iso19142.versioning.*</li>
+            </ul>
+          </td>
+        </tr>
       </tbody>
     </table>
 
@@ -226,10 +258,10 @@ dt {
     <p>The test suite may be run in any of the following environments:</p>
     <ul>
       <li style="list-style:square">Integrated development environment (IDE): The main Java class is <code>
-	  TestNGController</code>.</li>
+	  org.opengis.cite.iso19142.TestNGController</code>.</li>
       <li style="list-style:square">REST API: Submit a request that includes the necessary 
       arguments to the test run controller (/rest/suites/${ets-code}/${project.version}/run).</li>
-      <li style="list-style:square">TEAM-Engine: Run the CTL script located in the <code>/src/main/ctl/</code> 
+      <li style="list-style:square">TEAM Engine: Run the CTL script located in the <code>/src/main/ctl/</code> 
 	  directory.</li>
     </ul>
     <p>The test run arguments are summarized in Table 2. The <em>Obligation</em> 
@@ -272,7 +304,7 @@ dt {
     </p>
 
     <p>Which tests are actually run is determined by the content of the WFS capabilities 
-    document; in particular, the conformance classes the implementation claims to support. 
+    document; in particular, the conformance classes that the implementation claims to support. 
     There is a service constraint defined for each conformance class, except for the mandatory 
     "Simple WFS" conformance class (see ISO 19142, Table 13). The boolean-valued service 
     constraints are listed in the OperationsMetadata section of the capabilities 

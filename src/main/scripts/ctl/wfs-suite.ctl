@@ -18,8 +18,8 @@
   </ctl:function>
 
   <ctl:suite name="tns:ets-${ets-code}-${version}">
-    <ctl:title>WFS 2.0 (ISO 19142:2010) Conformance Test Suite</ctl:title>
-    <ctl:description>Checks WFS 2.0 implementations for conformance to ISO 19142:2010.</ctl:description>
+    <ctl:title>WFS 2.0 Conformance Test Suite</ctl:title>
+    <ctl:description>Checks WFS 2.0 implementations for conformance to OGC 09-025r2.</ctl:description>
     <ctl:starting-test>tns:Main</ctl:starting-test>
   </ctl:suite>
 
@@ -28,17 +28,19 @@
     <ctl:code>
       <xsl:variable name="form-data">
         <ctl:form method="POST" width="800" height="600" xmlns="http://www.w3.org/1999/xhtml">
-          <h2>WFS 2.0 (ISO 19142:2010) Conformance Test Suite</h2>
+          <h2>WFS 2.0 Conformance Test Suite</h2>
           <div style="background:#F0F8FF" bgcolor="#F0F8FF">
             <p>The WFS implementation under test (IUT) is checked against the following specifications:</p>
             <ul>
-              <li><a href="http://www.iso.org/iso/iso_catalogue/catalogue_tc/catalogue_detail.htm?csnumber=42136" 
-                   target="_blank">ISO 19142:2010</a>, Geographic information -- Web Feature Service</li>
-              <li><a href="http://www.iso.org/iso/iso_catalogue/catalogue_tc/catalogue_detail.htm?csnumber=42137" 
-                   target="_blank">ISO 19143:2010</a>, Geographic information -- Filter encoding</li>
+              <li style="list-style:square">[<a target="_blank" href="http://docs.opengeospatial.org/is/09-025r2/09-025r2.html">
+              OGC 09-025r2</a>] OpenGIS Web Feature Service 2.0 Interface Standard - With Corrigendum, Version 2.0.2</li>
+              <li style="list-style:square">[<a target="_blank" href="http://docs.opengeospatial.org/is/09-026r2/09-026r2.html">
+              OGC 09-026r2</a>] OGC Filter Encoding 2.0 Standard - With Corrigendum, Version 2.0.2</li>
+              <li style="list-style:square">[<a target="_blank" href="http://portal.opengeospatial.org/files/?artifact_id=20509">
+              OGC 07-036</a>] OpenGIS Geography Markup Language (GML) Encoding Standard, Version 3.2.1</li>
             </ul>
             <p>Four fundamental conformance levels are defined. The content of the capabilities document 
-            will determine which of the following conformance levels are tested:</p>
+            will determine which tests are run:</p>
             <ol>
               <li>Simple WFS</li>
               <li>Basic WFS</li>

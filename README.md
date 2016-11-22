@@ -1,11 +1,10 @@
-## WFS 2.0 (ISO 19142:2010) Conformance Test Suite
+## WFS 2.0 Conformance Test Suite
 
 ### Scope
 
-This test suite checks Web Feature Service (WFS) 2.0.x implementations for conformance 
-to ISO 19142, _Geographic information -- Web Feature Service_ (also published as 
-[OGC 09-025r2](http://docs.opengeospatial.org/is/09-025r2/09-025r2.html)). Tests for 
-the conformance classes listed below have been implemented:</p>
+This test suite verifies that a Web Feature Service (WFS) 2.0 implementation conforms 
+to [OGC 09-025r2](http://docs.opengeospatial.org/is/09-025r2/09-025r2.html)) and related 
+standards. Tests exist for the conformance classes listed below:</p>
 
 - **Simple WFS**: Implements the following operations: `GetCapabilities`, `DescribeFeatureType`, 
 `ListStoredQueries`, `DescribeStoredQueries`, and the `GetFeature` operation with at least the 
@@ -15,9 +14,16 @@ action and the `GetPropertyValue` operation.
 - **Transactional WFS**: As for **Basic WFS**, plus the `Transaction` operation.
 - **Locking WFS**: As for **Transactional WFS**, plus at least one of the `GetFeatureWithLock` 
 or `LockFeature` operations.
+- **HTTP GET**
+- **HTTP POST**
+- **SOAP**
 - **Response paging**
 - **Manage stored queries**
 - **Feature versions**
+- **Standard joins**
+- **Spatial joins**
+- **Temporal joins**
+
 
 The tests for WFS capabilities are supplemented by tests imported from the 
 [GML 3.2 test suite](https://github.com/opengeospatial/ets-gml32); these GML 
@@ -27,21 +33,21 @@ conformance classes apply to all WFS 2.0 implementations:
 - _GML application schemas defining features and feature collections_
 
 The WFS 2.0 test suite is schema-aware in the sense that the WFS under test does not 
-need to support any particular application schemas or to be loaded with special test 
+need to support any particular application schemas or to be pre-loaded with special test 
 data. However, the following preconditions must be satisfied:
 
 * The GML application schema meets the requirements of the GML conformance class 
 "GML application schemas defining features and feature collections" (ISO 19136, A.1.4).
-* Data are available for at least one feature type advertised in the capabilities 
+* Data are available for at least one feature type listed in the capabilities 
 document.
 * The service capabilities description contains all required elements in accord 
 with the "Simple WFS" conformance class.
 
 Which tests are actually executed is determined by the content of the WFS capabilities 
 document that is submitted; in particular, the test run is driven by the conformance 
-classes the implementation under test (IUT) claims to support. There is a service constraint 
+classes that the implementation under test (IUT) claims to support. There is a service constraint 
 defined for each conformance class, except for the mandatory "Simple WFS" conformance class 
-(see ISO 19142, Table 13). The boolean-valued service constraints are listed in the 
+(see OGC 09-025r2, Table 13). The boolean-valued service constraints are listed in the 
 OperationsMetadata section of the capabilities document as shown below.
 
     <OperationsMetadata xmlns="http://www.opengis.net/ows/1.1">
@@ -69,14 +75,10 @@ OperationsMetadata section of the capabilities document as shown below.
       </Constraint>
     </OperationsMetadata>
 
-Note that several optional conformance classes are **not** currently covered by the 
-test suite:
+Some optional conformance classes are not currently covered by the test suite:
 
 * Inheritance
 * Remote resolve
-* Standard joins
-* Spatial joins
-* Temporal joins
 
 Visit the [project documentation website](http://opengeospatial.github.io/ets-wfs20/) 
 for more information, including the API documentation.
@@ -110,7 +112,7 @@ or 'file' schemes.
 The TestNG results file (testng-results.xml) will be written to a subdirectory 
 in ${user.home}/testng/ having a UUID value as its name.
 
-#### Command shell (console)
+#### Command shell (terminal)
 
 One of the build artifacts is an "all-in-one" JAR file that includes the test 
 suite with all of its dependencies. This makes it very easy to execute the test 
@@ -120,7 +122,7 @@ suite in a command shell like so:
 
 #### OGC test harness
 
-Use [TEAMengine](https://github.com/opengeospatial/teamengine), the official 
+Use [TEAM Engine](https://github.com/opengeospatial/teamengine), the official 
 OGC test harness. The latest test suite release should be available at the 
 [beta testing facility](http://cite.opengeospatial.org/te2/). You can also 
 [build and deploy](https://github.com/opengeospatial/teamengine) the test 
