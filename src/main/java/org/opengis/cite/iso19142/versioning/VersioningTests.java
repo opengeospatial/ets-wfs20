@@ -157,8 +157,10 @@ public class VersioningTests extends BaseFixture {
      * state is NOT "valid"). An exception report is expected in response; it
      * must contain the error code <code>OperationProcessingFailed</code> and
      * refer to the update handle.
+     * 
+     * TODO: Enable this when expected behavior is clarified.
      */
-    @Test(description = "See OGC 09-025: Table 3, 15.4")
+    @Test(description = "See OGC 09-025: Table 3, 15.4", enabled = false)
     public void updateSupersededVersion() {
         this.reqEntity = WFSMessage.createRequestEntity(WFS2.TRANSACTION, this.wfsVersion);
         Element feature = this.dataSampler.randomlySelectFeatureInstance();
