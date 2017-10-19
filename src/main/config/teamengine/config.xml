@@ -17,7 +17,6 @@
           <conformanceClass>All GML application schemas</conformanceClass>
           <conformanceClass>GML application schemas defining features</conformanceClass>
           <conformanceClass>Simple WFS</conformanceClass>
-          <conformanceClass>Basic WFS</conformanceClass>
         </BasicConformanceClasses>
       </suite>
       <revision>
