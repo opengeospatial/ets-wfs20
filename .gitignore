@@ -10,3 +10,7 @@ target/
 pom.xml.releaseBackup
 release.properties
 /target/
+
+# IntelliJ IDEA
+.idea/
+*.iml
