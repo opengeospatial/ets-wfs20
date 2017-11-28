@@ -26,6 +26,7 @@ import org.opengis.cite.iso19142.util.DataSampler;
 import org.opengis.cite.iso19142.util.ServiceMetadataUtils;
 import org.opengis.cite.iso19142.util.WFSMessage;
 import org.testng.ITestContext;
+import org.testng.SkipException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -107,10 +108,12 @@ public class PagingTests extends BaseFixture {
      */
     @Test(description = "See OGC 09-025: 7.7.4.4.1")
     public void traverseResultSetInBothDirections() {
+        QName featureType = featureTypeWithAtLeastTwoFeatures(this.featureInfo);
+        if(featureType == null)
+            throw new SkipException( "Could not find appropriate feature type. A feature type with at least two features is required." );
         this.reqEntity = WFSMessage.createRequestEntity("GetFeature-Minimal", this.wfsVersion);
         int count = 1;
         this.reqEntity.getDocumentElement().setAttribute("count", Integer.toString(count));
-        QName featureType = featureTypeWithAtLeastTwoFeatures(this.featureInfo);
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.GET_FEATURE,
                 ProtocolBinding.GET);
