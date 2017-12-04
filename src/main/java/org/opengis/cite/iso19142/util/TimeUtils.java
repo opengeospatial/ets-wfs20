@@ -14,6 +14,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.opengis.cite.iso19142.Namespaces;
 import org.opengis.temporal.Period;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 /**
@@ -98,7 +99,9 @@ public class TimeUtils {
             return null;
         }
         OffsetDateTime tPos = instant.getPosition().getDate().toInstant().atOffset(offset);
-        gmlTimeInstant.getElementsByTagNameNS(Namespaces.GML, "timePosition").item(0).setTextContent(tPos.toString());
+        String timePositionValue = tPos.format( DateTimeFormatter.ISO_OFFSET_DATE_TIME );
+        Node timePosition = gmlTimeInstant.getElementsByTagNameNS( Namespaces.GML, "timePosition" ).item( 0 );
+        timePosition.setTextContent( timePositionValue );
         return gmlTimeInstant;
     }
 }
