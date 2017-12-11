@@ -20,10 +20,13 @@ import org.opengis.cite.iso19142.ErrorMessageKeys;
 import org.opengis.cite.iso19142.FeatureTypeInfo;
 import org.opengis.cite.iso19142.Namespaces;
 import org.opengis.cite.iso19142.ProtocolBinding;
+import org.opengis.cite.iso19142.SuiteAttribute;
 import org.opengis.cite.iso19142.WFS2;
+import org.opengis.cite.iso19142.util.DataSampler;
 import org.opengis.cite.iso19142.util.ServiceMetadataUtils;
 import org.opengis.cite.iso19142.util.WFSMessage;
 import org.testng.ITestContext;
+import org.testng.SkipException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -43,12 +46,20 @@ public class PagingTests extends BaseFixture {
 
     private int cacheTimeout = 0;
 
+    private DataSampler dataSampler;
+
+    @BeforeClass
+    public void initDataSample(ITestContext testContext) {
+        this.dataSampler = (DataSampler) testContext.getSuite().getAttribute( SuiteAttribute.SAMPLER.getName() );
+    }
+        
     @BeforeClass
     public void getPagingConstraints(ITestContext testContext) {
         Object obj = testContext.getAttribute(ResponsePaging.CACHE_TIMEOUT);
         if (null != obj) {
             this.cacheTimeout = Integer.class.cast(obj);
         }
+
     }
 
     /**
@@ -97,10 +108,12 @@ public class PagingTests extends BaseFixture {
      */
     @Test(description = "See OGC 09-025: 7.7.4.4.1")
     public void traverseResultSetInBothDirections() {
+        QName featureType = featureTypeWithAtLeastTwoFeatures(this.featureInfo);
+        if(featureType == null)
+            throw new SkipException( "Could not find appropriate feature type. A feature type with at least two features is required." );
         this.reqEntity = WFSMessage.createRequestEntity("GetFeature-Minimal", this.wfsVersion);
-        int count = 4;
+        int count = 1;
         this.reqEntity.getDocumentElement().setAttribute("count", Integer.toString(count));
-        QName featureType = anyFeatureType(this.featureInfo);
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.GET_FEATURE,
                 ProtocolBinding.GET);
@@ -168,4 +181,25 @@ public class PagingTests extends BaseFixture {
         }
         return qName;
     }
+
+    /**
+     * Returns the name of a feature type for which at least two features exist.
+     *
+     * @param featureInfo
+     *            Information about feature types gleaned from the SUT.
+     * @return The qualified name of a feature type.
+     */
+    QName featureTypeWithAtLeastTwoFeatures( Map<QName, FeatureTypeInfo> featureInfo ) {
+        for ( Map.Entry<QName, FeatureTypeInfo> featureTypeNameToInfo : featureInfo.entrySet() ) {
+            FeatureTypeInfo featureTypeValue = featureTypeNameToInfo.getValue();
+            if ( featureTypeValue.isInstantiated() ) {
+                QName featureTypeName = featureTypeNameToInfo.getKey();
+                Set<String> featureId = dataSampler.selectRandomFeatureIdentifiers( featureTypeName, 2 );
+                if ( featureId.size() > 1 )
+                    return featureTypeName;
+            }
+        }
+        return null;
+    }
+    
 }
