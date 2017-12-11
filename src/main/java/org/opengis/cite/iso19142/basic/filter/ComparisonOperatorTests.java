@@ -352,7 +352,7 @@ public class ComparisonOperatorTests extends QueryFilterFixture {
         addComparisonPredicate(this.reqEntity, FES2.LESS_THAN_OR_EQUAL, propName, gmlEnv, true, MATCH_ANY);
         ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
         this.rspEntity = rsp.getEntity(Document.class);
-        ETSAssert.assertStatusCode(rsp.getStatus(), new int[] { 400, 403 });
+        ETSAssert.assertStatusCode(rsp.getStatus(), new int[] { 500, 400, 403 });
         String xpath = "//ows:Exception[@exceptionCode='OperationProcessingFailed']";
         ETSAssert.assertXPath(xpath, this.rspEntity, null);
     }
