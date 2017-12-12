@@ -22,6 +22,7 @@ import org.opengis.cite.iso19142.util.AppSchemaUtils;
 import org.opengis.cite.iso19142.util.WFSMessage;
 import org.testng.Assert;
 import org.testng.ITestContext;
+import org.testng.SkipException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
@@ -104,7 +105,7 @@ public class PropertyIsNilOperatorTests extends QueryFilterFixture {
 	@Test(description = "See ISO 19143: 7.7.3.6, A.6", dataProvider = "protocol-binding")
 	public void propertyIsNil(ProtocolBinding binding) {
 		if (this.nillableProperties.isEmpty()) {
-			throw new AssertionError(
+			throw new SkipException(
 					ErrorMessage
 							.format(ErrorMessageKeys.CAPABILITY_NOT_TESTED,
 									"PropertyIsNil",
