@@ -18,6 +18,7 @@ import org.opengis.cite.iso19142.WFS2;
 import org.opengis.cite.iso19142.ETSAssert;
 import org.opengis.cite.iso19142.util.ServiceMetadataUtils;
 import org.opengis.cite.iso19142.util.TestSuiteLogger;
+import org.opengis.cite.iso19142.util.WFSMessage;
 import org.opengis.cite.validation.ValidationErrorHandler;
 import org.testng.Assert;
 import org.testng.ITestContext;
@@ -58,6 +59,7 @@ public class DescribeStoredQueriesTests extends BaseFixture {
 			DocumentBuilder builder = factory.newDocumentBuilder();
 			this.reqEntity = builder.parse(getClass().getResourceAsStream(
 					"DescribeStoredQueries.xml"));
+            WFSMessage.updateVersion( this.reqEntity, this.wfsVersion );
 		} catch (Exception e) {
 			TestSuiteLogger.log(Level.WARNING,
 					"Failed to parse request entity from classpath", e);
