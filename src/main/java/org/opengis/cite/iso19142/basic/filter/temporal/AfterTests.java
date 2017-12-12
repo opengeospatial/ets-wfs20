@@ -79,7 +79,7 @@ public class AfterTests extends QueryFilterFixture {
         }
         XSElementDeclaration timeProperty = timeProps.get(0);
         Period temporalExtent = this.dataSampler.getTemporalExtentOfProperty(this.model, featureType, timeProperty);
-        List<Period> subIntervals = TemporalUtils.splitInterval(temporalExtent, 2);
+        List<Period> subIntervals = TemporalUtils.splitInterval(temporalExtent, 3);
         Period firstSubInterval = subIntervals.get(0);
         if (!firstSubInterval.length().toString().contains("D")) {
             // less than 1 day
@@ -117,7 +117,7 @@ public class AfterTests extends QueryFilterFixture {
         }
         XSElementDeclaration timeProperty = timeProps.get(0);
         Period temporalExtent = this.dataSampler.getTemporalExtentOfProperty(this.model, featureType, timeProperty);
-        List<Period> subIntervals = TemporalUtils.splitInterval(temporalExtent, 2);
+        List<Period> subIntervals = TemporalUtils.splitInterval(temporalExtent, 3);
         // end of first sub-interval
         Instant instant = subIntervals.get(0).getEnding();
         Document gmlTimeLiteral = TimeUtils.instantAsGML(instant, ZoneOffset.UTC);
@@ -152,7 +152,7 @@ public class AfterTests extends QueryFilterFixture {
         }
         XSElementDeclaration timeProperty = timeProps.get(0);
         Period temporalExtent = this.dataSampler.getTemporalExtentOfProperty(this.model, featureType, timeProperty);
-        List<Period> subIntervals = TemporalUtils.splitInterval(temporalExtent, 2);
+        List<Period> subIntervals = TemporalUtils.splitInterval(temporalExtent, 3);
         // end of first sub-interval with UTC offset +09:00 (Japan)
         Instant instant = subIntervals.get(0).getEnding();
         Document gmlTimeLiteral = TimeUtils.instantAsGML(instant, ZoneOffset.ofHours(9));

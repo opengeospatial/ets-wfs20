@@ -76,8 +76,8 @@ public class BeforeTests extends QueryFilterFixture {
         }
         XSElementDeclaration timeProperty = timeProps.get(0);
         Period temporalExtent = this.dataSampler.getTemporalExtentOfProperty(this.model, featureType, timeProperty);
-        List<Period> subIntervals = TemporalUtils.splitInterval(temporalExtent, 2);
-        Period lastSubInterval = subIntervals.get(1);
+        List<Period> subIntervals = TemporalUtils.splitInterval(temporalExtent, 3);
+        Period lastSubInterval = subIntervals.get(2);
         if (!lastSubInterval.length().toString().contains("D")) {
             // less than 1 day
             throw new SkipException(String.format(
