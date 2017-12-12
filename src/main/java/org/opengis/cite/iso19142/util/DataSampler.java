@@ -473,6 +473,28 @@ public class DataSampler {
     }
 
     /**
+     * Randomly selects a feature type name for which instances are available in
+     * the SUT.
+     *
+     * @return A QName object denoting the name of a feature type, or
+     *         {@code null} if no data exist in the SUT.
+     */
+    public QName selectRandomFeatureType() {
+        List<FeatureTypeInfo> availableTypes = new ArrayList<FeatureTypeInfo>();
+        for (FeatureTypeInfo typeInfo : this.featureInfo.values()) {
+            if (typeInfo.isInstantiated()) {
+                availableTypes.add(typeInfo);
+            }
+        }
+        if (availableTypes.isEmpty()) {
+            return null;
+        }
+        Random random = new Random();
+        FeatureTypeInfo availableType = availableTypes.get(random.nextInt(availableTypes.size()));
+        return availableType.getTypeName();
+    }
+
+    /**
      * Evaluates the given XPath expression against all sample data sets. The
      * first non-empty result is returned.
      * 

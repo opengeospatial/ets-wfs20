@@ -1,5 +1,7 @@
 package org.opengis.cite.iso19142.util;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.*;
 
 import java.io.File;
@@ -18,6 +20,8 @@ import javax.xml.validation.Schema;
 
 import org.apache.xerces.xs.XSElementDeclaration;
 import org.apache.xerces.xs.XSModel;
+import org.hamcrest.CoreMatchers;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opengis.cite.iso19142.FeatureTypeInfo;
@@ -28,6 +32,7 @@ import org.opengis.geometry.Envelope;
 import org.opengis.temporal.Period;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
+import sun.font.CoreMetrics;
 
 public class VerifyDataSampler {
 
@@ -113,4 +118,22 @@ public class VerifyDataSampler {
         assertNotNull("Period is null.", period);
         assertTrue("Expected duration P11M", period.length().toString().startsWith("P11M"));
     }
+
+    @Test
+    public void testSelectRandomFeatureType()
+                            throws Exception {
+        Document capabilitiesDoc = docBuilder.parse( getClass().getResourceAsStream( "/wfs/capabilities-acme.xml" ) );
+        QName featureType = new QName( TNS, "ComplexFeature" );
+        DataSampler iut = new DataSampler( capabilitiesDoc );
+
+        QName selectedFeatureTypeBeforeInstantiaed = iut.selectRandomFeatureType();
+        assertThat( selectedFeatureTypeBeforeInstantiaed, nullValue());
+
+        FeatureTypeInfo typeInfo = iut.getFeatureTypeInfo().get(featureType);
+        typeInfo.setInstantiated(true);
+
+        QName selectedFeatureType = iut.selectRandomFeatureType();
+        assertThat( selectedFeatureType, is( featureType ) );
+    }
+
 }

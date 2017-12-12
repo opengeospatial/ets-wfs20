@@ -1,13 +1,10 @@
 package org.opengis.cite.iso19142.locking;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.logging.Level;
 
 import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMSource;
@@ -15,12 +12,10 @@ import javax.xml.transform.dom.DOMSource;
 import org.opengis.cite.iso19142.ETSAssert;
 import org.opengis.cite.iso19142.ErrorMessage;
 import org.opengis.cite.iso19142.ErrorMessageKeys;
-import org.opengis.cite.iso19142.FeatureTypeInfo;
 import org.opengis.cite.iso19142.Namespaces;
 import org.opengis.cite.iso19142.ProtocolBinding;
 import org.opengis.cite.iso19142.WFS2;
 import org.opengis.cite.iso19142.util.ServiceMetadataUtils;
-import org.opengis.cite.iso19142.util.TestSuiteLogger;
 import org.opengis.cite.iso19142.util.WFSMessage;
 import org.testng.Assert;
 import org.testng.SkipException;
@@ -28,7 +23,6 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 import com.sun.jersey.api.client.ClientResponse;
 
@@ -82,8 +76,8 @@ public class LockFeatureTests extends LockingFixture {
 	 */
 	@Test(description = "See ISO 19142: 12.2.4.2")
 	public void resetNonexistentLock() {
-		Map<String, QName> featureId = fetchRandomFeatureIdentifier(this.featureInfo);
-		String gmlId = featureId.keySet().iterator().next();
+		QName featureType = this.dataSampler.selectRandomFeatureType();
+		String gmlId = this.dataSampler.selectRandomFeatureIdentifiers( featureType, 1 ).iterator().next();
 		WFSMessage.appendStoredQuery(reqEntity, this.storedQueryId,
 				Collections.singletonMap("id", (Object) gmlId));
 		reqEntity.getDocumentElement().setAttribute("lockId",
@@ -113,8 +107,8 @@ public class LockFeatureTests extends LockingFixture {
 	 */
 	@Test(description = "See ISO 19142: 12.2.4.3, 15.2.3.1.2")
 	public void lockFeatureAndAttemptDelete() {
-		Map<String, QName> featureId = fetchRandomFeatureIdentifier(this.featureInfo);
-		String gmlId = featureId.keySet().iterator().next();
+		QName featureType = this.dataSampler.selectRandomFeatureType();
+		String gmlId = this.dataSampler.selectRandomFeatureIdentifiers( featureType, 1 ).iterator().next();
 		WFSMessage.appendStoredQuery(reqEntity, this.storedQueryId,
 				Collections.singletonMap("id", (Object) gmlId));
 		reqEntity.getDocumentElement().setAttribute("expiry", "60");
@@ -135,7 +129,9 @@ public class LockFeatureTests extends LockingFixture {
 		String xpath = String.format(
 				"//wfs:FeaturesLocked/fes:ResourceId/@rid = '%s'", gmlId);
 		ETSAssert.assertXPath(xpath, lockRsp, null);
-		Document trxResponse = wfsClient.deleteFeatures(featureId, ProtocolBinding.ANY);
+		Map<String, QName> idTofeatureType = new HashMap<>();
+		idTofeatureType.put( gmlId, featureType );
+		Document trxResponse = wfsClient.deleteFeatures( idTofeatureType, ProtocolBinding.ANY);
 		String xpath2 = "//ows:Exception[@exceptionCode = 'MissingParameterValue']";
 		ETSAssert.assertXPath(xpath2, trxResponse.getDocumentElement(), null);
 	}
@@ -155,8 +151,8 @@ public class LockFeatureTests extends LockingFixture {
 	 */
 	@Test(description = "See ISO 19142: 12.2.3, 12.2.5")
 	public void lockFeatureAlreadyLocked() {
-		Map<String, QName> featureId = fetchRandomFeatureIdentifier(this.featureInfo);
-		String gmlId = featureId.keySet().iterator().next();
+		QName featureType = this.dataSampler.selectRandomFeatureType();
+		String gmlId = this.dataSampler.selectRandomFeatureIdentifiers( featureType, 1 ).iterator().next();
 		WFSMessage.appendStoredQuery(reqEntity, this.storedQueryId,
 				Collections.singletonMap("id", (Object) gmlId));
 		reqEntity.getDocumentElement().setAttribute("expiry", "60");
@@ -226,59 +222,4 @@ public class LockFeatureTests extends LockingFixture {
 		ETSAssert.assertXPath("not(//wfs:FeaturesNotLocked)", lockRsp, null);
 	}
 
-	/**
-	 * Obtains the system-assigned identifier of an instance of some randomly
-	 * selected feature type.
-	 * 
-	 * @param featureInfo
-	 *            A Map containing information about supported feature types,
-	 *            keyed by type name (QName).
-	 * @return A Map containing at most a single entry that associates the
-	 *         (String) value of the gml:id attribute with the feature type name
-	 *         (QName); the map is empty if no data exist in the SUT.
-	 */
-	Map<String, QName> fetchRandomFeatureIdentifier(
-			Map<QName, FeatureTypeInfo> featureInfo) {
-		Map<String, QName> featureId = new HashMap<String, QName>();
-		QName featureType = selectRandomFeatureType(featureInfo);
-		if (null != featureType) {
-			Document doc = wfsClient.getFeatureByType(featureType, 10, null);
-			NodeList features = doc.getElementsByTagNameNS(
-					featureType.getNamespaceURI(), featureType.getLocalPart());
-			Element feature = (Element) features.item(randomIndex
-					.nextInt(features.getLength()));
-			featureId.put(feature.getAttributeNS(Namespaces.GML, "id"),
-					featureType);
-		}
-		if (TestSuiteLogger.isLoggable(Level.FINER)) {
-			TestSuiteLogger.log(Level.FINER, featureId.toString());
-		}
-		return featureId;
-	}
-
-	/**
-	 * Randomly selects a feature type name for which instances are available in
-	 * the SUT.
-	 * 
-	 * @param featureTypes
-	 *            A Map containing information about supported feature types,
-	 *            keyed by type name (QName).
-	 * @return A QName object denoting the name of a feature type, or
-	 *         {@code null} if no data exist in the SUT.
-	 */
-	static QName selectRandomFeatureType(
-			Map<QName, FeatureTypeInfo> featureTypes) {
-		List<FeatureTypeInfo> availableTypes = new ArrayList<FeatureTypeInfo>();
-		for (FeatureTypeInfo typeInfo : featureTypes.values()) {
-			if (typeInfo.isInstantiated()) {
-				availableTypes.add(typeInfo);
-			}
-		}
-		if (availableTypes.isEmpty()) {
-			return null;
-		}
-		FeatureTypeInfo availableType = availableTypes.get(randomIndex
-				.nextInt(availableTypes.size()));
-		return availableType.getTypeName();
-	}
 }
