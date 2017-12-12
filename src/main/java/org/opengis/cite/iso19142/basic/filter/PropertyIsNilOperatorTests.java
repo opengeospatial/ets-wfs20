@@ -1,30 +1,18 @@
 package org.opengis.cite.iso19142.basic.filter;
 
-import static org.opengis.cite.iso19142.Namespaces.GML;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.xerces.xs.XSElementDeclaration;
-import org.opengis.cite.iso19136.util.TestSuiteLogger;
 import org.opengis.cite.iso19142.ETSAssert;
 import org.opengis.cite.iso19142.ErrorMessage;
 import org.opengis.cite.iso19142.ErrorMessageKeys;
-import org.opengis.cite.iso19142.FeatureTypeInfo;
 import org.opengis.cite.iso19142.Namespaces;
 import org.opengis.cite.iso19142.ProtocolBinding;
 import org.opengis.cite.iso19142.WFS2;
-import org.opengis.cite.iso19142.util.AppSchemaUtils;
 import org.opengis.cite.iso19142.util.WFSMessage;
 import org.testng.Assert;
 import org.testng.SkipException;
@@ -32,7 +20,6 @@ import org.testng.annotations.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 import com.sun.jersey.api.client.ClientResponse;
 
@@ -61,8 +48,6 @@ import com.sun.jersey.api.client.ClientResponse;
  */
 public class PropertyIsNilOperatorTests extends QueryFilterFixture {
 
-    public static final QName BOUNDED_BY = new QName( GML, "boundedBy" );
-
     /**
      * [{@code Test}] Submits a GetFeature request containing a {@code PropertyIsNil} predicate designating a nillable
      * feature property (one per feature type). The response entity must include only feature instances that include the
@@ -78,7 +63,7 @@ public class PropertyIsNilOperatorTests extends QueryFilterFixture {
      */
     @Test(description = "See ISO 19143: 7.7.3.6, A.6", dataProvider = "protocol-featureType")
     public void propertyIsNil( ProtocolBinding binding, QName featureType ) {
-        List<QName> nillables = findNillableProperties( featureType );
+        List<QName> nillables = this.dataSampler.getNillableProperties( this.model, featureType );
         if ( nillables.isEmpty() ) {
             throw new SkipException( "FeatureType " + featureType + " does not contain at least one nillable property" );
         }
@@ -99,52 +84,6 @@ public class PropertyIsNilOperatorTests extends QueryFilterFixture {
         for ( int i = 0; i < features.getLength(); i++ ) {
             ETSAssert.assertXPath( xpath, features.item( i ), nsBindings );
         }
-    }
-
-    private List<QName> findNillableProperties( QName featureType ) {
-        List<QName> nillableProperties = new ArrayList<>();
-        TestSuiteLogger.log( Level.FINE, "Checking feature type for nillable properties: " + featureType );
-        List<XSElementDeclaration> nillableProps = AppSchemaUtils.getNillableProperties( this.model, featureType );
-        TestSuiteLogger.log( Level.FINE, nillableProps.toString() );
-        FeatureTypeInfo typeInfo = this.dataSampler.getFeatureTypeInfo().get( featureType );
-
-        if ( typeInfo.isInstantiated() ) {
-            for ( XSElementDeclaration elementDeclaration : nillableProps ) {
-                QName propName = new QName( elementDeclaration.getNamespace(), elementDeclaration.getName() );
-                // ignore nillable gml:boundedBy property
-                if ( !BOUNDED_BY.equals( propName )
-                     && nillablePropertyContainsNilledProperties( typeInfo, propName ) ) {
-                    nillableProperties.add( propName );
-                }
-
-            }
-        }
-        TestSuiteLogger.log( Level.FINE, "Nillable properties:\n" + nillableProps );
-        return nillableProperties;
-    }
-
-    private boolean nillablePropertyContainsNilledProperties( FeatureTypeInfo typeInfo, QName propertyName ) {
-        TestSuiteLogger.log( Level.FINE, "Checking property " + propertyName + " for nilled properties." );
-        File dataFile = typeInfo.getSampleData();
-        Document data;
-        try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            factory.setNamespaceAware( true );
-            data = factory.newDocumentBuilder().parse( dataFile );
-        } catch ( SAXException | IOException | ParserConfigurationException e ) {
-            throw new RuntimeException( String.format( "Failed to parse data file at %s.\n %s",
-                                                       dataFile.getAbsolutePath(), e.getMessage() ) );
-        }
-        NodeList propNodes = data.getElementsByTagNameNS( propertyName.getNamespaceURI(),
-														  propertyName.getLocalPart() );
-        for ( int i = 0; i < propNodes.getLength(); i++ ) {
-			Element propElem = (Element) propNodes.item( i );
-			String nilValue = propElem.getAttributeNS( Namespaces.XSI, "nil" );
-			if ( "true".equals( nilValue ) )
-				return true;
-		}
-		TestSuiteLogger.log( Level.FINE, "Property " + propertyName + " does not have nilled properties." );
-        return false;
     }
 
     /**
