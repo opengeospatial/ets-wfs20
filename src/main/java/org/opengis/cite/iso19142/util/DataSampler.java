@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -404,7 +406,7 @@ public class DataSampler {
 
     /**
      * Determines the temporal extent of all instances of the specified feature
-     * property in the sample data.
+     * property in the sample data. The temporal extent is extend by 1 day and 1 hour in the beginning and the end.
      * 
      * @param model
      *            A model representing the relevant GML application schema.
@@ -449,6 +451,10 @@ public class DataSampler {
                 LOGR.log(Level.WARNING, re.getMessage());
                 continue;
             }
+        }
+        if ( period != null ) {
+            TemporalUtils.add( period.getEnding(), 2, ChronoUnit.DAYS );
+            TemporalUtils.add( period.getBeginning(), -2, ChronoUnit.DAYS );
         }
         period = TemporalUtils.temporalExtent(tmSet);
         this.temporalPropertyExtents.put(tmProp, period);
