@@ -61,44 +61,6 @@ public class LockFeatureTests extends LockingFixture {
 	}
 
 	/**
-	 * [{@code Test}] An attempt to reset a non-existent lock should produce a
-	 * service exception with error code "LockHasExpired" and HTTP status code
-	 * 403 (Forbidden).
-	 * 
-	 * <p>
-	 * <strong>Note</strong>: The WFS2 specification makes no distinction
-	 * between a non-existent and an expired lock in this context. The error
-	 * code {@code InvalidLockId} would seem more appropriate here but that may
-	 * only appear in a Transaction response according to Table 3.
-	 * </p>
-	 * 
-	 * <p style="margin-bottom: 0.5em">
-	 * <strong>Sources</strong>
-	 * </p>
-	 * <ul>
-	 * <li>ISO 19142:2010, cl. 12.2.4.2: lockId parameter</li>
-	 * <li>ISO 19142:2010, Table D.2</li>
-	 * </ul>
-	 */
-	@Test(description = "See ISO 19142: 12.2.4.2")
-	public void resetNonexistentLock() {
-		Map<String, QName> featureId = fetchRandomFeatureIdentifier(this.featureInfo);
-		String gmlId = featureId.keySet().iterator().next();
-		WFSMessage.appendStoredQuery(reqEntity, this.storedQueryId,
-				Collections.singletonMap("id", (Object) gmlId));
-		reqEntity.getDocumentElement().setAttribute("lockId",
-				"lock-does-not-exist");
-		ClientResponse rsp = wfsClient.submitRequest(reqEntity,
-				ProtocolBinding.ANY);
-		this.rspEntity = rsp.getEntity(Document.class);
-		Assert.assertEquals(rsp.getStatus(),
-				ClientResponse.Status.FORBIDDEN.getStatusCode(),
-				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
-		String xpath = "//ows:Exception[@exceptionCode = 'LockHasExpired']";
-		ETSAssert.assertXPath(xpath, this.rspEntity.getDocumentElement(), null);
-	}
-
-	/**
 	 * [{@code Test}] Submits a request to lock a feature instance; within this
 	 * interval an attempt to delete the instance without the correct lock
 	 * identifier should fail with exception code {@code MissingParameterValue}.
