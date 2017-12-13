@@ -483,7 +483,6 @@ public class DataSampler {
                 NodeList features = rspEntity.getElementsByTagNameNS( typeName.getNamespaceURI(),
                                                                       typeName.getLocalPart());
                 boolean hasFeatures = features.getLength() > 0;
-                featureTypeInfo.setInstantiated( hasFeatures);
                 if (hasFeatures) {
                     saveFeatureDataFile( featureTypeInfo, typeName, rspEntity );
                     return;
@@ -494,7 +493,6 @@ public class DataSampler {
                                          binding, typeName));
                 err.append(" \n").append(re.getMessage());
                 LOGR.log( Level.WARNING, err.toString(), re);
-                throw new RuntimeException(err.toString(), re);
             }
         }
     }
@@ -508,6 +506,7 @@ public class DataSampler {
                       this.getClass().getName() + " - wrote feature data to " + file.getAbsolutePath());
             featureTypeInfo.setSampleData(file);
             fos.close();
+            featureTypeInfo.setInstantiated(true);
         } catch (Exception e) {
             LOGR.log(Level.WARNING, "Failed to save feature data.", e);
         }
