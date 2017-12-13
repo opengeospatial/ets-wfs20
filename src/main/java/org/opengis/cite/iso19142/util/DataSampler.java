@@ -233,36 +233,8 @@ public class DataSampler {
                 WFS2.GET_FEATURE);
         for (Map.Entry<QName, FeatureTypeInfo> entry : featureInfo.entrySet()) {
             QName typeName = entry.getKey();
-            for (ProtocolBinding binding : getFeatureBindings) {
-                try {
-                    Document rspEntity = wfsClient.getFeatureByType(typeName, maxFeatures, binding);
-                    NodeList features = rspEntity.getElementsByTagNameNS(typeName.getNamespaceURI(),
-                            typeName.getLocalPart());
-                    boolean hasFeatures = features.getLength() > 0;
-                    entry.getValue().setInstantiated(hasFeatures);
-                    if (hasFeatures) {
-                        try {
-                            File file = File.createTempFile(typeName.getLocalPart() + "-", ".xml");
-                            FileOutputStream fos = new FileOutputStream(file);
-                            XMLUtils.writeNode(rspEntity, fos);
-                            LOGR.log(Level.CONFIG,
-                                    this.getClass().getName() + " - wrote feature data to " + file.getAbsolutePath());
-                            entry.getValue().setSampleData(file);
-                            fos.close();
-                        } catch (Exception e) {
-                            LOGR.log(Level.WARNING, "Failed to save feature data.", e);
-                        }
-                        break;
-                    }
-                } catch (RuntimeException re) {
-                    StringBuilder err = new StringBuilder();
-                    err.append(String.format("Failed to read XML response entity using %s method for feature type %s.",
-                            binding, typeName));
-                    err.append(" \n").append(re.getMessage());
-                    LOGR.log(Level.WARNING, err.toString(), re);
-                    throw new RuntimeException(err.toString(), re);
-                }
-            }
+            FeatureTypeInfo featureTypeInfo = entry.getValue();
+            acquireFeatureData( wfsClient, getFeatureBindings, typeName, featureTypeInfo );
         }
         LOGR.log(Level.INFO, featureInfo.toString());
     }
@@ -502,4 +474,43 @@ public class DataSampler {
         }
         return results;
     }
+
+    private void acquireFeatureData( WFSClient wfsClient, Set<ProtocolBinding> getFeatureBindings, QName typeName,
+                                     FeatureTypeInfo featureTypeInfo ) {
+        for (ProtocolBinding binding : getFeatureBindings) {
+            try {
+                Document rspEntity = wfsClient.getFeatureByType( typeName, maxFeatures, binding);
+                NodeList features = rspEntity.getElementsByTagNameNS( typeName.getNamespaceURI(),
+                                                                      typeName.getLocalPart());
+                boolean hasFeatures = features.getLength() > 0;
+                featureTypeInfo.setInstantiated( hasFeatures);
+                if (hasFeatures) {
+                    saveFeatureDataFile( featureTypeInfo, typeName, rspEntity );
+                    return;
+                }
+            } catch (RuntimeException re) {
+                StringBuilder err = new StringBuilder();
+                err.append(String.format("Failed to read XML response entity using %s method for feature type %s.",
+                                         binding, typeName));
+                err.append(" \n").append(re.getMessage());
+                LOGR.log( Level.WARNING, err.toString(), re);
+                throw new RuntimeException(err.toString(), re);
+            }
+        }
+    }
+
+    private void saveFeatureDataFile( FeatureTypeInfo featureTypeInfo, QName typeName, Document rspEntity ) {
+        try {
+            File file = File.createTempFile( typeName.getLocalPart() + "-", ".xml");
+            FileOutputStream fos = new FileOutputStream( file);
+            XMLUtils.writeNode( rspEntity, fos);
+            LOGR.log( Level.CONFIG,
+                      this.getClass().getName() + " - wrote feature data to " + file.getAbsolutePath());
+            featureTypeInfo.setSampleData(file);
+            fos.close();
+        } catch (Exception e) {
+            LOGR.log(Level.WARNING, "Failed to save feature data.", e);
+        }
+    }
+
 }
