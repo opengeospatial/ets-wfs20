@@ -231,6 +231,8 @@ public class DataSampler {
         WFSClient wfsClient = new WFSClient(this.serviceDescription);
         Set<ProtocolBinding> getFeatureBindings = ServiceMetadataUtils.getOperationBindings(serviceDescription,
                 WFS2.GET_FEATURE);
+        if(getFeatureBindings.isEmpty())
+            throw new IllegalArgumentException( "No bindings available for GetFeature request." );
         for (Map.Entry<QName, FeatureTypeInfo> entry : featureInfo.entrySet()) {
             QName typeName = entry.getKey();
             FeatureTypeInfo featureTypeInfo = entry.getValue();
