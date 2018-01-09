@@ -406,7 +406,7 @@ public class WFSClient {
             response = builder.type(MediaType.APPLICATION_XML_TYPE).post(ClientResponse.class, entity);
             break;
         case SOAP:
-            Document soapEnv = WFSMessage.wrapEntityInSOAPEnvelope(entity, WFS2.SOAP_VERSION);
+            Document soapEnv = WFSMessage.wrapEntityInSOAPEnvelope( entity, determineSoapVersion() );
             response = builder.type(MediaType.valueOf(WFS2.APPLICATION_SOAP)).post(ClientResponse.class,
                     new DOMSource(soapEnv));
             break;
@@ -573,6 +573,12 @@ public class WFSClient {
             idList.add(Element.class.cast(qryList.item(i)).getAttribute("id"));
         }
         return idList;
+    }
+
+    private String determineSoapVersion() {
+        if ( "2.0.2".equals( this.wfsVersion ) )
+            return WFS2.SOAP_VERSION_1_2;
+        return WFS2.SOAP_VERSION;
     }
 
 }

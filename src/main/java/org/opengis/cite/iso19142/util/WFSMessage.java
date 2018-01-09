@@ -89,31 +89,12 @@ public class WFSMessage {
      *            not specified the latest version is assumed.
      * @return A DOM Document node representing a SOAP request message.
      */
-    public static Document wrapEntityInSOAPEnvelope(Source xmlSource, String version) {
-        String soapNS;
-        if (null != version && version.equals("1.1")) {
-            soapNS = Namespaces.SOAP11;
-        } else {
-            soapNS = Namespaces.SOAP_ENV;
-        }
-        Document soapDoc = BUILDER.newDocument();
-        Element soapEnv = soapDoc.createElementNS(soapNS, "soap:Envelope");
-        soapDoc.appendChild(soapEnv);
-        Element soapBody = soapDoc.createElementNS(soapNS, "soap:Body");
-        soapEnv.appendChild(soapBody);
-        try {
-            TransformerFactory tFactory = TransformerFactory.newInstance();
-            Transformer idTransformer = tFactory.newTransformer();
-            Document wfsReq = BUILDER.newDocument();
-            idTransformer.transform(xmlSource, new DOMResult(wfsReq));
-            soapBody.appendChild(soapDoc.importNode(wfsReq.getDocumentElement(), true));
-        } catch (Exception e) {
-            TestSuiteLogger.log(Level.WARNING, "Failed to create SOAP envelope from Source " + xmlSource.getSystemId(),
-                    e);
-        }
-        return soapDoc;
+    public static Document wrapEntityInSOAPEnvelope( Source xmlSource, String version ) {
+        if ( "1.1".equals( version ) )
+            return wrapEntityInSOAPEnvelopeWithNS( xmlSource, Namespaces.SOAP11 );
+        return wrapEntityInSOAPEnvelopeWithNS( xmlSource, Namespaces.SOAP_ENV );
     }
-
+    
     /**
      * Adds a simple wfs:Query element (without a filter) to the given request
      * entity. The typeNames attribute value is set using the supplied QName
@@ -575,5 +556,28 @@ public class WFSMessage {
         // import temporal element to avoid WRONG_DOCUMENT_ERR
         predicate.appendChild(request.importNode(gmlTime.getDocumentElement(), true));
     }
+    
+    private static Document wrapEntityInSOAPEnvelopeWithNS( Source xmlSource, String soapNS ) {
+        Document soapDoc = BUILDER.newDocument();
+        Element soapEnv = soapDoc.createElementNS( soapNS, "soap:Envelope" );
+        soapDoc.appendChild( soapEnv );
+        Element soapBody = soapDoc.createElementNS( soapNS, "soap:Body" );
+        soapEnv.appendChild( soapBody );
+        appendContent( xmlSource, soapDoc, soapBody );
+        return soapDoc;
+    }
 
+    private static void appendContent( Source xmlSource, Document soapDoc, Element soapBody ) {
+        try {
+            TransformerFactory tFactory = TransformerFactory.newInstance();
+            Transformer idTransformer = tFactory.newTransformer();
+            Document wfsReq = BUILDER.newDocument();
+            idTransformer.transform( xmlSource, new DOMResult( wfsReq ) );
+            soapBody.appendChild( soapDoc.importNode( wfsReq.getDocumentElement(), true ) );
+        } catch ( Exception e ) {
+            TestSuiteLogger.log( Level.WARNING,
+                                 "Failed to create SOAP envelope from Source " + xmlSource.getSystemId(), e );
+        }
+    }
+    
 }
