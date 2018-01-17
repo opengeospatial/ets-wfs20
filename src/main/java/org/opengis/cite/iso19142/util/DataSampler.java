@@ -53,6 +53,8 @@ import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmItem;
 import net.sf.saxon.s9api.XdmValue;
 
+import static org.opengis.cite.iso19142.Namespaces.GML;
+
 /**
  * Obtains samples of the feature data available from the WFS under test.
  * Instances of all feature types advertised in the service description are
@@ -61,11 +63,13 @@ import net.sf.saxon.s9api.XdmValue;
 public class DataSampler {
 
     private static final Logger LOGR = Logger.getLogger(DataSampler.class.getPackage().getName());
+    public static final QName BOUNDED_BY = new QName( GML, "boundedBy" );
     private int maxFeatures = 25;
     private Document serviceDescription;
     private Map<QName, FeatureTypeInfo> featureInfo;
     private Map<QName, Envelope> spatialExtents;
     private Map<FeatureProperty, Period> temporalPropertyExtents;
+    private final Map<QName, List<QName>> nillableProperties = new HashMap<>();
 
     /**
      * Constructs a new DataSampler for a particular WFS implementation.
@@ -429,6 +433,64 @@ public class DataSampler {
         return period;
     }
 
+    /**
+     * Determines a property which is nillable and contains nilled properties for the specified feature type in the
+     * sample data.
+     *
+     * @param model
+     *            A model representing the relevant GML application schema, never <code>null</code>.
+     * @param featureType
+     *            The name of the feature type, never <code>null</code>.
+     * @return A list of property names which are nillable and contains nilled instances, empty if such a property does
+     *         not occur or has no values.
+     */
+    public List<QName> getNillableProperties( XSModel model, QName featureType ) {
+        if ( nillableProperties.containsKey( featureType ) )
+            return nillableProperties.get( featureType );
+        List<QName> nillableProperties = new ArrayList<>();
+        LOGR.fine( "Checking feature type for nillable properties: " + featureType );
+        List<XSElementDeclaration> nillableProps = AppSchemaUtils.getNillableProperties( model, featureType );
+        LOGR.fine( nillableProps.toString() );
+        FeatureTypeInfo typeInfo = getFeatureTypeInfo().get( featureType );
+
+        if ( typeInfo.isInstantiated() ) {
+            for ( XSElementDeclaration elementDeclaration : nillableProps ) {
+                QName propName = new QName( elementDeclaration.getNamespace(), elementDeclaration.getName() );
+                // ignore nillable gml:boundedBy property
+                if ( !BOUNDED_BY.equals( propName ) && nillablePropertyContainsNilledProperties( typeInfo, propName ) ) {
+                    nillableProperties.add( propName );
+                }
+
+            }
+        }
+        LOGR.fine( "Nillable properties:\n" + nillableProps );
+        this.nillableProperties.put( featureType, nillableProperties );
+        return nillableProperties;
+    }
+
+    private boolean nillablePropertyContainsNilledProperties( FeatureTypeInfo typeInfo, QName propertyName ) {
+        LOGR.fine( "Checking property " + propertyName + " for nilled properties." );
+        File dataFile = typeInfo.getSampleData();
+        Document data;
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setNamespaceAware( true );
+            data = factory.newDocumentBuilder().parse( dataFile );
+        } catch ( SAXException | IOException | ParserConfigurationException e ) {
+            throw new RuntimeException( String.format( "Failed to parse data file at %s.\n %s",
+                                                       dataFile.getAbsolutePath(), e.getMessage() ) );
+        }
+        NodeList propNodes = data.getElementsByTagNameNS( propertyName.getNamespaceURI(), propertyName.getLocalPart() );
+        for ( int i = 0; i < propNodes.getLength(); i++ ) {
+            Element propElem = (Element) propNodes.item( i );
+            String nilValue = propElem.getAttributeNS( Namespaces.XSI, "nil" );
+            if ( "true".equals( nilValue ) )
+                return true;
+        }
+        LOGR.fine( "Property " + propertyName + " does not have nilled properties." );
+        return false;
+    }
+    
     /**
      * Randomly selects a feature instance from the sample data obtained from
      * the IUT.
