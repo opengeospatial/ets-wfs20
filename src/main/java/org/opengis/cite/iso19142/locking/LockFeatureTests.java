@@ -189,6 +189,63 @@ public class LockFeatureTests extends LockingFixture {
 	}
 
 	/**
+	 * [{@code Test}] An attempt to reset a lock with locKId and fes:AbstractQueryExpression
+	 * should produce a service exception with error code "OperationParsingFailed" and HTTP
+	 * status code 400 (Bad Request).
+	 *
+	 * <p>
+	 * <strong>Note</strong>: The WFS 2.0.2 specification specifies this behaviour in detail (12.2.4.2 lockId parameter):
+	 *
+	 * "If both a lockId parameter and one or more fes:AbstractQueryExpression elements are
+	 * included in a LockFeature request then the server shall raise an OperationParsingFailed
+	 * exception (see 7.5).[24]"
+	 * </p>
+	 *
+	 * <p style="margin-bottom: 0.5em">
+	 * <strong>Sources</strong>
+	 * </p>
+	 * <ul>
+	 * <li>09-025r2, cl. 12.2.4.2: lockId parameter</li>
+	 * <li>09-025r2, Table D.2</li>
+	 * </ul>
+	 */
+	@Test(description = "See 09-025r2: 12.2.4.2")
+	public void lockFeatureWithLockIdAndQuery() {
+		if(!"2.0.2".equals( this.wfsVersion) ){
+			throw new SkipException( "Tested only for WFS 2.0.2" );
+		}
+		QName featureType = LockFeatureTests
+								.selectRandomFeatureType(this.featureInfo);
+		WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
+		this.reqEntity.getDocumentElement().setAttribute("expiry", "10");
+		ClientResponse rsp = wfsClient.submitRequest(this.reqEntity,
+													 ProtocolBinding.ANY);
+		this.rspEntity = rsp.getEntity(Document.class);
+		Assert.assertEquals(rsp.getStatus(),
+							ClientResponse.Status.OK.getStatusCode(),
+							ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
+		Element featureColl = (Element) this.rspEntity.getElementsByTagNameNS(
+								Namespaces.WFS, WFS2.FEATURE_COLLECTION).item(0);
+		String lockId = featureColl.getAttribute("lockId");
+		Assert.assertFalse(lockId.isEmpty(), ErrorMessage.format(
+								ErrorMessageKeys.MISSING_INFOSET_ITEM, "@lockId"));
+		locks.add(lockId);
+
+		// try to reset expired lock with LockFeature request
+		this.reqEntity = WFSMessage.createRequestEntity("LockFeature",
+														this.wfsVersion);
+		reqEntity.getDocumentElement().setAttribute("lockId", lockId);
+		WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
+		rsp = wfsClient.submitRequest(reqEntity, ProtocolBinding.ANY);
+		this.rspEntity = rsp.getEntity(Document.class);
+		Assert.assertEquals(rsp.getStatus(),
+							ClientResponse.Status.BAD_REQUEST.getStatusCode(),
+							ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
+		String xpath = "//ows:Exception[@exceptionCode = 'OperationParsingFailed']";
+		ETSAssert.assertXPath(xpath, this.rspEntity.getDocumentElement(), null);
+	}
+
+	/**
 	 * Obtains the system-assigned identifier of an instance of some randomly
 	 * selected feature type.
 	 * 
