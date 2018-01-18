@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -53,6 +55,8 @@ import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmItem;
 import net.sf.saxon.s9api.XdmValue;
 
+import static org.opengis.cite.iso19142.Namespaces.GML;
+
 /**
  * Obtains samples of the feature data available from the WFS under test.
  * Instances of all feature types advertised in the service description are
@@ -61,11 +65,13 @@ import net.sf.saxon.s9api.XdmValue;
 public class DataSampler {
 
     private static final Logger LOGR = Logger.getLogger(DataSampler.class.getPackage().getName());
+    public static final QName BOUNDED_BY = new QName( GML, "boundedBy" );
     private int maxFeatures = 25;
     private Document serviceDescription;
     private Map<QName, FeatureTypeInfo> featureInfo;
     private Map<QName, Envelope> spatialExtents;
     private Map<FeatureProperty, Period> temporalPropertyExtents;
+    private final Map<QName, List<QName>> nillableProperties = new HashMap<>();
 
     /**
      * Constructs a new DataSampler for a particular WFS implementation.
@@ -231,38 +237,12 @@ public class DataSampler {
         WFSClient wfsClient = new WFSClient(this.serviceDescription);
         Set<ProtocolBinding> getFeatureBindings = ServiceMetadataUtils.getOperationBindings(serviceDescription,
                 WFS2.GET_FEATURE);
+        if(getFeatureBindings.isEmpty())
+            throw new IllegalArgumentException( "No bindings available for GetFeature request." );
         for (Map.Entry<QName, FeatureTypeInfo> entry : featureInfo.entrySet()) {
             QName typeName = entry.getKey();
-            for (ProtocolBinding binding : getFeatureBindings) {
-                try {
-                    Document rspEntity = wfsClient.getFeatureByType(typeName, maxFeatures, binding);
-                    NodeList features = rspEntity.getElementsByTagNameNS(typeName.getNamespaceURI(),
-                            typeName.getLocalPart());
-                    boolean hasFeatures = features.getLength() > 0;
-                    entry.getValue().setInstantiated(hasFeatures);
-                    if (hasFeatures) {
-                        try {
-                            File file = File.createTempFile(typeName.getLocalPart() + "-", ".xml");
-                            FileOutputStream fos = new FileOutputStream(file);
-                            XMLUtils.writeNode(rspEntity, fos);
-                            LOGR.log(Level.CONFIG,
-                                    this.getClass().getName() + " - wrote feature data to " + file.getAbsolutePath());
-                            entry.getValue().setSampleData(file);
-                            fos.close();
-                        } catch (Exception e) {
-                            LOGR.log(Level.WARNING, "Failed to save feature data.", e);
-                        }
-                        break;
-                    }
-                } catch (RuntimeException re) {
-                    StringBuilder err = new StringBuilder();
-                    err.append(String.format("Failed to read XML response entity using %s method for feature type %s.",
-                            binding, typeName));
-                    err.append(" \n").append(re.getMessage());
-                    LOGR.log(Level.WARNING, err.toString(), re);
-                    throw new RuntimeException(err.toString(), re);
-                }
-            }
+            FeatureTypeInfo featureTypeInfo = entry.getValue();
+            acquireFeatureData( wfsClient, getFeatureBindings, typeName, featureTypeInfo );
         }
         LOGR.log(Level.INFO, featureInfo.toString());
     }
@@ -404,7 +384,7 @@ public class DataSampler {
 
     /**
      * Determines the temporal extent of all instances of the specified feature
-     * property in the sample data.
+     * property in the sample data. The temporal extent is extend by 1 day and 1 hour in the beginning and the end.
      * 
      * @param model
      *            A model representing the relevant GML application schema.
@@ -450,11 +430,73 @@ public class DataSampler {
                 continue;
             }
         }
+        if ( period != null ) {
+            TemporalUtils.add( period.getEnding(), 2, ChronoUnit.DAYS );
+            TemporalUtils.add( period.getBeginning(), -2, ChronoUnit.DAYS );
+        }
         period = TemporalUtils.temporalExtent(tmSet);
         this.temporalPropertyExtents.put(tmProp, period);
         return period;
     }
 
+    /**
+     * Determines a property which is nillable and contains nilled properties for the specified feature type in the
+     * sample data.
+     *
+     * @param model
+     *            A model representing the relevant GML application schema, never <code>null</code>.
+     * @param featureType
+     *            The name of the feature type, never <code>null</code>.
+     * @return A list of property names which are nillable and contains nilled instances, empty if such a property does
+     *         not occur or has no values.
+     */
+    public List<QName> getNillableProperties( XSModel model, QName featureType ) {
+        if ( nillableProperties.containsKey( featureType ) )
+            return nillableProperties.get( featureType );
+        List<QName> nillableProperties = new ArrayList<>();
+        LOGR.fine( "Checking feature type for nillable properties: " + featureType );
+        List<XSElementDeclaration> nillableProps = AppSchemaUtils.getNillableProperties( model, featureType );
+        LOGR.fine( nillableProps.toString() );
+        FeatureTypeInfo typeInfo = getFeatureTypeInfo().get( featureType );
+
+        if ( typeInfo.isInstantiated() ) {
+            for ( XSElementDeclaration elementDeclaration : nillableProps ) {
+                QName propName = new QName( elementDeclaration.getNamespace(), elementDeclaration.getName() );
+                // ignore nillable gml:boundedBy property
+                if ( !BOUNDED_BY.equals( propName ) && nillablePropertyContainsNilledProperties( typeInfo, propName ) ) {
+                    nillableProperties.add( propName );
+                }
+
+            }
+        }
+        LOGR.fine( "Nillable properties:\n" + nillableProps );
+        this.nillableProperties.put( featureType, nillableProperties );
+        return nillableProperties;
+    }
+
+    private boolean nillablePropertyContainsNilledProperties( FeatureTypeInfo typeInfo, QName propertyName ) {
+        LOGR.fine( "Checking property " + propertyName + " for nilled properties." );
+        File dataFile = typeInfo.getSampleData();
+        Document data;
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setNamespaceAware( true );
+            data = factory.newDocumentBuilder().parse( dataFile );
+        } catch ( SAXException | IOException | ParserConfigurationException e ) {
+            throw new RuntimeException( String.format( "Failed to parse data file at %s.\n %s",
+                                                       dataFile.getAbsolutePath(), e.getMessage() ) );
+        }
+        NodeList propNodes = data.getElementsByTagNameNS( propertyName.getNamespaceURI(), propertyName.getLocalPart() );
+        for ( int i = 0; i < propNodes.getLength(); i++ ) {
+            Element propElem = (Element) propNodes.item( i );
+            String nilValue = propElem.getAttributeNS( Namespaces.XSI, "nil" );
+            if ( "true".equals( nilValue ) )
+                return true;
+        }
+        LOGR.fine( "Property " + propertyName + " does not have nilled properties." );
+        return false;
+    }
+    
     /**
      * Randomly selects a feature instance from the sample data obtained from
      * the IUT.
@@ -524,4 +566,42 @@ public class DataSampler {
         }
         return results;
     }
+
+    private void acquireFeatureData( WFSClient wfsClient, Set<ProtocolBinding> getFeatureBindings, QName typeName,
+                                     FeatureTypeInfo featureTypeInfo ) {
+        for (ProtocolBinding binding : getFeatureBindings) {
+            try {
+                Document rspEntity = wfsClient.getFeatureByType( typeName, maxFeatures, binding);
+                NodeList features = rspEntity.getElementsByTagNameNS( typeName.getNamespaceURI(),
+                                                                      typeName.getLocalPart());
+                boolean hasFeatures = features.getLength() > 0;
+                if (hasFeatures) {
+                    saveFeatureDataFile( featureTypeInfo, typeName, rspEntity );
+                    return;
+                }
+            } catch (RuntimeException re) {
+                StringBuilder err = new StringBuilder();
+                err.append(String.format("Failed to read XML response entity using %s method for feature type %s.",
+                                         binding, typeName));
+                err.append(" \n").append(re.getMessage());
+                LOGR.log( Level.WARNING, err.toString(), re);
+            }
+        }
+    }
+
+    private void saveFeatureDataFile( FeatureTypeInfo featureTypeInfo, QName typeName, Document rspEntity ) {
+        try {
+            File file = File.createTempFile( typeName.getLocalPart() + "-", ".xml");
+            FileOutputStream fos = new FileOutputStream( file);
+            XMLUtils.writeNode( rspEntity, fos);
+            LOGR.log( Level.CONFIG,
+                      this.getClass().getName() + " - wrote feature data to " + file.getAbsolutePath());
+            featureTypeInfo.setSampleData(file);
+            fos.close();
+            featureTypeInfo.setInstantiated(true);
+        } catch (Exception e) {
+            LOGR.log(Level.WARNING, "Failed to save feature data.", e);
+        }
+    }
+
 }

@@ -71,4 +71,27 @@ public class VerifyTimeUtils {
         Node timePosition = doc.getElementsByTagNameNS(Namespaces.GML, "timePosition").item(0);
         assertEquals("Unexpected date-time", timePosition.getTextContent().trim(), "2016-05-03T10:15:30-07:00");
     }
+
+    @Test
+    public void instantDateTimeWithoutSecond() {
+        ZonedDateTime t1 = ZonedDateTime.of(2016, 05, 3, 0, 0, 0, 0, ZoneId.of("Z"));
+        Instant instant = tmFactory.createInstant(new DefaultPosition(Date.from(t1.minusMonths(1).toInstant())));
+        Document doc = TimeUtils.instantAsGML(instant, ZoneOffset.UTC);
+        Node timePosition = doc.getElementsByTagNameNS(Namespaces.GML, "timePosition").item(0);
+        assertEquals("Unexpected date-time", timePosition.getTextContent().trim(), "2016-04-03T00:00:00Z");
+    }
+
+
+    @Test
+    public void intervalAsGML() {
+        ZonedDateTime t1 = ZonedDateTime.of(2016, 05, 3, 10, 20, 30, 0, ZoneId.of("Z"));
+        ZonedDateTime t2 = ZonedDateTime.of(2017, 05, 3, 0, 0, 0, 0, ZoneId.of("Z"));
+        Document doc = TimeUtils.intervalAsGML( t1, t2 );
+        Node beginPosition = doc.getElementsByTagNameNS(Namespaces.GML, "beginPosition").item(0);
+        Node endPosition = doc.getElementsByTagNameNS(Namespaces.GML, "endPosition").item(0);
+
+        assertEquals("Unexpected date-time", beginPosition.getTextContent().trim(), "2016-05-03T10:20:30Z");
+        assertEquals("Unexpected date-time", endPosition.getTextContent().trim(), "2017-05-03T00:00:00Z");
+    }
+
 }

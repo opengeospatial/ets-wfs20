@@ -124,7 +124,6 @@ public class GetFeatureWithLockTests extends LockingFixture {
 		// try to reset expired lock with LockFeature request
 		this.reqEntity = WFSMessage.createRequestEntity("LockFeature",
 				this.wfsVersion);
-		WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
 		reqEntity.getDocumentElement().setAttribute("lockId", lockId);
 		rsp = wfsClient.submitRequest(reqEntity, ProtocolBinding.ANY);
 		this.rspEntity = rsp.getEntity(Document.class);

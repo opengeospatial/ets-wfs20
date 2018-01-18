@@ -205,11 +205,23 @@ public class WFSMessage {
         } catch (Exception e) {
             TestSuiteLogger.log(Level.WARNING, "Failed to parse request entity from classpath: " + resourceName, e);
         }
-        Attr verAttr = doc.getDocumentElement().getAttributeNode("version");
-        if (null != verAttr && null != wfsVersion && !wfsVersion.isEmpty()) {
-            doc.getDocumentElement().getAttributeNode("version").setValue(wfsVersion);
-        }
+        updateVersion( doc , wfsVersion);
         return doc;
+    }
+
+    /**
+     * Sets the @version attribute in the root element of the doc to the specified version
+     * 
+     * @param doc
+     *            the doc to update. never <code>null</code>
+     * @param wfsVersion
+     *            A WFS version identifier ("2.0.0" if not specified).
+     */
+    public static void updateVersion( Document doc, String wfsVersion ) {
+        Attr verAttr = doc.getDocumentElement().getAttributeNode( "version" );
+        if ( null != verAttr && null != wfsVersion && !wfsVersion.isEmpty() ) {
+            doc.getDocumentElement().getAttributeNode( "version" ).setValue( wfsVersion );
+        }
     }
 
     /**
