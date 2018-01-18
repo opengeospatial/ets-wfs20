@@ -588,4 +588,30 @@ public class WFSMessage {
         predicate.appendChild(request.importNode(gmlTime.getDocumentElement(), true));
     }
 
+    /**
+     * Sets the attribute CreateStoredQuery/StoredQueryDefinition/QueryExpressionText/Query/@typeNames to the passed
+     * feature type name.
+     * 
+     * @param request
+     *            request to modify, never <code>null</code>
+     * @param featureTypeName
+     *            name to set, never <code>null</code>
+     */
+    public static void setTypeNamesAttribute( Document request, QName featureTypeName ) {
+        if ( !request.getDocumentElement().getLocalName().equals( WFS2.CREATE_STORED_QRY ) ) {
+            throw new IllegalArgumentException( "Not a CreateStoredQuery request: "
+                                                + request.getDocumentElement().getNodeName() );
+        }
+        Element storedQueryDefinition = (Element) request.getElementsByTagNameNS( Namespaces.WFS,
+                                                                                  "StoredQueryDefinition" ).item( 0 );
+        Element queryExpressionText = (Element) storedQueryDefinition.getElementsByTagNameNS( Namespaces.WFS,
+                                                                                              "QueryExpressionText" ).item( 0 );
+        Element queryElem = (Element) queryExpressionText.getElementsByTagNameNS( Namespaces.WFS, WFS2.QUERY_ELEM ).item( 0 );
+
+        String prefix = "ns" + Integer.toString( (int) ( Math.random() * 100 ) );
+        String typeNamesAttributeValue = prefix + ":" + featureTypeName.getLocalPart();
+        queryElem.setAttribute( "xmlns:" + prefix, featureTypeName.getNamespaceURI() );
+        queryElem.setAttribute( "typeNames", typeNamesAttributeValue );
+    }
+
 }

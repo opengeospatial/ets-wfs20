@@ -5,6 +5,7 @@ import static org.testng.Assert.assertEquals;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -12,15 +13,20 @@ import java.util.logging.Level;
 import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMSource;
 
+import org.apache.xerces.xs.XSModel;
 import org.opengis.cite.iso19142.BaseFixture;
 import org.opengis.cite.iso19142.ETSAssert;
 import org.opengis.cite.iso19142.ErrorMessage;
 import org.opengis.cite.iso19142.ErrorMessageKeys;
 import org.opengis.cite.iso19142.ProtocolBinding;
+import org.opengis.cite.iso19142.SuiteAttribute;
 import org.opengis.cite.iso19142.WFS2;
+import org.opengis.cite.iso19142.util.DataSampler;
 import org.opengis.cite.iso19142.util.ServiceMetadataUtils;
 import org.opengis.cite.iso19142.util.TestSuiteLogger;
 import org.opengis.cite.iso19142.util.WFSMessage;
+import org.testng.ISuite;
+import org.testng.ITestContext;
 import org.testng.SkipException;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -43,7 +49,14 @@ public class CreateStoredQueryTests extends BaseFixture {
     public final static String QRY_GET_FEATURE_BY_NAME = "urn:example:wfs2-query:GetFeatureByName";
     public final static String QRY_INVALID_LANG = "urn:example:wfs2-query:InvalidLang";
     private List<String> createdStoredQueries = new ArrayList<>(2);
+    private DataSampler dataSampler;
 
+    @BeforeClass()
+    public void initQueryFilterFixture( ITestContext testContext ) {
+        ISuite suite = testContext.getSuite();
+        this.dataSampler = (DataSampler) suite.getAttribute( SuiteAttribute.SAMPLER.getName() );
+    }
+    
     /**
      * This configuration method deletes specific stored queries that may
      * already be known to the IUT; specifically:
@@ -151,6 +164,7 @@ public class CreateStoredQueryTests extends BaseFixture {
                 ProtocolBinding.POST);
         this.reqEntity = WFSMessage.createRequestEntity(ETS_PKG + "/querymgmt/CreateStoredQuery-GetFeatureByName",
                 this.wfsVersion);
+        WFSMessage.setTypeNamesAttribute( this.reqEntity, this.dataSampler.selectRandomFeatureType() );
         ClientResponse rsp = this.wfsClient.submitRequest(new DOMSource(this.reqEntity), ProtocolBinding.POST,
                 endpoint);
         this.rspEntity = rsp.getEntity(Document.class);

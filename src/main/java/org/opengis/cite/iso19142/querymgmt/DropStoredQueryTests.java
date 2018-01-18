@@ -15,9 +15,14 @@ import org.opengis.cite.iso19142.ETSAssert;
 import org.opengis.cite.iso19142.ErrorMessage;
 import org.opengis.cite.iso19142.ErrorMessageKeys;
 import org.opengis.cite.iso19142.ProtocolBinding;
+import org.opengis.cite.iso19142.SuiteAttribute;
 import org.opengis.cite.iso19142.WFS2;
+import org.opengis.cite.iso19142.util.DataSampler;
 import org.opengis.cite.iso19142.util.ServiceMetadataUtils;
 import org.opengis.cite.iso19142.util.WFSMessage;
+import org.testng.ISuite;
+import org.testng.ITestContext;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
 
@@ -28,6 +33,14 @@ import com.sun.jersey.api.client.ClientResponse;
  */
 public class DropStoredQueryTests extends BaseFixture {
 
+    private DataSampler dataSampler;
+
+    @BeforeClass()
+    public void initQueryFilterFixture( ITestContext testContext ) {
+        ISuite suite = testContext.getSuite();
+        this.dataSampler = (DataSampler) suite.getAttribute( SuiteAttribute.SAMPLER.getName() );
+    }
+    
     /**
      * [{@code Test}] Submits a <code>DropStoredQuery</code> request to remove
      * an existing stored query. The response is expected to contain an XML
@@ -41,6 +54,7 @@ public class DropStoredQueryTests extends BaseFixture {
                 ProtocolBinding.POST);
         this.reqEntity = WFSMessage.createRequestEntity(ETS_PKG + "/querymgmt/CreateStoredQuery-GetFeatureByName",
                 this.wfsVersion);
+        WFSMessage.setTypeNamesAttribute( this.reqEntity, this.dataSampler.selectRandomFeatureType() );
         ClientResponse rsp = this.wfsClient.submitRequest(new DOMSource(this.reqEntity), ProtocolBinding.POST,
                 endpoint);
         assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
