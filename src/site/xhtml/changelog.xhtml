@@ -7,6 +7,33 @@
   <body>
     <h1>Release Notes</h1>
 
+    <h2>1.28 (2018-01-25)</h2>
+    <p>This release includes the changes listed below.</p>
+    <ul>
+      <li style="list-style:square">Fix <a target="_blank" href="https://github.com/opengeospatial/ets-wfs20/issues/73">#73</a>:
+        Tests expecting OperationProcessingFailed along with a 400/403</li>
+      <li style="list-style:square">Fix <a target="_blank" href="https://github.com/opengeospatial/ets-wfs20/issues/71">#71</a>:
+        tranverseResultsSetInBothDirections assumes the dataset has at least 4 features</li>
+      <li style="list-style:square">Fix <a target="_blank" href="https://github.com/opengeospatial/ets-wfs20/issues/82">#82</a>:
+        LockFeatureTest.resetNonExistentLock expects 403 but the specs demands 400</li>
+      <li style="list-style:square">Fix <a target="_blank" href="https://github.com/opengeospatial/ets-wfs20/issues/69">#69</a>:
+        Data availability tests has opaque failures</li>
+      <li style="list-style:square">Fix <a target="_blank" href="https://github.com/opengeospatial/ets-wfs20/issues/80">#80</a>:
+        SpatialJoinTest.joinWithIntersects won't work unless there are two feature types with surface properties</li>
+      <li style="list-style:square">Fix <a target="_blank" href="https://github.com/opengeospatial/ets-wfs20/issues/83">#83</a>:
+        GetFeatureWithLock.lockAllQueryResults_20Seconds issues an invalid LockFeature request</li>
+      <li style="list-style:square">Fix <a target="_blank" href="https://github.com/opengeospatial/ets-wfs20/issues/72">#72</a>:
+        Complaince failed if there is no dataset supporting nillable properties</li>
+      <li style="list-style:square">Fix <a target="_blank" href="https://github.com/opengeospatial/ets-wfs20/issues/62">#62</a>:
+        Describe Stored Query test failure for 2.0.2</li>
+      <li style="list-style:square">Fix <a target="_blank" href="https://github.com/opengeospatial/ets-wfs20/issues/75">#75</a>:
+        After/Before tests cannot work against data sets having a single time</li>
+      <li style="list-style:square">Fix <a target="_blank" href="https://github.com/opengeospatial/ets-wfs20/issues/81">#81</a>:
+        After test might post a schema invalid request</li>
+      <li style="list-style:square">Fix <a target="_blank" href="https://github.com/opengeospatial/ets-wfs20/issues/79">#79</a>:
+        Test tries to create a stored query assuming inheritance support</li>
+    </ul>
+
     <h2>1.27 (2017-10-27)</h2>
     <p>This release includes the changes listed below.</p>
     <ul>
