@@ -597,7 +597,7 @@ public class WFSMessage {
      * @param featureTypeName
      *            name to set, never <code>null</code>
      */
-    public static void setTypeNamesAttribute( Document request, QName featureTypeName ) {
+    public static void setReturnTypesAndTypeNamesAttribute( Document request, QName featureTypeName ) {
         if ( !request.getDocumentElement().getLocalName().equals( WFS2.CREATE_STORED_QRY ) ) {
             throw new IllegalArgumentException( "Not a CreateStoredQuery request: "
                                                 + request.getDocumentElement().getNodeName() );
@@ -610,8 +610,10 @@ public class WFSMessage {
 
         String prefix = "ns" + Integer.toString( (int) ( Math.random() * 100 ) );
         String typeNamesAttributeValue = prefix + ":" + featureTypeName.getLocalPart();
-        queryElem.setAttribute( "xmlns:" + prefix, featureTypeName.getNamespaceURI() );
+        queryExpressionText.setAttribute( "xmlns:" + prefix, featureTypeName.getNamespaceURI() );
+
         queryElem.setAttribute( "typeNames", typeNamesAttributeValue );
+        queryExpressionText.setAttribute( "returnFeatureTypes", typeNamesAttributeValue );
     }
 
 }

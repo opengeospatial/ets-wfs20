@@ -54,7 +54,7 @@ public class DropStoredQueryTests extends BaseFixture {
                 ProtocolBinding.POST);
         this.reqEntity = WFSMessage.createRequestEntity(ETS_PKG + "/querymgmt/CreateStoredQuery-GetFeatureByName",
                 this.wfsVersion);
-        WFSMessage.setTypeNamesAttribute( this.reqEntity, this.dataSampler.selectRandomFeatureType() );
+        WFSMessage.setReturnTypesAndTypeNamesAttribute( this.reqEntity, this.dataSampler.selectRandomFeatureType() );
         ClientResponse rsp = this.wfsClient.submitRequest(new DOMSource(this.reqEntity), ProtocolBinding.POST,
                 endpoint);
         assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
