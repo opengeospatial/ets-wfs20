@@ -76,10 +76,10 @@ public class VerifyUpdate {
         QName featureType = new QName(NS1, "ComplexFeature");
         List<XSElementDeclaration> simpleProps = AppSchemaUtils.getSimpleFeatureProperties(model, featureType);
         List<String> propValues = new ArrayList<String>();
-        propValues.add("49.25");
+        propValues.add("48.2");
         Update iut = new Update();
         String newVal = iut.newPropertyValue(simpleProps.get(0), propValues);
-        assertEquals(3.8969, Double.parseDouble(newVal), 0.00001);
+        assertEquals(24.1, Double.parseDouble(newVal), 0.00001);
     }
 
     @Test
