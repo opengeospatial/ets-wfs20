@@ -52,6 +52,14 @@ public class VerifyServiceMetadataUtils {
     }
 
     @Test
+    public void findDescribeFeatureTypeUsingGETPreserveQuery() throws SAXException, IOException {
+        File xmlFile = new File("src/test/resources/capabilities-querystring.xml");
+        URI endpoint = ServiceMetadataUtils.getOperationEndpoint(docBuilder.parse(xmlFile), WFS2.DESCRIBE_FEATURE_TYPE,
+                ProtocolBinding.GET);
+        assertEquals("Unexpected endpoint for DescribeFeatureType(GET)", "http://localhost/wfs2?param=abc&", endpoint.toString());
+    }
+
+    @Test
     public void findDescribeFeatureTypeUsingPOST_notFound() throws SAXException, IOException {
         File xmlFile = new File("src/test/resources/capabilities-simple.xml");
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(docBuilder.parse(xmlFile), WFS2.DESCRIBE_FEATURE_TYPE,
