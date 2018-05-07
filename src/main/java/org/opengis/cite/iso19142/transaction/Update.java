@@ -267,7 +267,7 @@ public class Update extends TransactionFixture {
             break;
         case XSConstants.DOUBLE_DT:
             Double dVal = Double.valueOf(propValues.get(0));
-            newValue = Double.toString(Math.log(dVal));
+            newValue = Double.toString(dVal / 2);
             break;
         case XSConstants.DECIMAL_DT:
             BigDecimal decimalVal = new BigDecimal(propValues.get(0));
