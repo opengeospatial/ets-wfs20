@@ -94,11 +94,9 @@ public class ServiceMetadataUtils {
             TestSuiteLogger.log(Level.INFO, ex.getMessage());
         }
         if (null != endpoint.getQuery()) {
-            // make sure the query component is ready for appending extra params
+            // prune query component if present
             String uri = endpoint.toString();
-            if (!uri.endsWith("&")) {
-                endpoint = URI.create(uri + "&");
-            }
+            endpoint = URI.create(uri.substring(0, uri.indexOf('?')));
         }
         return endpoint;
     }
