@@ -1,6 +1,9 @@
 package org.opengis.cite.iso19142.util;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -57,7 +60,7 @@ public class VerifyAppSchemaUtils {
         XSTypeDefinition xsdDoubleType = model.getTypeDefinition("decimal", XMLConstants.W3C_XML_SCHEMA_NS_URI);
         List<XSElementDeclaration> props = AppSchemaUtils.getFeaturePropertiesByType(model, featureTypeName,
                 xsdDoubleType);
-        assertEquals("Unexpected number of xsd:decimal properties.", 2, props.size());
+        assertEquals("Unexpected number of xsd:decimal properties.", 14, props.size());
     }
 
     @Test
@@ -159,5 +162,32 @@ public class VerifyAppSchemaUtils {
         XSElementDeclaration value = AppSchemaUtils.getComplexPropertyValue(multiGeomProperty);
         assertEquals("Unexpected namespace", GML32.NS_NAME, value.getNamespace());
         assertEquals("Unexpected name.", "AbstractGeometricAggregate", value.getName());
+    }
+
+    @Test
+    public void findSimpleProperties_integerType() {
+        String[] integerProperties = {"byteProperty", "intProperty2", "longProperty",
+                "negativeIntegerProperty", "nonNegativeIntegerProperty",
+                "nonPositiveIntegerProperty", "positiveIntegerProperty", "shortProperty",
+                "unsignedLongProperty", "unsignedIntProperty", "unsingedShortProperty",
+                "unsignedByteProperty"};
+        for (String property : integerProperties) {
+            XSElementDeclaration declaration = getPropertyByLocalName(property);
+            assertNotNull("Could not find property " + property, declaration);
+            QName qName = AppSchemaUtils.getBuiltInDatatype(declaration);
+            assertEquals("integer", qName.getLocalPart());
+        }
+    }
+
+    private XSElementDeclaration getPropertyByLocalName(String name) {
+        QName featureTypeName = new QName(EX_NS, "SimpleFeature");
+        List<XSElementDeclaration> simpleProps = AppSchemaUtils.getSimpleFeatureProperties(model, featureTypeName);
+        for (XSElementDeclaration simpleProp : simpleProps) {
+            if (name.equals(simpleProp.getName())) {
+                return simpleProp;
+            }
+        }
+
+        return null;
     }
 }
