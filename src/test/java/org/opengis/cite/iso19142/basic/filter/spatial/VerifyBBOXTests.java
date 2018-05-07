@@ -7,6 +7,8 @@ import java.io.IOException;
 
 import javax.xml.namespace.QName;
 
+import org.geotoolkit.geometry.jts.JTSEnvelope2D;
+import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -15,6 +17,7 @@ import org.opengis.cite.iso19142.Namespaces;
 import org.opengis.cite.iso19142.basic.filter.spatial.BBOXTests;
 import org.opengis.cite.iso19142.util.WFSMessage;
 import org.opengis.cite.iso19142.util.XMLUtils;
+import org.opengis.referencing.crs.GeographicCRS;
 import org.testng.ISuite;
 import org.testng.ITestContext;
 import org.w3c.dom.Document;
@@ -74,5 +77,16 @@ public class VerifyBBOXTests extends CommonTestFixture {
 						0);
 		Assert.assertEquals("Unexpected fes:ValueReference.", "tns:geom",
 				node.getTextContent());
+	}
+	
+	@Test
+	public void bboxExpansion() {
+		JTSEnvelope2D envelope = new JTSEnvelope2D(0, 1, 0, 1, DefaultGeographicCRS.WGS84);
+		BBOXTests iut = new BBOXTests();
+		Document document = iut.envelopeAsGML(envelope);
+		Node nodeLower = document.getElementsByTagNameNS(Namespaces.GML, "lowerCorner").item(0);
+		Assert.assertEquals("Unexpected LowerCorner", "-0.01 -0.01",nodeLower.getTextContent());
+		Node nodeUpper = document.getElementsByTagNameNS(Namespaces.GML, "upperCorner").item(0);
+		Assert.assertEquals("Unexpected LowerCorner", "1.01 1.01", nodeUpper.getTextContent());
 	}
 }

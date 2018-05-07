@@ -1,17 +1,17 @@
 package org.opengis.cite.iso19142.basic.filter.spatial;
 
+import com.sun.jersey.api.client.ClientResponse;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPathExpressionException;
-
 import org.apache.xerces.xs.XSElementDeclaration;
 import org.apache.xerces.xs.XSTypeDefinition;
+import org.geotoolkit.geometry.GeneralEnvelope;
 import org.opengis.cite.geomatics.Extents;
 import org.opengis.cite.geomatics.SpatialOperator;
 import org.opengis.cite.geomatics.TopologicalRelationships;
@@ -35,8 +35,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import com.sun.jersey.api.client.ClientResponse;
-
 /**
  * Tests the response to a GetFeature request that includes a BBOX predicate.
  * All conforming "Basic WFS" implementations must support this spatial
@@ -53,6 +51,8 @@ import com.sun.jersey.api.client.ClientResponse;
 public class BBOXTests extends QueryFilterFixture {
 
     private static final String XSLT_ENV2POLYGON = "/org/opengis/cite/iso19142/util/bbox2polygon.xsl";
+    // avoids rounding issues in the GML encoding
+    public static final double ENVELOPE_EXPANSION = 0.01;
     private XSTypeDefinition gmlGeomBaseType;
 
     /**
@@ -86,7 +86,7 @@ public class BBOXTests extends QueryFilterFixture {
             throw new SkipException("Feature type has no geometry properties: " + featureType);
         }
         Envelope extent = this.dataSampler.getSpatialExtent(this.model, featureType);
-        Document gmlEnv = Extents.envelopeAsGML(extent);
+        Document gmlEnv = envelopeAsGML(extent);
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
         addBBOXPredicate(this.reqEntity, gmlEnv.getDocumentElement(), null);
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.GET_FEATURE, binding);
@@ -141,7 +141,7 @@ public class BBOXTests extends QueryFilterFixture {
         Element valueRef = WFSMessage.createValueReference(geomProp);
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
         Envelope extent = this.dataSampler.getSpatialExtent(this.model, featureType);
-        Document gmlEnv = Extents.envelopeAsGML(extent);
+        Document gmlEnv = envelopeAsGML(extent);
         addBBOXPredicate(this.reqEntity, gmlEnv.getDocumentElement(), valueRef);
         ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
         this.rspEntity = extractBodyAsDocument(rsp);
@@ -180,6 +180,21 @@ public class BBOXTests extends QueryFilterFixture {
     }
 
     /**
+     * Work around for Extents{@link #envelopeAsGML(Envelope)} only using 2 decimals
+     */
+    public Document envelopeAsGML(Envelope extent) {
+        double[] low = new double[extent.getDimension()];
+        double[] high = new double[extent.getDimension()];
+        for (int i = 0; i < extent.getDimension(); i++) {
+            low[i] = extent.getMinimum(i) - ENVELOPE_EXPANSION;
+            high[i] = extent.getMaximum(i) + ENVELOPE_EXPANSION;
+        }
+        GeneralEnvelope expanded = new GeneralEnvelope(low, high);
+        expanded.setCoordinateReferenceSystem(extent.getCoordinateReferenceSystem());
+        return Extents.envelopeAsGML(expanded);
+    }
+
+    /**
      * [{@code Test}] Submits a GetFeature request where the BBOX predicate
      * refers to a feature property (gml:description) that is not
      * geometry-valued. An exception is expected in response with status code
@@ -197,7 +212,8 @@ public class BBOXTests extends QueryFilterFixture {
         XSElementDeclaration gmlDesc = this.model.getElementDeclaration("description", Namespaces.GML);
         Element valueRef = WFSMessage.createValueReference(gmlDesc);
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
-        Document gmlEnv = Extents.envelopeAsGML(featureInfo.get(featureType).getSpatialExtent());
+        Envelope spatialExtent = featureInfo.get(featureType).getSpatialExtent();
+        Document gmlEnv = envelopeAsGML(spatialExtent);
         addBBOXPredicate(this.reqEntity, gmlEnv.getDocumentElement(), valueRef);
         ClientResponse rsp = wfsClient.submitRequest(reqEntity, ProtocolBinding.ANY);
         this.rspEntity = rsp.getEntity(Document.class);
