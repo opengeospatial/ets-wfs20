@@ -5,7 +5,6 @@ import static org.testng.Assert.assertEquals;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -13,7 +12,6 @@ import java.util.logging.Level;
 import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMSource;
 
-import org.apache.xerces.xs.XSModel;
 import org.opengis.cite.iso19142.BaseFixture;
 import org.opengis.cite.iso19142.ETSAssert;
 import org.opengis.cite.iso19142.ErrorMessage;
@@ -164,7 +162,7 @@ public class CreateStoredQueryTests extends BaseFixture {
                 ProtocolBinding.POST);
         this.reqEntity = WFSMessage.createRequestEntity(ETS_PKG + "/querymgmt/CreateStoredQuery-GetFeatureByName",
                 this.wfsVersion);
-        WFSMessage.setTypeNamesAttribute( this.reqEntity, this.dataSampler.selectRandomFeatureType() );
+        WFSMessage.setReturnTypesAndTypeNamesAttribute( this.reqEntity, this.dataSampler.selectRandomFeatureType() );
         ClientResponse rsp = this.wfsClient.submitRequest(new DOMSource(this.reqEntity), ProtocolBinding.POST,
                 endpoint);
         this.rspEntity = rsp.getEntity(Document.class);

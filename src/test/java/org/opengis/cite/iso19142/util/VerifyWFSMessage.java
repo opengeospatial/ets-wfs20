@@ -1,5 +1,6 @@
 package org.opengis.cite.iso19142.util;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -238,4 +239,24 @@ public class VerifyWFSMessage {
         assertNotNull(predicate);
         assertEquals("Unexpected number of operands", 2, predicate.getChildNodes().getLength());
     }
+
+    @Test
+    public void setReturnTypesAndTypeNamesAttribute()
+                            throws SAXException, IOException {
+        Document doc = docBuilder.parse( this.getClass().getResourceAsStream( "/org/opengis/cite/iso19142/querymgmt/CreateStoredQuery-GetFeatureByTypeName.xml" ) );
+        QName featureType = new QName( "abc", "http://test.org" );
+        WFSMessage.setReturnTypesAndTypeNamesAttribute( doc, featureType );
+        NodeList queryExpressionText = doc.getElementsByTagNameNS( Namespaces.WFS, "QueryExpressionText" );
+        assertEquals( "Unexpected number of filters.", 1, queryExpressionText.getLength() );
+        Element queryExpressionTextElement = (Element) queryExpressionText.item( 0 );
+        assertThat( "Unexpected returnFeatureTypes.", queryExpressionTextElement.getAttribute( "returnFeatureTypes" ),
+                    containsString( featureType.getLocalPart() ) );
+
+        NodeList query = doc.getElementsByTagNameNS( Namespaces.WFS, "Query" );
+        assertEquals( "Unexpected number of filters.", 1, queryExpressionText.getLength() );
+        Element queryElement = (Element) query.item( 0 );
+        assertThat( "Unexpected typeNames.", queryElement.getAttribute( "typeNames" ),
+                    containsString( featureType.getLocalPart() ) );
+    }
+    
 }
