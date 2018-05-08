@@ -22,9 +22,12 @@ import javax.xml.validation.Schema;
 import org.apache.xerces.xs.XSElementDeclaration;
 import org.apache.xerces.xs.XSModel;
 import org.apache.xerces.xs.XSTypeDefinition;
+import org.hamcrest.CoreMatchers;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Matchers;
+import org.mockito.Mockito;
 import org.opengis.cite.iso19142.FES2;
 import org.opengis.cite.iso19142.Namespaces;
 import org.opengis.cite.iso19142.SuiteAttribute;
@@ -34,7 +37,11 @@ import org.opengis.cite.iso19142.util.WFSMessage;
 import org.opengis.cite.validation.XSModelBuilder;
 import org.opengis.cite.validation.XmlSchemaCompiler;
 
+import static org.hamcrest.CoreMatchers.anyOf;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -81,20 +88,26 @@ public class VerifyComparisonOperatorTests {
     }
 
     @Test
-    public void findNumericPropertyOfSimpleFeature() throws SAXException, IOException {
-        List<String> valueList = Arrays.asList("600.68", "100.47", "200.54");
-        when(suite.getAttribute(org.opengis.cite.iso19136.SuiteAttribute.XSMODEL.getName())).thenReturn(model);
-        when(dataSampler.getSimplePropertyValues(Matchers.any(QName.class), Matchers.any(QName.class),
-                Matchers.anyString())).thenReturn(valueList);
-        QName featureType = new QName(NS1, "SimpleFeature");
+    public void findNumericPropertyOfSimpleFeature() {
+        QName featureType = new QName( NS1, "SimpleFeature" );
+        when( suite.getAttribute( org.opengis.cite.iso19136.SuiteAttribute.XSMODEL.getName() ) ).thenReturn( model );
+
+        List<String> integerValueList = Arrays.asList( "600", "100", "200" );
+        QName integerPropName = new QName( NS1, "intProperty2" );
+        when( dataSampler.getSimplePropertyValues( eq( featureType ), eq( integerPropName ), anyString() ) ).thenReturn( integerValueList );
+
+        List<String> doubleValueList = Arrays.asList( "600.68", "100.47", "200.54" );
+        QName doublePropName = new QName( NS1, "measurand" );
+        when( dataSampler.getSimplePropertyValues( eq( featureType ), eq( doublePropName ), anyString() ) ).thenReturn( doubleValueList );
+
         ComparisonOperatorTests iut = new ComparisonOperatorTests();
-        iut.initQueryFilterFixture(testContext);
-        Set<XSTypeDefinition> dataTypes = iut.getNumericDataTypes(model);
-        Map<XSElementDeclaration, String[]> prop = iut.findFeaturePropertyValue(model, featureType, dataTypes);
-        assertFalse("Expected to find numeric property for SimpleFeature.", prop.isEmpty());
+        iut.initQueryFilterFixture( testContext );
+        Set<XSTypeDefinition> dataTypes = iut.getNumericDataTypes( model );
+        Map<XSElementDeclaration, String[]> prop = iut.findFeaturePropertyValue( model, featureType, dataTypes );
+        assertFalse( "Expected to find numeric property for SimpleFeature.", prop.isEmpty() );
         Entry<XSElementDeclaration, String[]> propRange = prop.entrySet().iterator().next();
         String[] range = propRange.getValue();
-        assertEquals("Unexpected maximum value.", "600.68", range[range.length - 1]);
+        assertThat( "Unexpected maximum value.", range[range.length - 1], anyOf( is( "600" ), is( "600.68" ) ) );
     }
 
     @Test
