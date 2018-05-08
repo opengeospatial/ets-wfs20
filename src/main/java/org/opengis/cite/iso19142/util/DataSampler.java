@@ -30,6 +30,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.apache.xerces.xs.XSComplexTypeDefinition;
 import org.apache.xerces.xs.XSElementDeclaration;
 import org.apache.xerces.xs.XSModel;
 import org.apache.xerces.xs.XSTypeDefinition;
@@ -396,7 +397,12 @@ public class DataSampler {
      *         values.
      */
     public Period getTemporalExtentOfProperty(XSModel model, QName featureType, XSElementDeclaration tmPropDecl) {
-        FeatureProperty tmProp = new FeatureProperty(featureType, tmPropDecl);
+        FeatureProperty tmProp;
+        try {
+            tmProp = new FeatureProperty( featureType, tmPropDecl );
+        } catch ( Exception e ) {
+            throw new RuntimeException( "Property " + tmPropDecl + " is not suitable as temporal property.", e );
+        }
         Period period = this.temporalPropertyExtents.get(tmProp);
         if (null != period) {
             return period;
@@ -418,8 +424,9 @@ public class DataSampler {
             XSTypeDefinition propType = tmPropDecl.getTypeDefinition();
             Element propElem = (Element) propNodes.item(i);
             try {
-                if (propType.getTypeCategory() == XSTypeDefinition.SIMPLE_TYPE) {
-                    tVal = TemporalQuery.parseTemporalValue(propElem.getTextContent(), propType);
+                if ( propType.getTypeCategory() == XSTypeDefinition.SIMPLE_TYPE
+                     || ( (XSComplexTypeDefinition) propType ).getContentType() == XSComplexTypeDefinition.CONTENTTYPE_SIMPLE ) {
+                    tVal = TemporalQuery.parseTemporalValue( propElem.getTextContent(), propType );
                 } else {
                     Element propValue = (Element) propElem.getElementsByTagName("*").item(0);
                     tVal = GmlUtils.gmlToTemporalGeometricPrimitive(propValue);

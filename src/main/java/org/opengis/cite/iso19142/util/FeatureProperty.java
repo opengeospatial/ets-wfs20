@@ -7,6 +7,8 @@ import org.apache.xerces.xs.XSElementDeclaration;
 import org.apache.xerces.xs.XSTypeDefinition;
 import org.opengis.cite.iso19136.util.XMLSchemaModelUtils;
 
+import java.util.List;
+
 /**
  * An immutable description of a feature property. The property type may be
  * simple (e.g. a string) or complex (e.g. a GML geometry element).
@@ -87,18 +89,18 @@ final public class FeatureProperty {
      *            A schema component representing an element declaration.
      * @return A QName denoting the name of a simple or complex type.
      */
-    QName getTypeName(XSElementDeclaration elementDecl) {
+    QName getTypeName( XSElementDeclaration elementDecl ) {
         XSTypeDefinition typeDef = elementDecl.getTypeDefinition();
-        QName typeName = null;
-        if (typeDef.getTypeCategory() == XSTypeDefinition.SIMPLE_TYPE) {
-            typeName = new QName(typeDef.getNamespace(), typeDef.getName());
-        } else {
-            XSComplexTypeDefinition complexTypeDef = (XSComplexTypeDefinition) typeDef;
-            XSElementDeclaration elemDecl = XMLSchemaModelUtils.getAllElementsInParticle(complexTypeDef.getParticle())
-                    .get(0);
-            typeName = new QName(elemDecl.getNamespace(), elemDecl.getName());
-        }
-        return typeName;
+        if ( typeDef.getTypeCategory() == XSTypeDefinition.SIMPLE_TYPE )
+            return new QName( typeDef.getNamespace(), typeDef.getName() );
+
+        XSComplexTypeDefinition complexTypeDef = (XSComplexTypeDefinition) typeDef;
+        if ( complexTypeDef.getContentType() == XSComplexTypeDefinition.CONTENTTYPE_SIMPLE )
+            return new QName( elementDecl.getNamespace(), elementDecl.getName() );
+
+        List<XSElementDeclaration> allElementsInParticle = XMLSchemaModelUtils.getAllElementsInParticle( complexTypeDef.getParticle() );
+        XSElementDeclaration elemDecl = allElementsInParticle.get( 0 );
+        return new QName( elemDecl.getNamespace(), elemDecl.getName() );
     }
 
     @Override

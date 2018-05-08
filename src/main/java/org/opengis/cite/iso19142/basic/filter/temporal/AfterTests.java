@@ -6,6 +6,7 @@ import java.util.List;
 import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMSource;
 
+import org.apache.xerces.xs.XSComplexTypeDefinition;
 import org.apache.xerces.xs.XSElementDeclaration;
 import org.apache.xerces.xs.XSTypeDefinition;
 import org.opengis.cite.geomatics.gml.GmlUtils;
@@ -181,7 +182,8 @@ public class AfterTests extends QueryFilterFixture {
         XSTypeDefinition typeDef = propertyDecl.getTypeDefinition();
         for (Node timeNode : temporalNodes) {
             TemporalGeometricPrimitive t1 = null;
-            if (typeDef.getTypeCategory() == XSTypeDefinition.SIMPLE_TYPE) {
+            if ( typeDef.getTypeCategory() == XSTypeDefinition.SIMPLE_TYPE
+                 || ( (XSComplexTypeDefinition) typeDef ).getContentType() == XSComplexTypeDefinition.CONTENTTYPE_SIMPLE ) {
                 t1 = TemporalQuery.parseTemporalValue(timeNode.getTextContent(), typeDef);
             } else {
                 t1 = GmlUtils.gmlToTemporalGeometricPrimitive((Element) timeNode);
