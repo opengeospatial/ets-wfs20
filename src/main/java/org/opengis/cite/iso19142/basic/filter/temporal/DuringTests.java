@@ -61,7 +61,7 @@ import com.sun.jersey.api.client.ClientResponse;
  * <li>ISO 19108, 5.2.3.5: TM_RelativePosition</li>
  * </ul>
  */
-public class DuringTests extends QueryFilterFixture {
+public class DuringTests extends AbstractTemporalTest {
 
     private static final String DURING_OP = "During";
 
@@ -78,30 +78,18 @@ public class DuringTests extends QueryFilterFixture {
      */
     @Test(description = "See ISO 19143: 7.14.6, A.9", dataProvider = "protocol-featureType")
     public void duringPeriod(ProtocolBinding binding, QName featureType) {
-        List<XSElementDeclaration> timeProps = findTemporalProperties(featureType);
-        if (timeProps.isEmpty()) {
-            throw new SkipException("Feature type has no temporal properties: " + featureType);
-        }
-        Period temporalExtent = null;
-        XSElementDeclaration tmProperty;
-        Iterator<XSElementDeclaration> propsItr = timeProps.iterator();
-        do {
-            tmProperty = propsItr.next();
-            temporalExtent = this.dataSampler.getTemporalExtentOfProperty(this.model, featureType, tmProperty);
-            if (null != temporalExtent) {
-                break;
-            }
-        } while (propsItr.hasNext());
-        Document gmlTimeLiteral = TimeUtils.periodAsGML(temporalExtent);
+        TemporalProperty temporalProperty = findTemporalProperty( featureType );
+
+        Document gmlTimeLiteral = TimeUtils.periodAsGML(temporalProperty.getExtent());
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
-        Element valueRef = WFSMessage.createValueReference(tmProperty);
+        Element valueRef = WFSMessage.createValueReference(temporalProperty.getProperty());
         WFSMessage.addTemporalPredicate(this.reqEntity, DURING_OP, gmlTimeLiteral, valueRef);
         ClientResponse rsp = wfsClient.getFeature(new DOMSource(reqEntity), binding);
         this.rspEntity = extractBodyAsDocument(rsp);
         Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
-        List<Node> temporalNodes = TemporalQuery.extractTemporalNodes(this.rspEntity, tmProperty, this.model);
-        assertDuring(temporalNodes, tmProperty, gmlTimeLiteral);
+        List<Node> temporalNodes = TemporalQuery.extractTemporalNodes(this.rspEntity, temporalProperty.getProperty(), this.model);
+        assertDuring(temporalNodes, temporalProperty.getProperty(), gmlTimeLiteral);
     }
 
     /**

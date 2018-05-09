@@ -43,7 +43,7 @@ import com.sun.jersey.api.client.ClientResponse;
  *
  * <img src="doc-files/before.png" alt="Before relationship">
  */
-public class BeforeTests extends QueryFilterFixture {
+public class BeforeTests extends AbstractTemporalTest {
 
     private static final String BEFORE_OP = "Before";
 
@@ -71,24 +71,20 @@ public class BeforeTests extends QueryFilterFixture {
      */
     @Test(description = "See ISO 19143: A.10", dataProvider = "protocol-featureType")
     public void beforePeriod(ProtocolBinding binding, QName featureType) {
-        List<XSElementDeclaration> timeProps = findTemporalProperties(featureType);
-        if (timeProps.isEmpty()) {
-            throw new SkipException("Feature type has no temporal properties: " + featureType);
-        }
-        XSElementDeclaration timeProperty = timeProps.get(0);
-        Period temporalExtent = this.dataSampler.getTemporalExtentOfProperty(this.model, featureType, timeProperty);
-        List<Period> subIntervals = TemporalUtils.splitInterval(temporalExtent, 3);
+        TemporalProperty temporalProperty = findTemporalProperty( featureType );
+
+        List<Period> subIntervals = TemporalUtils.splitInterval(temporalProperty.getExtent(), 3);
         Period lastSubInterval = subIntervals.get(2);
         Document gmlTimeLiteral = TimeUtils.periodAsGML(lastSubInterval);
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
-        Element valueRef = WFSMessage.createValueReference(timeProperty);
+        Element valueRef = WFSMessage.createValueReference(temporalProperty.getProperty());
         WFSMessage.addTemporalPredicate(this.reqEntity, BEFORE_OP, gmlTimeLiteral, valueRef);
         ClientResponse rsp = wfsClient.getFeature(new DOMSource(this.reqEntity), binding);
         this.rspEntity = extractBodyAsDocument(rsp);
         Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
-        List<Node> temporalNodes = TemporalQuery.extractTemporalNodes(this.rspEntity, timeProperty, this.model);
-        assertBefore(temporalNodes, timeProperty, gmlTimeLiteral);
+        List<Node> temporalNodes = TemporalQuery.extractTemporalNodes(this.rspEntity, temporalProperty.getProperty(), this.model);
+        assertBefore(temporalNodes, temporalProperty.getProperty(), gmlTimeLiteral);
     }
 
     /**

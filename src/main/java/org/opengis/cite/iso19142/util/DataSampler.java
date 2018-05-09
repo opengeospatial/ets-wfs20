@@ -401,7 +401,7 @@ public class DataSampler {
         try {
             tmProp = new FeatureProperty( featureType, tmPropDecl );
         } catch ( Exception e ) {
-            throw new RuntimeException( "Property " + tmPropDecl + " is not suitable as temporal property.", e );
+            throw new IllegalArgumentException( "Property " + tmPropDecl + " is not suitable as temporal property.", e );
         }
         Period period = this.temporalPropertyExtents.get(tmProp);
         if (null != period) {
