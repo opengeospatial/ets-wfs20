@@ -6,6 +6,7 @@ import java.util.List;
 import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMSource;
 
+import org.apache.xerces.xs.XSComplexTypeDefinition;
 import org.apache.xerces.xs.XSElementDeclaration;
 import org.apache.xerces.xs.XSTypeDefinition;
 import org.opengis.cite.geomatics.gml.GmlUtils;
@@ -45,7 +46,7 @@ import com.sun.jersey.api.client.ClientResponse;
  * <img src="doc-files/after.png" alt="After relationship">
  *
  */
-public class AfterTests extends QueryFilterFixture {
+public class AfterTests extends AbstractTemporalTest {
 
     private static final String AFTER_OP = "After";
 
@@ -73,24 +74,20 @@ public class AfterTests extends QueryFilterFixture {
      */
     @Test(description = "See ISO 19143: A.10", dataProvider = "protocol-featureType")
     public void afterPeriod(ProtocolBinding binding, QName featureType) {
-        List<XSElementDeclaration> timeProps = findTemporalProperties(featureType);
-        if (timeProps.isEmpty()) {
-            throw new SkipException("Feature type has no temporal properties: " + featureType);
-        }
-        XSElementDeclaration timeProperty = timeProps.get(0);
-        Period temporalExtent = this.dataSampler.getTemporalExtentOfProperty(this.model, featureType, timeProperty);
-        List<Period> subIntervals = TemporalUtils.splitInterval(temporalExtent, 3);
+        TemporalProperty temporalProperty = findTemporalProperty( featureType );
+
+        List<Period> subIntervals = TemporalUtils.splitInterval(temporalProperty.getExtent(), 3);
         Period firstSubInterval = subIntervals.get(0);
         Document gmlTimeLiteral = TimeUtils.periodAsGML(firstSubInterval);
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
-        Element valueRef = WFSMessage.createValueReference(timeProperty);
+        Element valueRef = WFSMessage.createValueReference(temporalProperty.getProperty());
         WFSMessage.addTemporalPredicate(this.reqEntity, AFTER_OP, gmlTimeLiteral, valueRef);
         ClientResponse rsp = wfsClient.getFeature(new DOMSource(this.reqEntity), binding);
         this.rspEntity = extractBodyAsDocument(rsp);
         Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
-        List<Node> temporalNodes = TemporalQuery.extractTemporalNodes(this.rspEntity, timeProperty, this.model);
-        assertAfter(temporalNodes, timeProperty, gmlTimeLiteral);
+        List<Node> temporalNodes = TemporalQuery.extractTemporalNodes(this.rspEntity, temporalProperty.getProperty(), this.model);
+        assertAfter(temporalNodes, temporalProperty.getProperty(), gmlTimeLiteral);
     }
 
     /**
@@ -106,25 +103,21 @@ public class AfterTests extends QueryFilterFixture {
      */
     @Test(description = "See ISO 19143: A.10", dataProvider = "protocol-featureType")
     public void afterInstant(ProtocolBinding binding, QName featureType) {
-        List<XSElementDeclaration> timeProps = findTemporalProperties(featureType);
-        if (timeProps.isEmpty()) {
-            throw new SkipException("Feature type has no temporal properties: " + featureType);
-        }
-        XSElementDeclaration timeProperty = timeProps.get(0);
-        Period temporalExtent = this.dataSampler.getTemporalExtentOfProperty(this.model, featureType, timeProperty);
-        List<Period> subIntervals = TemporalUtils.splitInterval(temporalExtent, 3);
+        TemporalProperty temporalProperty = findTemporalProperty( featureType );
+
+        List<Period> subIntervals = TemporalUtils.splitInterval(temporalProperty.getExtent(), 3);
         // end of first sub-interval
         Instant instant = subIntervals.get(0).getEnding();
         Document gmlTimeLiteral = TimeUtils.instantAsGML(instant, ZoneOffset.UTC);
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
-        Element valueRef = WFSMessage.createValueReference(timeProperty);
+        Element valueRef = WFSMessage.createValueReference(temporalProperty.getProperty());
         WFSMessage.addTemporalPredicate(this.reqEntity, AFTER_OP, gmlTimeLiteral, valueRef);
         ClientResponse rsp = wfsClient.getFeature(new DOMSource(this.reqEntity), binding);
         this.rspEntity = extractBodyAsDocument(rsp);
         Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
-        List<Node> temporalNodes = TemporalQuery.extractTemporalNodes(this.rspEntity, timeProperty, this.model);
-        assertAfter(temporalNodes, timeProperty, gmlTimeLiteral);
+        List<Node> temporalNodes = TemporalQuery.extractTemporalNodes(this.rspEntity, temporalProperty.getProperty(), this.model);
+        assertAfter(temporalNodes, temporalProperty.getProperty(), gmlTimeLiteral);
     }
 
     /**
@@ -141,25 +134,21 @@ public class AfterTests extends QueryFilterFixture {
      */
     @Test(description = "See ISO 19143: A.10", dataProvider = "protocol-featureType")
     public void afterInstantWithOffset(ProtocolBinding binding, QName featureType) {
-        List<XSElementDeclaration> timeProps = findTemporalProperties(featureType);
-        if (timeProps.isEmpty()) {
-            throw new SkipException("Feature type has no temporal properties: " + featureType);
-        }
-        XSElementDeclaration timeProperty = timeProps.get(0);
-        Period temporalExtent = this.dataSampler.getTemporalExtentOfProperty(this.model, featureType, timeProperty);
-        List<Period> subIntervals = TemporalUtils.splitInterval(temporalExtent, 3);
+        TemporalProperty temporalProperty = findTemporalProperty( featureType );
+
+        List<Period> subIntervals = TemporalUtils.splitInterval(temporalProperty.getExtent(), 3);
         // end of first sub-interval with UTC offset +09:00 (Japan)
         Instant instant = subIntervals.get(0).getEnding();
         Document gmlTimeLiteral = TimeUtils.instantAsGML(instant, ZoneOffset.ofHours(9));
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
-        Element valueRef = WFSMessage.createValueReference(timeProperty);
+        Element valueRef = WFSMessage.createValueReference(temporalProperty.getProperty());
         WFSMessage.addTemporalPredicate(this.reqEntity, AFTER_OP, gmlTimeLiteral, valueRef);
         ClientResponse rsp = wfsClient.getFeature(new DOMSource(this.reqEntity), binding);
         this.rspEntity = extractBodyAsDocument(rsp);
         Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
-        List<Node> temporalNodes = TemporalQuery.extractTemporalNodes(this.rspEntity, timeProperty, this.model);
-        assertAfter(temporalNodes, timeProperty, gmlTimeLiteral);
+        List<Node> temporalNodes = TemporalQuery.extractTemporalNodes(this.rspEntity, temporalProperty.getProperty(), this.model);
+        assertAfter(temporalNodes, temporalProperty.getProperty(), gmlTimeLiteral);
     }
 
     /**
@@ -181,7 +170,8 @@ public class AfterTests extends QueryFilterFixture {
         XSTypeDefinition typeDef = propertyDecl.getTypeDefinition();
         for (Node timeNode : temporalNodes) {
             TemporalGeometricPrimitive t1 = null;
-            if (typeDef.getTypeCategory() == XSTypeDefinition.SIMPLE_TYPE) {
+            if ( typeDef.getTypeCategory() == XSTypeDefinition.SIMPLE_TYPE
+                 || ( (XSComplexTypeDefinition) typeDef ).getContentType() == XSComplexTypeDefinition.CONTENTTYPE_SIMPLE ) {
                 t1 = TemporalQuery.parseTemporalValue(timeNode.getTextContent(), typeDef);
             } else {
                 t1 = GmlUtils.gmlToTemporalGeometricPrimitive((Element) timeNode);

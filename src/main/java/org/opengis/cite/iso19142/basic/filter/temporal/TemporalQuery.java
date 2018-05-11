@@ -12,10 +12,14 @@ import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalQueries;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import org.apache.xerces.impl.dv.XSSimpleType;
+import org.apache.xerces.xs.XSComplexTypeDefinition;
+import org.apache.xerces.xs.XSConstants;
 import org.apache.xerces.xs.XSElementDeclaration;
 import org.apache.xerces.xs.XSModel;
+import org.apache.xerces.xs.XSSimpleTypeDefinition;
 import org.apache.xerces.xs.XSTypeDefinition;
 import org.geotoolkit.temporal.factory.DefaultTemporalFactory;
 import org.geotoolkit.temporal.object.DefaultPosition;
@@ -36,7 +40,7 @@ public class TemporalQuery {
     /**
      * Extracts the values of the specified temporal property from the given XML
      * document.
-     * 
+     *
      * @param rspEntity
      *            A Document representing a WFS response entity containing
      *            feature instances.
@@ -54,7 +58,8 @@ public class TemporalQuery {
             XSModel model) {
         List<Node> temporalNodes = null;
         XSTypeDefinition timePropType = timeProperty.getTypeDefinition();
-        if (timePropType.getTypeCategory() == XSTypeDefinition.SIMPLE_TYPE) {
+        if ( timePropType.getTypeCategory() == XSTypeDefinition.SIMPLE_TYPE
+             || ( (XSComplexTypeDefinition) timePropType ).getContentType() == XSComplexTypeDefinition.CONTENTTYPE_SIMPLE ) {
             temporalNodes = WFSMessage.findMatchingElements(rspEntity, timeProperty);
         } else {
             // elements that substitute for gml:AbstractTimeGeometricPrimitive
@@ -71,7 +76,7 @@ public class TemporalQuery {
     /**
      * Creates a primitive temporal object from the given temporal value and
      * type definition.
-     * 
+     *
      * @param value
      *            A string representation of a temporal value.
      * @param typeDefinition
@@ -80,14 +85,20 @@ public class TemporalQuery {
      * @return A TemporalGeometricPrimitive instance (instant or period).
      */
     public static TemporalGeometricPrimitive parseTemporalValue(String value, XSTypeDefinition typeDefinition) {
-        if (typeDefinition.getTypeCategory() != XSTypeDefinition.SIMPLE_TYPE) {
-            throw new IllegalArgumentException("Not a simple type definition: " + typeDefinition.getName());
+        if ( typeDefinition.getTypeCategory() != XSTypeDefinition.SIMPLE_TYPE
+             && !( ( (XSComplexTypeDefinition) typeDefinition ).getContentType() == XSComplexTypeDefinition.CONTENTTYPE_SIMPLE ) ) {
+            throw new IllegalArgumentException( "Not a simple type definition: " + typeDefinition.getName() );
         }
         TemporalGeometricPrimitive tmPrimitive = null;
         TemporalFactory tmFactory = new DefaultTemporalFactory();
-        XSSimpleType simpleType = XSSimpleType.class.cast(typeDefinition);
-        switch (simpleType.getPrimitiveKind()) {
-        case XSSimpleType.PRIMITIVE_DATETIME:
+        XSSimpleTypeDefinition simpleTypeDefinition;
+        if ( typeDefinition.getTypeCategory() == XSTypeDefinition.SIMPLE_TYPE ) {
+            simpleTypeDefinition = XSSimpleTypeDefinition.class.cast( typeDefinition );
+        } else
+            simpleTypeDefinition = ( (XSComplexTypeDefinition) typeDefinition ).getSimpleType();
+
+        switch ( simpleTypeDefinition.getBuiltInKind() ) {
+        case XSConstants.DATETIME_DT:
             DateTimeFormatter xsdDateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss[.SSS][XXX]");
             TemporalAccessor tm = xsdDateTimeFormatter.parseBest(value, ZonedDateTime::from, LocalDateTime::from);
             if (tm instanceof LocalDateTime) {
@@ -97,7 +108,7 @@ public class TemporalQuery {
             ZonedDateTime dateTime = (ZonedDateTime) tm;
             tmPrimitive = tmFactory.createInstant(new DefaultPosition(Date.from(dateTime.toInstant())));
             break;
-        case XSSimpleType.PRIMITIVE_DATE:
+        case XSConstants.DATE_DT:
             ZoneOffset zone = DateTimeFormatter.ISO_DATE.parse(value, TemporalQueries.offset());
             if (null == zone) {
                 zone = ZonedDateTime.now().getOffset();
