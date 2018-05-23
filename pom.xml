@@ -176,6 +176,7 @@
         <configuration>
           <projectFile>test/ets-wfs20-soapui-project.xml</projectFile>
           <junitReport>true</junitReport>
+          <testFailIgnore>true</testFailIgnore>
           <projectProperties>
             <value>wfs20.teamengine.endpoint=${soapui.wfs20.teamengine.endpoint}</value>
             <value>wfs20.ets.version=${soapui.wfs20.ets.version}</value>
