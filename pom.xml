@@ -46,6 +46,12 @@
   <properties>
     <ets-code>wfs20</ets-code>
     <spec-version>2.0.0</spec-version>
+    <soapui.wfs20.teamengine.endpoint>http://cite.opengeospatial.org/te2</soapui.wfs20.teamengine.endpoint>
+    <soapui.wfs20.ets.version>1.29</soapui.wfs20.ets.version>
+    <soapui.wfs20.iut>http://cite.deegree.org/deegree-webservices-3.4.0/services/wfs200?service=WFS&amp;request=GetCapabilities</soapui.wfs20.iut>
+    <soapui.wfs20.tests.passed>83</soapui.wfs20.tests.passed>
+    <soapui.wfs20.tests.skipped>42</soapui.wfs20.tests.skipped>
+    <soapui.wfs20.tests.failed>3</soapui.wfs20.tests.failed>
   </properties>
 
   <dependencies>
@@ -156,6 +162,30 @@
           <scmBranch>gh-pages</scmBranch>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>com.smartbear.soapui</groupId>
+        <artifactId>soapui-maven-plugin</artifactId>
+        <version>5.4.0</version>
+        <dependencies>
+          <dependency>
+            <groupId>com.jgoodies</groupId>
+            <artifactId>forms</artifactId>
+            <version>1.0.7</version>
+          </dependency>
+        </dependencies>
+        <configuration>
+          <projectFile>test/ets-wfs20-soapui-project.xml</projectFile>
+          <junitReport>true</junitReport>
+          <projectProperties>
+            <value>wfs20.teamengine.endpoint=${soapui.wfs20.teamengine.endpoint}</value>
+            <value>wfs20.ets.version=${soapui.wfs20.ets.version}</value>
+            <value>wfs20.iut=${soapui.wfs20.iut}</value>
+            <value>wfs20.tests.passed=${soapui.wfs20.tests.passed}</value>
+            <value>wfs20.tests.skipped=${soapui.wfs20.tests.skipped}</value>
+            <value>wfs20.tests.failed=${soapui.wfs20.tests.failed}</value>
+          </projectProperties>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 
@@ -189,6 +219,13 @@
       </build>
     </profile>
   </profiles>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>smartbear-sweden-plugin-repository</id>
+      <url>http://www.soapui.org/repository/maven2/</url>
+    </pluginRepository>
+  </pluginRepositories>
 
   <distributionManagement>
     <repository>

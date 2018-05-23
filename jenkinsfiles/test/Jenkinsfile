@@ -1,0 +1,26 @@
+pipeline {
+  agent any
+  tools {
+    maven 'mvn'
+    jdk 'JDK 8'
+  }
+  stages {
+    stage('Preparation') {
+      steps{
+        deleteDir()
+        sh 'git clone git@github.com:opengeospatial/ets-wfs20.git .'
+      }
+    }
+    stage('Test') {
+      steps{
+        sh 'mvn --version'
+        sh 'mvn clean com.smartbear.soapui:soapui-maven-plugin:test -Dsoapui.wfs20.teamengine.endpoint=${soapui.wfs20.teamengine.endpoint} -Dsoapui.wfs20.ets.version=${soapui.wfs20.ets.version} -Dsoapui.wfs20.iut=${soapui.wfs20.iut} -Dsoapui.wfs20.tests.passed=${soapui.wfs20.tests.passed} -Dsoapui.wfs20.tests.skipped=${soapui.wfs20.tests.skipped} -Dsoapui.wfs20.tests.failed=${soapui.wfs20.tests.failed}'
+      }
+    }
+    stage('Results') {
+      steps{
+        junit 'TEST-*.xml'
+      }
+    }
+  }
+}
