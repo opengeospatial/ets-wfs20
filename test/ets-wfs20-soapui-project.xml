@@ -12,7 +12,7 @@
           <con:settings>
             <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
           </con:settings>
-          <con:endpoint>${#Project#wfs20.teamengine.endpoint}/rest/suites</con:endpoint>
+          <con:endpoint>${#Project#teamengine.endpoint}/rest/suites</con:endpoint>
           <con:request/>
           <con:assertion type="Valid HTTP Status Codes" id="4d39c148-0ddc-4260-8bfb-b44b7034192b" name="Valid HTTP Status Codes">
             <con:configuration>
@@ -47,7 +47,7 @@
           <con:settings>
             <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
           </con:settings>
-          <con:endpoint>${#Project#wfs20.teamengine.endpoint}/rest/suites/wfs20/${#Project#wfs20.ets.version}</con:endpoint>
+          <con:endpoint>${#Project#teamengine.endpoint}/rest/suites/wfs20/${#Project#ets.version}</con:endpoint>
           <con:request/>
           <con:assertion type="Valid HTTP Status Codes" id="0b7f5046-5ac7-41d0-829e-17315ac969ba" name="Valid HTTP Status Codes">
             <con:configuration>
@@ -75,7 +75,7 @@
           <con:settings>
             <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;entry key="Accept" value="application/xml" xmlns="http://eviware.com/soapui/config"/></con:setting>
           </con:settings>
-          <con:endpoint>${#Project#wfs20.teamengine.endpoint}/rest/suites/wfs20/${#Project#wfs20.ets.version}/run</con:endpoint>
+          <con:endpoint>${#Project#teamengine.endpoint}/rest/suites/wfs20/${#Project#ets.version}/run</con:endpoint>
           <con:request/>
           <con:assertion type="Valid HTTP Status Codes" id="0b7f5046-5ac7-41d0-829e-17315ac969ba" name="Valid HTTP Status Codes">
             <con:configuration>
@@ -105,7 +105,7 @@ assert headers != null &amp;&amp; headers[0] != null &amp;&amp; headers[0].index
           <con:parameters>
             <con:parameter>
               <con:name>wfs</con:name>
-              <con:value>${#Project#wfs20.iut}</con:value>
+              <con:value>${#Project#iut}</con:value>
               <con:style>QUERY</con:style>
             </con:parameter>
           </con:parameters>
@@ -117,7 +117,7 @@ assert headers != null &amp;&amp; headers[0] != null &amp;&amp; headers[0].index
           <con:settings>
             <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;entry key="Accept" value="application/zip" xmlns="http://eviware.com/soapui/config"/></con:setting>
           </con:settings>
-          <con:endpoint>${#Project#wfs20.teamengine.endpoint}/rest/suites/wfs20/${#Project#wfs20.ets.version}/run</con:endpoint>
+          <con:endpoint>${#Project#teamengine.endpoint}/rest/suites/wfs20/${#Project#ets.version}/run</con:endpoint>
           <con:request/>
           <con:assertion type="Valid HTTP Status Codes" id="0b7f5046-5ac7-41d0-829e-17315ac969ba" name="Valid HTTP Status Codes">
             <con:configuration>
@@ -147,7 +147,7 @@ assert headers != null &amp;&amp; headers[0] != null &amp;&amp; headers[0].index
           <con:parameters>
             <con:parameter>
               <con:name>wfs</con:name>
-              <con:value>${#Project#wfs20.iut}</con:value>
+              <con:value>${#Project#iut}</con:value>
               <con:style>QUERY</con:style>
             </con:parameter>
           </con:parameters>
@@ -159,7 +159,7 @@ assert headers != null &amp;&amp; headers[0] != null &amp;&amp; headers[0].index
           <con:settings>
             <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;entry key="Accept" value="application/rdf+xml" xmlns="http://eviware.com/soapui/config"/></con:setting>
           </con:settings>
-          <con:endpoint>${#Project#wfs20.teamengine.endpoint}/rest/suites/wfs20/${#Project#wfs20.ets.version}/run</con:endpoint>
+          <con:endpoint>${#Project#teamengine.endpoint}/rest/suites/wfs20/${#Project#ets.version}/run</con:endpoint>
           <con:request/>
           <con:assertion type="Valid HTTP Status Codes" id="0b7f5046-5ac7-41d0-829e-17315ac969ba" name="Valid HTTP Status Codes">
             <con:configuration>
@@ -188,21 +188,21 @@ exists(/rdf:RDF)</path>
 declare namespace rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#";
 declare namespace cite="http://cite.opengeospatial.org/";
 
-/rdf:RDF/cite:TestRun/cite:testsPassed</path><content>${#Project#wfs20.tests.passed}</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration>
+/rdf:RDF/cite:TestRun/cite:testsPassed</path><content>${#Project#tests.passed}</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration>
           </con:assertion>
           <con:assertion type="XPath Match" id="52c5d6bd-4b82-439c-935e-83fc502c889c" name="Total tests skipped">
             <con:configuration><path>declare namespace dct="http://purl.org/dc/terms/";
 declare namespace rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#";
 declare namespace cite="http://cite.opengeospatial.org/";
 
-/rdf:RDF/cite:TestRun/cite:testsSkipped</path><content>${#Project#wfs20.tests.skipped}</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration>
+/rdf:RDF/cite:TestRun/cite:testsSkipped</path><content>${#Project#tests.skipped}</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration>
           </con:assertion>
           <con:assertion type="XPath Match" id="52c5d6bd-4b82-439c-935e-83fc502c889c" name="Total tests failed">
             <con:configuration><path>declare namespace dct="http://purl.org/dc/terms/";
 declare namespace rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#";
 declare namespace cite="http://cite.opengeospatial.org/";
 
-/rdf:RDF/cite:TestRun/cite:testsFailed</path><content>${#Project#wfs20.tests.failed}</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration>
+/rdf:RDF/cite:TestRun/cite:testsFailed</path><content>${#Project#tests.failed}</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration>
           </con:assertion>
           <con:credentials>
             <con:authType>No Authorization</con:authType>
@@ -212,7 +212,7 @@ declare namespace cite="http://cite.opengeospatial.org/";
           <con:parameters>
             <con:parameter>
               <con:name>wfs</con:name>
-              <con:value>${#Project#wfs20.iut}</con:value>
+              <con:value>${#Project#iut}</con:value>
               <con:style>QUERY</con:style>
             </con:parameter>
           </con:parameters>
@@ -229,7 +229,7 @@ declare namespace cite="http://cite.opengeospatial.org/";
       
     </con:properties>
   </con:testSuite>
-  <con:properties><con:property><con:name>wfs20.teamengine.endpoint</con:name><con:value>http://cite.opengeospatial.org/te2</con:value></con:property><con:property><con:name>wfs20.ets.version</con:name><con:value>1.29</con:value></con:property><con:property><con:name>wfs20.iut</con:name><con:value>http://cite.deegree.org/deegree-webservices-3.4.0/services/wfs200?service=WFS&amp;request=GetCapabilities</con:value></con:property><con:property><con:name>wfs20.tests.passed</con:name><con:value>83</con:value></con:property><con:property><con:name>wfs20.tests.skipped</con:name><con:value>42</con:value></con:property><con:property><con:name>wfs20.tests.failed</con:name><con:value>3</con:value></con:property></con:properties>
+  <con:properties><con:property><con:name>teamengine.endpoint</con:name><con:value>http://cite.opengeospatial.org/te2</con:value></con:property><con:property><con:name>ets.version</con:name><con:value>1.29</con:value></con:property><con:property><con:name>iut</con:name><con:value>http://cite.deegree.org/deegree-webservices-3.4.0/services/wfs200?service=WFS&amp;request=GetCapabilities</con:value></con:property><con:property><con:name>tests.passed</con:name><con:value>83</con:value></con:property><con:property><con:name>tests.skipped</con:name><con:value>42</con:value></con:property><con:property><con:name>tests.failed</con:name><con:value>3</con:value></con:property></con:properties>
   <con:wssContainer/>
   <con:oAuth2ProfileContainer/>
   <con:oAuth1ProfileContainer/>

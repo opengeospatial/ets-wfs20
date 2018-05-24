@@ -46,12 +46,12 @@
   <properties>
     <ets-code>wfs20</ets-code>
     <spec-version>2.0.0</spec-version>
-    <soapui.wfs20.teamengine.endpoint>http://cite.opengeospatial.org/te2</soapui.wfs20.teamengine.endpoint>
-    <soapui.wfs20.ets.version>1.29</soapui.wfs20.ets.version>
-    <soapui.wfs20.iut>http://cite.deegree.org/deegree-webservices-3.4.0/services/wfs200?service=WFS&amp;request=GetCapabilities</soapui.wfs20.iut>
-    <soapui.wfs20.tests.passed>83</soapui.wfs20.tests.passed>
-    <soapui.wfs20.tests.skipped>42</soapui.wfs20.tests.skipped>
-    <soapui.wfs20.tests.failed>3</soapui.wfs20.tests.failed>
+    <soapui.teamengine.endpoint>http://cite.opengeospatial.org/te2</soapui.teamengine.endpoint>
+    <soapui.ets.version>1.29</soapui.ets.version>
+    <soapui.iut>http://cite.deegree.org/deegree-webservices-3.4.0/services/wfs200?service=WFS&amp;request=GetCapabilities</soapui.iut>
+    <soapui.tests.passed>83</soapui.tests.passed>
+    <soapui.tests.skipped>42</soapui.tests.skipped>
+    <soapui.tests.failed>3</soapui.tests.failed>
   </properties>
 
   <dependencies>
@@ -178,12 +178,12 @@
           <junitReport>true</junitReport>
           <testFailIgnore>true</testFailIgnore>
           <projectProperties>
-            <value>wfs20.teamengine.endpoint=${soapui.wfs20.teamengine.endpoint}</value>
-            <value>wfs20.ets.version=${soapui.wfs20.ets.version}</value>
-            <value>wfs20.iut=${soapui.wfs20.iut}</value>
-            <value>wfs20.tests.passed=${soapui.wfs20.tests.passed}</value>
-            <value>wfs20.tests.skipped=${soapui.wfs20.tests.skipped}</value>
-            <value>wfs20.tests.failed=${soapui.wfs20.tests.failed}</value>
+            <value>teamengine.endpoint=${soapui.teamengine.endpoint}</value>
+            <value>ets.version=${soapui.ets.version}</value>
+            <value>iut=${soapui.iut}</value>
+            <value>tests.passed=${soapui.tests.passed}</value>
+            <value>tests.skipped=${soapui.tests.skipped}</value>
+            <value>tests.failed=${soapui.tests.failed}</value>
           </projectProperties>
         </configuration>
       </plugin>

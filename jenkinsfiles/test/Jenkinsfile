@@ -14,7 +14,7 @@ pipeline {
     stage('Test') {
       steps{
         sh 'mvn --version'
-        sh 'mvn clean com.smartbear.soapui:soapui-maven-plugin:test -Dsoapui.wfs20.teamengine.endpoint=${teamengineEndpoint} -Dsoapui.wfs20.ets.version=${etsVersion} -Dsoapui.wfs20.iut=${iut} -Dsoapui.wfs20.tests.passed=${testsPassed} -Dsoapui.wfs20.tests.skipped=${testsSkipped} -Dsoapui.wfs20.tests.failed=${testsFailed}'
+        sh 'mvn clean com.smartbear.soapui:soapui-maven-plugin:test -Dsoapui.teamengine.endpoint=${teamengineEndpoint} -Dsoapui.ets.version=${etsVersion} -Dsoapui.iut=${iut} -Dsoapui.tests.passed=${testsPassed} -Dsoapui.tests.skipped=${testsSkipped} -Dsoapui.tests.failed=${testsFailed}'
       }
     }
     stage('Results') {
