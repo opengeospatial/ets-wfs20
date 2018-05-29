@@ -93,10 +93,16 @@ public class ServiceMetadataUtils {
             // XPath expression is correct
             TestSuiteLogger.log(Level.INFO, ex.getMessage());
         }
-        if (null != endpoint.getQuery()) {
-            // prune query component if present
+        String queryString = endpoint.getQuery();
+        if ( null != queryString ) {
             String uri = endpoint.toString();
-            endpoint = URI.create(uri.substring(0, uri.indexOf('?')));
+            if( queryString.trim().isEmpty() ) {
+                // remove trailing '?'
+                endpoint = URI.create(uri.substring(0, uri.indexOf('?')));
+            } else if (!uri.endsWith("&")) {
+                // make sure the query component is ready for appending extra params
+                endpoint = URI.create(uri + "&");
+            }
         }
         return endpoint;
     }
