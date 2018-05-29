@@ -8,7 +8,7 @@
     <Parameter name="typeName" type="xsd:QName">
       <Abstract>Qualified name of feature type (required).</Abstract>
     </Parameter>
-    <QueryExpressionText returnFeatureTypes="${typeName}"
+    <QueryExpressionText returnFeatureTypes=""
       language="urn:ogc:def:queryLanguage:OGC-WFS::WFSQueryExpression" isPrivate="false">
       <Query typeNames="${typeName}" />
     </QueryExpressionText>
