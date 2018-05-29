@@ -28,9 +28,9 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 import com.sun.jersey.api.client.ClientResponse;
+import org.w3c.dom.NodeList;
 
 /**
  * Tests the response to a LockFeature request that attempts to lock feature
@@ -61,44 +61,6 @@ public class LockFeatureTests extends LockingFixture {
 	}
 
 	/**
-	 * [{@code Test}] An attempt to reset a non-existent lock should produce a
-	 * service exception with error code "LockHasExpired" and HTTP status code
-	 * 403 (Forbidden).
-	 * 
-	 * <p>
-	 * <strong>Note</strong>: The WFS2 specification makes no distinction
-	 * between a non-existent and an expired lock in this context. The error
-	 * code {@code InvalidLockId} would seem more appropriate here but that may
-	 * only appear in a Transaction response according to Table 3.
-	 * </p>
-	 * 
-	 * <p style="margin-bottom: 0.5em">
-	 * <strong>Sources</strong>
-	 * </p>
-	 * <ul>
-	 * <li>ISO 19142:2010, cl. 12.2.4.2: lockId parameter</li>
-	 * <li>ISO 19142:2010, Table D.2</li>
-	 * </ul>
-	 */
-	@Test(description = "See ISO 19142: 12.2.4.2")
-	public void resetNonexistentLock() {
-		Map<String, QName> featureId = fetchRandomFeatureIdentifier(this.featureInfo);
-		String gmlId = featureId.keySet().iterator().next();
-		WFSMessage.appendStoredQuery(reqEntity, this.storedQueryId,
-				Collections.singletonMap("id", (Object) gmlId));
-		reqEntity.getDocumentElement().setAttribute("lockId",
-				"lock-does-not-exist");
-		ClientResponse rsp = wfsClient.submitRequest(reqEntity,
-				ProtocolBinding.ANY);
-		this.rspEntity = rsp.getEntity(Document.class);
-		Assert.assertEquals(rsp.getStatus(),
-				ClientResponse.Status.FORBIDDEN.getStatusCode(),
-				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
-		String xpath = "//ows:Exception[@exceptionCode = 'LockHasExpired']";
-		ETSAssert.assertXPath(xpath, this.rspEntity.getDocumentElement(), null);
-	}
-
-	/**
 	 * [{@code Test}] Submits a request to lock a feature instance; within this
 	 * interval an attempt to delete the instance without the correct lock
 	 * identifier should fail with exception code {@code MissingParameterValue}.
@@ -113,8 +75,8 @@ public class LockFeatureTests extends LockingFixture {
 	 */
 	@Test(description = "See ISO 19142: 12.2.4.3, 15.2.3.1.2")
 	public void lockFeatureAndAttemptDelete() {
-		Map<String, QName> featureId = fetchRandomFeatureIdentifier(this.featureInfo);
-		String gmlId = featureId.keySet().iterator().next();
+		QName featureType = this.dataSampler.selectRandomFeatureType();
+		String gmlId = this.dataSampler.selectRandomFeatureIdentifiers( featureType, 1 ).iterator().next();
 		WFSMessage.appendStoredQuery(reqEntity, this.storedQueryId,
 				Collections.singletonMap("id", (Object) gmlId));
 		reqEntity.getDocumentElement().setAttribute("expiry", "60");
@@ -135,7 +97,9 @@ public class LockFeatureTests extends LockingFixture {
 		String xpath = String.format(
 				"//wfs:FeaturesLocked/fes:ResourceId/@rid = '%s'", gmlId);
 		ETSAssert.assertXPath(xpath, lockRsp, null);
-		Document trxResponse = wfsClient.deleteFeatures(featureId, ProtocolBinding.ANY);
+		Map<String, QName> idTofeatureType = new HashMap<>();
+		idTofeatureType.put( gmlId, featureType );
+		Document trxResponse = wfsClient.deleteFeatures( idTofeatureType, ProtocolBinding.ANY);
 		String xpath2 = "//ows:Exception[@exceptionCode = 'MissingParameterValue']";
 		ETSAssert.assertXPath(xpath2, trxResponse.getDocumentElement(), null);
 	}
@@ -155,8 +119,8 @@ public class LockFeatureTests extends LockingFixture {
 	 */
 	@Test(description = "See ISO 19142: 12.2.3, 12.2.5")
 	public void lockFeatureAlreadyLocked() {
-		Map<String, QName> featureId = fetchRandomFeatureIdentifier(this.featureInfo);
-		String gmlId = featureId.keySet().iterator().next();
+		QName featureType = this.dataSampler.selectRandomFeatureType();
+		String gmlId = this.dataSampler.selectRandomFeatureIdentifiers( featureType, 1 ).iterator().next();
 		WFSMessage.appendStoredQuery(reqEntity, this.storedQueryId,
 				Collections.singletonMap("id", (Object) gmlId));
 		reqEntity.getDocumentElement().setAttribute("expiry", "60");
@@ -226,59 +190,60 @@ public class LockFeatureTests extends LockingFixture {
 		ETSAssert.assertXPath("not(//wfs:FeaturesNotLocked)", lockRsp, null);
 	}
 
-	/**
-	 * Obtains the system-assigned identifier of an instance of some randomly
-	 * selected feature type.
-	 * 
-	 * @param featureInfo
-	 *            A Map containing information about supported feature types,
-	 *            keyed by type name (QName).
-	 * @return A Map containing at most a single entry that associates the
-	 *         (String) value of the gml:id attribute with the feature type name
-	 *         (QName); the map is empty if no data exist in the SUT.
-	 */
-	Map<String, QName> fetchRandomFeatureIdentifier(
-			Map<QName, FeatureTypeInfo> featureInfo) {
-		Map<String, QName> featureId = new HashMap<String, QName>();
-		QName featureType = selectRandomFeatureType(featureInfo);
-		if (null != featureType) {
-			Document doc = wfsClient.getFeatureByType(featureType, 10, null);
-			NodeList features = doc.getElementsByTagNameNS(
-					featureType.getNamespaceURI(), featureType.getLocalPart());
-			Element feature = (Element) features.item(randomIndex
-					.nextInt(features.getLength()));
-			featureId.put(feature.getAttributeNS(Namespaces.GML, "id"),
-					featureType);
-		}
-		if (TestSuiteLogger.isLoggable(Level.FINER)) {
-			TestSuiteLogger.log(Level.FINER, featureId.toString());
-		}
-		return featureId;
-	}
+    /**
+     * [{@code Test}] An attempt to reset a lock with locKId and fes:AbstractQueryExpression
+     * should produce a service exception with error code "OperationParsingFailed" and HTTP
+     * status code 400 (Bad Request).
+     *
+     * <p>
+     * <strong>Note</strong>: The WFS 2.0.2 specification specifies this behaviour in detail (12.2.4.2 lockId parameter):
+     *
+     * "If both a lockId parameter and one or more fes:AbstractQueryExpression elements are
+     * included in a LockFeature request then the server shall raise an OperationParsingFailed
+     * exception (see 7.5).[24]"
+     * </p>
+     *
+     * <p style="margin-bottom: 0.5em">
+     * <strong>Sources</strong>
+     * </p>
+     * <ul>
+     * <li>09-025r2, cl. 12.2.4.2: lockId parameter</li>
+     * <li>09-025r2, Table D.2</li>
+     * </ul>
+     */
+    @Test(description = "See 09-025r2: 12.2.4.2")
+    public void lockFeatureWithLockIdAndQuery() {
+        if(!"2.0.2".equals( this.wfsVersion) ){
+            throw new SkipException( "Tested only for WFS 2.0.2" );
+        }
+		QName featureType = this.dataSampler.selectRandomFeatureType();
+        WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
+        this.reqEntity.getDocumentElement().setAttribute("expiry", "10");
+        ClientResponse rsp = wfsClient.submitRequest(this.reqEntity,
+                                                     ProtocolBinding.ANY);
+        this.rspEntity = rsp.getEntity(Document.class);
+        Assert.assertEquals(rsp.getStatus(),
+                            ClientResponse.Status.OK.getStatusCode(),
+                            ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
+        Element featureColl = (Element) this.rspEntity.getElementsByTagNameNS(
+                                Namespaces.WFS, WFS2.FEATURE_COLLECTION).item(0);
+        String lockId = featureColl.getAttribute("lockId");
+        Assert.assertFalse(lockId.isEmpty(), ErrorMessage.format(
+                                ErrorMessageKeys.MISSING_INFOSET_ITEM, "@lockId"));
+        locks.add(lockId);
 
-	/**
-	 * Randomly selects a feature type name for which instances are available in
-	 * the SUT.
-	 * 
-	 * @param featureTypes
-	 *            A Map containing information about supported feature types,
-	 *            keyed by type name (QName).
-	 * @return A QName object denoting the name of a feature type, or
-	 *         {@code null} if no data exist in the SUT.
-	 */
-	static QName selectRandomFeatureType(
-			Map<QName, FeatureTypeInfo> featureTypes) {
-		List<FeatureTypeInfo> availableTypes = new ArrayList<FeatureTypeInfo>();
-		for (FeatureTypeInfo typeInfo : featureTypes.values()) {
-			if (typeInfo.isInstantiated()) {
-				availableTypes.add(typeInfo);
-			}
-		}
-		if (availableTypes.isEmpty()) {
-			return null;
-		}
-		FeatureTypeInfo availableType = availableTypes.get(randomIndex
-				.nextInt(availableTypes.size()));
-		return availableType.getTypeName();
-	}
+        // try to reset expired lock with LockFeature request
+        this.reqEntity = WFSMessage.createRequestEntity("LockFeature",
+                                                        this.wfsVersion);
+        reqEntity.getDocumentElement().setAttribute("lockId", lockId);
+        WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
+        rsp = wfsClient.submitRequest(reqEntity, ProtocolBinding.ANY);
+        this.rspEntity = rsp.getEntity(Document.class);
+        Assert.assertEquals(rsp.getStatus(),
+                            ClientResponse.Status.BAD_REQUEST.getStatusCode(),
+                            ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
+        String xpath = "//ows:Exception[@exceptionCode = 'OperationParsingFailed']";
+        ETSAssert.assertXPath(xpath, this.rspEntity.getDocumentElement(), null);
+    }
+
 }

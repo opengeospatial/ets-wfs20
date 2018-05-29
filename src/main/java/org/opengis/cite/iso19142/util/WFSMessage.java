@@ -186,11 +186,23 @@ public class WFSMessage {
         } catch (Exception e) {
             TestSuiteLogger.log(Level.WARNING, "Failed to parse request entity from classpath: " + resourceName, e);
         }
-        Attr verAttr = doc.getDocumentElement().getAttributeNode("version");
-        if (null != verAttr && null != wfsVersion && !wfsVersion.isEmpty()) {
-            doc.getDocumentElement().getAttributeNode("version").setValue(wfsVersion);
-        }
+        updateVersion( doc , wfsVersion);
         return doc;
+    }
+
+    /**
+     * Sets the @version attribute in the root element of the doc to the specified version
+     * 
+     * @param doc
+     *            the doc to update. never <code>null</code>
+     * @param wfsVersion
+     *            A WFS version identifier ("2.0.0" if not specified).
+     */
+    public static void updateVersion( Document doc, String wfsVersion ) {
+        Attr verAttr = doc.getDocumentElement().getAttributeNode( "version" );
+        if ( null != verAttr && null != wfsVersion && !wfsVersion.isEmpty() ) {
+            doc.getDocumentElement().getAttributeNode( "version" ).setValue( wfsVersion );
+        }
     }
 
     /**
@@ -557,7 +569,33 @@ public class WFSMessage {
         predicate.appendChild(request.importNode(gmlTime.getDocumentElement(), true));
     }
     
-    private static Document wrapEntityInSOAPEnvelopeWithNS( Source xmlSource, String soapNS ) {
+    /**
+     * Sets the attribute CreateStoredQuery/StoredQueryDefinition/QueryExpressionText/Query/@typeNames to the passed
+     * feature type name.
+     * 
+     * @param request
+     *            request to modify, never <code>null</code>
+     * @param featureTypeName
+     *            name to set, never <code>null</code>
+     */
+    public static void setReturnTypesAndTypeNamesAttribute( Document request, QName featureTypeName ) {
+        if ( !request.getDocumentElement().getLocalName().equals( WFS2.CREATE_STORED_QRY ) ) {
+            throw new IllegalArgumentException( "Not a CreateStoredQuery request: "
+                                                + request.getDocumentElement().getNodeName() );
+        }
+        Element storedQueryDefinition = (Element) request.getElementsByTagNameNS( Namespaces.WFS,
+                                                                                  "StoredQueryDefinition" ).item( 0 );
+        Element queryExpressionText = (Element) storedQueryDefinition.getElementsByTagNameNS( Namespaces.WFS,
+                                                                                              "QueryExpressionText" ).item( 0 );
+        Element queryElem = (Element) queryExpressionText.getElementsByTagNameNS( Namespaces.WFS, WFS2.QUERY_ELEM ).item( 0 );
+
+        String prefix = "ns" + Integer.toString( (int) ( Math.random() * 100 ) );
+        String typeNamesAttributeValue = prefix + ":" + featureTypeName.getLocalPart();
+        queryExpressionText.setAttribute( "xmlns:" + prefix, featureTypeName.getNamespaceURI() );
+
+        queryElem.setAttribute( "typeNames", typeNamesAttributeValue );
+        queryExpressionText.setAttribute( "returnFeatureTypes", typeNamesAttributeValue );
+    }    private static Document wrapEntityInSOAPEnvelopeWithNS( Source xmlSource, String soapNS ) {
         Document soapDoc = BUILDER.newDocument();
         Element soapEnv = soapDoc.createElementNS( soapNS, "soap:Envelope" );
         soapDoc.appendChild( soapEnv );
@@ -579,5 +617,5 @@ public class WFSMessage {
                                  "Failed to create SOAP envelope from Source " + xmlSource.getSystemId(), e );
         }
     }
-    
+
 }

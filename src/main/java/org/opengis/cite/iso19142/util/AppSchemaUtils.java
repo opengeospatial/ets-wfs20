@@ -243,6 +243,18 @@ public class AppSchemaUtils {
             datatype = new QName(XMLConstants.W3C_XML_SCHEMA_NS_URI, "decimal");
             break;
         case XSConstants.INTEGER_DT:
+        case XSConstants.BYTE_DT:
+        case XSConstants.UNSIGNEDBYTE_DT:
+        case XSConstants.INT_DT:
+        case XSConstants.UNSIGNEDINT_DT:
+        case XSConstants.LONG_DT:
+        case XSConstants.UNSIGNEDLONG_DT:
+        case XSConstants.NEGATIVEINTEGER_DT:
+        case XSConstants.POSITIVEINTEGER_DT:
+        case XSConstants.NONNEGATIVEINTEGER_DT:
+        case XSConstants.NONPOSITIVEINTEGER_DT:
+        case XSConstants.SHORT_DT:
+        case XSConstants.UNSIGNEDSHORT_DT:
             datatype = new QName(XMLConstants.W3C_XML_SCHEMA_NS_URI, "integer");
             break;
         case XSConstants.STRING_DT:

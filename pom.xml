@@ -7,7 +7,7 @@
     <version>9</version>
   </parent>
   <artifactId>ets-wfs20</artifactId>
-  <version>1.28-SNAPSHOT</version>
+  <version>1.30-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>WFS 2.0 (ISO 19142:2010) Conformance Test Suite</name>
@@ -46,6 +46,12 @@
   <properties>
     <ets-code>wfs20</ets-code>
     <spec-version>2.0.0</spec-version>
+    <soapui.teamengine.endpoint>http://cite.opengeospatial.org/te2</soapui.teamengine.endpoint>
+    <soapui.ets.version>1.29</soapui.ets.version>
+    <soapui.iut>http://cite.deegree.org/deegree-webservices-3.4.0/services/wfs200?service=WFS&amp;request=GetCapabilities</soapui.iut>
+    <soapui.tests.passed>83</soapui.tests.passed>
+    <soapui.tests.skipped>42</soapui.tests.skipped>
+    <soapui.tests.failed>3</soapui.tests.failed>
   </properties>
 
   <dependencies>
@@ -132,11 +138,13 @@
         <artifactId>maven-jar-plugin</artifactId>
       </plugin>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-release-plugin</artifactId>
         <version>2.5.3</version>
         <configuration>
           <autoVersionSubmodules>true</autoVersionSubmodules>
           <tagNameFormat>@{project.version}</tagNameFormat>
+          <releaseProfiles>release</releaseProfiles>
         </configuration>
       </plugin>
       <plugin>
@@ -146,6 +154,88 @@
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>buildnumber-maven-plugin</artifactId>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-scm-publish-plugin</artifactId>
+        <version>1.1</version>
+        <configuration>
+          <scmBranch>gh-pages</scmBranch>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>com.smartbear.soapui</groupId>
+        <artifactId>soapui-maven-plugin</artifactId>
+        <version>5.4.0</version>
+        <dependencies>
+          <dependency>
+            <groupId>com.jgoodies</groupId>
+            <artifactId>forms</artifactId>
+            <version>1.0.7</version>
+          </dependency>
+        </dependencies>
+        <configuration>
+          <projectFile>test/ets-wfs20-soapui-project.xml</projectFile>
+          <junitReport>true</junitReport>
+          <testFailIgnore>true</testFailIgnore>
+          <projectProperties>
+            <value>teamengine.endpoint=${soapui.teamengine.endpoint}</value>
+            <value>ets.version=${soapui.ets.version}</value>
+            <value>iut=${soapui.iut}</value>
+            <value>tests.passed=${soapui.tests.passed}</value>
+            <value>tests.skipped=${soapui.tests.skipped}</value>
+            <value>tests.failed=${soapui.tests.failed}</value>
+          </projectProperties>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>release</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.6</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+                <configuration>
+                  <!-- Enable if GPG 2.1+ is used -->
+                  <!--<gpgArguments>
+                    <arg>&#45;&#45;pinentry-mode</arg>
+                    <arg>loopback</arg>
+                  </gpgArguments>-->
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>smartbear-sweden-plugin-repository</id>
+      <url>http://www.soapui.org/repository/maven2/</url>
+    </pluginRepository>
+  </pluginRepositories>
+
+  <distributionManagement>
+    <repository>
+      <id>sonatype-nexus-staging</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
+    <site>
+      <id>site</id>
+      <url>scm:git:git@github.com:opengeospatial/ets-wfs20.git</url>
+    </site>
+  </distributionManagement>
 </project>

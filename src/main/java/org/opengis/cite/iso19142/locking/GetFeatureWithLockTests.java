@@ -72,8 +72,7 @@ public class GetFeatureWithLockTests extends LockingFixture {
 	 */
 	@Test(description = "See ISO 19142: 13.2.4.3")
 	public void lockQueryResults_hits() {
-		QName featureType = LockFeatureTests
-				.selectRandomFeatureType(this.featureInfo);
+		QName featureType = this.dataSampler.selectRandomFeatureType();
 		WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
 		this.reqEntity.getDocumentElement().setAttribute("resultType", "hits");
 		ClientResponse rsp = wfsClient.submitRequest(this.reqEntity,
@@ -102,8 +101,7 @@ public class GetFeatureWithLockTests extends LockingFixture {
 	 */
 	@Test(description = "See ISO 19142: 12.2.4.2, Table D.2")
 	public void lockAllQueryResults_20Seconds() {
-		QName featureType = LockFeatureTests
-				.selectRandomFeatureType(this.featureInfo);
+		QName featureType = this.dataSampler.selectRandomFeatureType();
 		WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
 		this.reqEntity.getDocumentElement().setAttribute("expiry", "20");
 		ClientResponse rsp = wfsClient.submitRequest(this.reqEntity,
@@ -126,7 +124,6 @@ public class GetFeatureWithLockTests extends LockingFixture {
 		// try to reset expired lock with LockFeature request
 		this.reqEntity = WFSMessage.createRequestEntity("LockFeature",
 				this.wfsVersion);
-		WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
 		reqEntity.getDocumentElement().setAttribute("lockId", lockId);
 		rsp = wfsClient.submitRequest(reqEntity, ProtocolBinding.ANY);
 		this.rspEntity = rsp.getEntity(Document.class);
@@ -156,8 +153,7 @@ public class GetFeatureWithLockTests extends LockingFixture {
 	 */
 	@Test(description = "See ISO 19142: 13.2.4.2")
 	public void lockSomeFeatures() {
-		QName featureType = LockFeatureTests
-				.selectRandomFeatureType(this.featureInfo);
+		QName featureType = this.dataSampler.selectRandomFeatureType();
 		Set<String> featureIdSet = this.dataSampler
 				.selectRandomFeatureIdentifiers(featureType, 10);
 		// Submit Q1 to lock one feature

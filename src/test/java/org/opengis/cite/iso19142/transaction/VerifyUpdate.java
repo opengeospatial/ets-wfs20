@@ -76,10 +76,10 @@ public class VerifyUpdate {
         QName featureType = new QName(NS1, "ComplexFeature");
         List<XSElementDeclaration> simpleProps = AppSchemaUtils.getSimpleFeatureProperties(model, featureType);
         List<String> propValues = new ArrayList<String>();
-        propValues.add("49.25");
+        propValues.add("48.2");
         Update iut = new Update();
         String newVal = iut.newPropertyValue(simpleProps.get(0), propValues);
-        assertEquals(3.8969, Double.parseDouble(newVal), 0.00001);
+        assertEquals(24.1, Double.parseDouble(newVal), 0.00001);
     }
 
     @Test
@@ -89,7 +89,7 @@ public class VerifyUpdate {
         List<String> propValues = new ArrayList<String>();
         propValues.add("49.25");
         Update iut = new Update();
-        String newVal = iut.newPropertyValue(simpleProps.get(simpleProps.size() - 1), propValues);
+        String newVal = iut.newPropertyValue(simpleProps.get(5), propValues);
         assertEquals(4.925, Double.parseDouble(newVal), 0.0001);
     }
 
@@ -100,7 +100,7 @@ public class VerifyUpdate {
         List<String> propValues = new ArrayList<String>();
         propValues.add("2010-01-01");
         Update iut = new Update();
-        String newVal = iut.newPropertyValue(simpleProps.get(simpleProps.size() - 2), propValues);
+        String newVal = iut.newPropertyValue(simpleProps.get(4), propValues);
         assertEquals(LocalDate.now(ZoneId.of("Z")), LocalDate.parse(newVal));
     }
 }
