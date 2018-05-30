@@ -174,7 +174,7 @@
           </dependency>
         </dependencies>
         <configuration>
-          <projectFile>test/ets-wfs20-soapui-project.xml</projectFile>
+          <projectFile>src/test/resources/soapui/ets-wfs20-soapui-project.xml</projectFile>
           <junitReport>true</junitReport>
           <testFailIgnore>true</testFailIgnore>
           <projectProperties>
