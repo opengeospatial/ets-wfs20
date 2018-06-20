@@ -254,9 +254,12 @@
             <configuration>
               <images>
                 <image>
-                  <name>opengeospatial/${project.artifactId}:${project.version}</name>
+                  <name>opengeospatial/${project.artifactId}</name>
                   <build>
                     <dockerFileDir>${project.basedir}/src/main/docker</dockerFileDir>
+                    <tags>
+                      <tag>${project.version}-teamengine-${docker.teamengine.version}</tag>
+                    </tags>
                     <assembly>
                       <inline>
                         <fileSets>
