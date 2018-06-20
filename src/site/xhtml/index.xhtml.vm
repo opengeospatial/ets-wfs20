@@ -69,6 +69,9 @@ dt {
     <p>The fundamental conformance levels defined in the WFS 2.0 specification are covered by 
     this test suite:</p>
     <dl>
+      <dt><strong>Preconditions</strong></dt>
+      <dt><strong>All GML application schemas</strong></dt>
+      <dt><strong>GML application schemas defining features and feature collections</strong></dt>
       <dt><strong>Simple WFS</strong></dt>
       <dd>Implements the following operations: GetCapabilities, DescribeFeatureType, 
       ListStoredQueries, DescribeStoredQueries, and the GetFeature operation with at 
@@ -76,11 +79,23 @@ dt {
       <dt><strong>Basic WFS</strong></dt>
       <dd>As for <strong>Simple WFS</strong>, plus the GetFeature operation with the Query action and 
       the GetPropertyValue operation.</dd>
+      <dt><strong>Spatial filter</strong></dt>
+      <dd>Implements the BBOX spatial operator and one or more of the other spatial operators.</dd>
+      <dt><strong>Temporal filter</strong></dt>
+      <dd>Implements the During temporal operator and one or more of the other temporal operators.</dd>  
       <dt><strong>Transactional WFS</strong></dt>
       <dd>As for <strong>Basic WFS</strong>, plus the Transaction operation.</dd>
       <dt><strong>Locking WFS</strong></dt>
       <dd>As for <strong>Transactional WFS</strong>, plus at least one of the GetFeatureWithLock or 
       LockFeature operations.</dd>
+      <dt><strong>Spatial joins</strong></dt>
+      <dd>The server shall implement join predicates using spatial operators.</dd>
+      <dt><strong>Response paging</strong></dt>
+      <dd>The server shall implement the ability to page through the set of  response features or values.</dd>
+      <dt><strong>Manage stored queries</strong></dt>
+      <dd>The server shall implement the <strong>CreateStoredQuery</strong> and the <strong>DropStoredQuery</strong> operations.</dd>
+      <dt><strong>Feature versions</strong></dt>
+      <dd>The server shall implement the ability to navigate feature versions.</dd>
     </dl>
 
     <h2>Test requirements</h2>
