@@ -14,12 +14,13 @@ pipeline {
     stage('Build') {
       steps{
         sh 'mvn --version'
-        sh 'mvn clean install site'
+        sh 'mvn clean install site -Psoapui,docker -Dsoapui.test.fail.ignore=true'
       }
     }
     stage('Results') {
       steps{
         junit '**/target/surefire-reports/TEST-*.xml'
+        junit '**/target/soapui/TEST-*.xml'
         archive 'target/*'
       }
     }
