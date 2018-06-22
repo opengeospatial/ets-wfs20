@@ -280,6 +280,12 @@
                     <ports>
                       <port>8081:8080</port>
                     </ports>
+                    <wait>
+                      <http>
+                        <url>http://localhost:8081/teamengine</url>
+                      </http>
+                      <time>120000</time>
+                    </wait>
                   </run>
                 </image>
               </images>
