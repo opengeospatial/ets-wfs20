@@ -213,6 +213,7 @@
             </dependencies>
             <configuration>
               <projectFile>src/test/resources/soapui/ets-wfs20-soapui-project.xml</projectFile>
+              <settingsFile>src/test/resources/soapui/ets-wfs20-soapui-settings.xml</settingsFile>
               <outputFolder>${project.build.directory}/soapui</outputFolder>
               <junitReport>true</junitReport>
               <testFailIgnore>${soapui.test.fail.ignore}</testFailIgnore>
