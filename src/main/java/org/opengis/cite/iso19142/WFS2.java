@@ -45,6 +45,7 @@ public class WFS2 {
     /** Service constraint indicating support for SOAP message bindings. */
     public static final String SOAP_ENC = "SOAPEncoding";
     public static final String SOAP_VERSION = "1.1";
+    public static final String SOAP_VERSION_1_2 = "1.2";
     /** Local name of document element in WFS capabilities document. */
     public static final String WFS_CAPABILITIES = "WFS_Capabilities";
     /** Qualified name of document element in WFS capabilities document. */
