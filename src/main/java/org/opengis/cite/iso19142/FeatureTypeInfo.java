@@ -19,6 +19,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.temporal.Period;
 import org.opengis.util.FactoryException;
+import org.testng.SkipException;
 
 /**
  * Provides information about a feature type managed by a WFS. Much of the
@@ -142,6 +143,8 @@ public class FeatureTypeInfo {
             defaultCRS = CRS.decode(crsId);
         } catch (FactoryException fex) {
             throw new RuntimeException("Default CRS not recognized. " + fex.getMessage());
+        }catch (IllegalArgumentException iae) {
+            throw new SkipException("Default CRS is not valid. " + iae.getMessage());
         }
         if (!geoExtent.getCoordinateReferenceSystem().equals(defaultCRS)) {
             Envelope bbox = null;
