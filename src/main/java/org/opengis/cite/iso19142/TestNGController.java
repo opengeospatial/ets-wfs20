@@ -14,6 +14,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Source;
 
+import org.apache.commons.io.FilenameUtils;
 import org.opengis.cite.iso19142.util.TestSuiteLogger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -108,9 +109,9 @@ public class TestNGController implements TestSuiteController {
         URL tngSuite = TestNGController.class.getResource("testng.xml");
         File resultsDir;
         if (null == outputDir || outputDir.isEmpty()) {
-            resultsDir = new File(System.getProperty("user.home"));
+            resultsDir = new File(FilenameUtils.normalize(System.getProperty("user.home")));
         } else if (outputDir.startsWith("file:")) {
-            resultsDir = new File(URI.create(outputDir));
+            resultsDir = new File(URI.create(FilenameUtils.normalize(outputDir)));
         } else {
             resultsDir = new File(outputDir);
         }

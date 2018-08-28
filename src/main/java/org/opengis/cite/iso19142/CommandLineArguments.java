@@ -1,6 +1,8 @@
 package org.opengis.cite.iso19142;
 
 import com.beust.jcommander.Parameter;
+import org.apache.commons.io.FilenameUtils;
+
 import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
@@ -43,7 +45,7 @@ public class CommandLineArguments {
     public File getPropertiesFile() {
         File fileRef;
         if (xmlProps.isEmpty()) {
-            fileRef = new File(System.getProperty("user.home"), "test-run-props.xml");
+            fileRef = new File(FilenameUtils.normalize(System.getProperty("user.home")), "test-run-props.xml");
         } else {
             String propsFile = xmlProps.get(0);
             fileRef = (propsFile.startsWith("file:")) ? new File(URI.create(propsFile)) : new File(propsFile);
