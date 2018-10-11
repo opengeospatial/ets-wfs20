@@ -38,6 +38,7 @@ public abstract class AbstractTemporalTest extends QueryFilterFixture {
 
         for ( XSElementDeclaration temporalProp : temporalProperties ) {
             try {
+            	temporalProperty = temporalProp;
                 temporalExtent = this.dataSampler.getTemporalExtentOfProperty( this.model, featureType, temporalProp );
             } catch ( Exception e ) {
                 LOGR.warning( "Could not calculate the extent of the temporal property " + temporalProp
