@@ -14,7 +14,7 @@ pipeline {
     stage('Build') {
       steps{
         sh 'mvn --version'
-        sh 'mvn clean install site -Psoapui,docker -Dsoapui.test.fail.ignore=true'
+        sh 'mvn clean install site -Pintegration-tests,docker -Dsoapui.test.fail.ignore=true'
       }
     }
     stage('Results') {
