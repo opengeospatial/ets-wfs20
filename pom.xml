@@ -366,6 +366,12 @@
                   <goal>build</goal>
                 </goals>
               </execution>
+              <execution>
+                <id>push</id>
+                <goals>
+                  <goal>push</goal>
+                </goals>
+              </execution>
             </executions>
           </plugin>
           <plugin>
