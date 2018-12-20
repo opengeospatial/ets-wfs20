@@ -109,7 +109,7 @@ public class TestNGController implements TestSuiteController {
         URL tngSuite = TestNGController.class.getResource("testng.xml");
         File resultsDir;
         if (null == outputDir || outputDir.isEmpty()) {
-            resultsDir = new File(System.getProperty("user.home"));
+            resultsDir = new File(FilenameUtils.normalize(System.getProperty("user.home")));
         } else if (outputDir.startsWith("file:")) {
             resultsDir = new File(URI.create(outputDir));
         } else {
