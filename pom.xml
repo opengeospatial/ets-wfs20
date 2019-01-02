@@ -50,8 +50,8 @@
     <soapui.teamengine.endpoint>http://localhost:8081/teamengine</soapui.teamengine.endpoint>
     <soapui.ets.version>${project.version}</soapui.ets.version>
     <soapui.iut>http://cite.deegree.org/deegree-webservices-3.4.0/services/wfs200?service=WFS&amp;request=GetCapabilities</soapui.iut>
-    <soapui.tests.passed>83</soapui.tests.passed>
-    <soapui.tests.skipped>42</soapui.tests.skipped>
+    <soapui.tests.passed>93</soapui.tests.passed>
+    <soapui.tests.skipped>32</soapui.tests.skipped>
     <soapui.tests.failed>3</soapui.tests.failed>
     <docker.teamengine.version>5.3</docker.teamengine.version>
   </properties>
@@ -112,7 +112,7 @@
           </execution>
         </executions>
       </plugin>
-	  <plugin>
+      <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <configuration>
           <archive>
@@ -168,6 +168,109 @@
         </configuration>
       </plugin>
     </plugins>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>com.smartbear.soapui</groupId>
+          <artifactId>soapui-maven-plugin</artifactId>
+          <version>5.4.0</version>
+          <dependencies>
+            <dependency>
+              <groupId>com.jgoodies</groupId>
+              <artifactId>forms</artifactId>
+              <version>1.0.7</version>
+            </dependency>
+          </dependencies>
+          <configuration>
+            <projectFile>src/test/resources/soapui/ets-wfs20-soapui-project.xml</projectFile>
+            <settingsFile>src/test/resources/soapui/ets-wfs20-soapui-settings.xml</settingsFile>
+            <outputFolder>${project.build.directory}/soapui</outputFolder>
+            <junitReport>true</junitReport>
+            <testFailIgnore>${soapui.test.fail.ignore}</testFailIgnore>
+            <projectProperties>
+              <value>teamengine.endpoint=${soapui.teamengine.endpoint}</value>
+              <value>ets.version=${soapui.ets.version}</value>
+              <value>iut=${soapui.iut}</value>
+              <value>tests.passed=${soapui.tests.passed}</value>
+              <value>tests.skipped=${soapui.tests.skipped}</value>
+              <value>tests.failed=${soapui.tests.failed}</value>
+            </projectProperties>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>io.fabric8</groupId>
+          <artifactId>docker-maven-plugin</artifactId>
+          <version>0.26.1</version>
+          <configuration>
+            <images>
+              <image>
+                <name>opengeospatial/${project.artifactId}</name>
+                <build>
+                  <dockerFileDir>${project.basedir}/src/docker</dockerFileDir>
+                  <tags>
+                    <tag>${project.version}-teamengine-${docker.teamengine.version}</tag>
+                  </tags>
+                  <assembly>
+                    <inline>
+                      <fileSets>
+                        <fileSet>
+                          <directory>${project.build.directory}</directory>
+                          <outputDirectory>.</outputDirectory>
+                          <includes>
+                            <include>dependency/*teamengine-*.war</include>
+                            <include>dependency/*teamengine-*.zip</include>
+                            <include>*ets-*.zip</include>
+                          </includes>
+                        </fileSet>
+                      </fileSets>
+                    </inline>
+                  </assembly>
+                </build>
+                <run>
+                  <ports>
+                    <port>8081:8080</port>
+                  </ports>
+                  <wait>
+                    <http>
+                      <url>http://localhost:8081/teamengine</url>
+                    </http>
+                    <time>120000</time>
+                  </wait>
+                </run>
+              </image>
+            </images>
+          </configuration>
+        </plugin>
+        <plugin>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>3.0.0</version>
+          <configuration>
+            <artifactItems>
+              <artifactItem>
+                <groupId>org.opengis.cite.teamengine</groupId>
+                <artifactId>teamengine-web</artifactId>
+                <version>${docker.teamengine.version}</version>
+                <type>war</type>
+              </artifactItem>
+              <artifactItem>
+                <groupId>org.opengis.cite.teamengine</groupId>
+                <artifactId>teamengine-web</artifactId>
+                <version>${docker.teamengine.version}</version>
+                <classifier>common-libs</classifier>
+                <type>zip</type>
+              </artifactItem>
+              <artifactItem>
+                <groupId>org.opengis.cite.teamengine</groupId>
+                <artifactId>teamengine-console</artifactId>
+                <version>${docker.teamengine.version}</version>
+                <classifier>base</classifier>
+                <type>zip</type>
+              </artifactItem>
+            </artifactItems>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
 
   <profiles>
@@ -199,35 +302,12 @@
       </build>
     </profile>
     <profile>
-      <id>soapui</id>
+      <id>integration-tests</id>
       <build>
         <plugins>
           <plugin>
             <groupId>com.smartbear.soapui</groupId>
             <artifactId>soapui-maven-plugin</artifactId>
-            <version>5.4.0</version>
-            <dependencies>
-              <dependency>
-                <groupId>com.jgoodies</groupId>
-                <artifactId>forms</artifactId>
-                <version>1.0.7</version>
-              </dependency>
-            </dependencies>
-            <configuration>
-              <projectFile>src/test/resources/soapui/ets-wfs20-soapui-project.xml</projectFile>
-              <settingsFile>src/test/resources/soapui/ets-wfs20-soapui-settings.xml</settingsFile>
-              <outputFolder>${project.build.directory}/soapui</outputFolder>
-              <junitReport>true</junitReport>
-              <testFailIgnore>${soapui.test.fail.ignore}</testFailIgnore>
-              <projectProperties>
-                <value>teamengine.endpoint=${soapui.teamengine.endpoint}</value>
-                <value>ets.version=${soapui.ets.version}</value>
-                <value>iut=${soapui.iut}</value>
-                <value>tests.passed=${soapui.tests.passed}</value>
-                <value>tests.skipped=${soapui.tests.skipped}</value>
-                <value>tests.failed=${soapui.tests.failed}</value>
-              </projectProperties>
-            </configuration>
             <executions>
               <execution>
                 <phase>integration-test</phase>
@@ -237,62 +317,9 @@
               </execution>
             </executions>
           </plugin>
-        </plugins>
-      </build>
-      <pluginRepositories>
-        <pluginRepository>
-          <id>smartbear-sweden-plugin-repository</id>
-          <url>http://www.soapui.org/repository/maven2/</url>
-        </pluginRepository>
-      </pluginRepositories>
-    </profile>
-    <profile>
-      <id>docker</id>
-      <build>
-        <plugins>
           <plugin>
             <groupId>io.fabric8</groupId>
             <artifactId>docker-maven-plugin</artifactId>
-            <version>0.26.0</version>
-            <configuration>
-              <images>
-                <image>
-                  <name>opengeospatial/${project.artifactId}</name>
-                  <build>
-                    <dockerFileDir>${project.basedir}/src/main/docker</dockerFileDir>
-                    <tags>
-                      <tag>${project.version}-teamengine-${docker.teamengine.version}</tag>
-                    </tags>
-                    <assembly>
-                      <inline>
-                        <fileSets>
-                          <fileSet>
-                            <directory>${project.build.directory}</directory>
-                            <outputDirectory>.</outputDirectory>
-                            <includes>
-                              <include>dependency/*teamengine-*.war</include>
-                              <include>dependency/*teamengine-*.zip</include>
-                              <include>*ets-*.zip</include>
-                            </includes>
-                          </fileSet>
-                        </fileSets>
-                      </inline>
-                    </assembly>
-                  </build>
-                  <run>
-                    <ports>
-                      <port>8081:8080</port>
-                    </ports>
-                    <wait>
-                      <http>
-                        <url>http://localhost:8081/teamengine</url>
-                      </http>
-                      <time>120000</time>
-                    </wait>
-                  </run>
-                </image>
-              </images>
-            </configuration>
             <executions>
               <execution>
                 <id>start</id>
@@ -310,51 +337,64 @@
                   <goal>remove</goal>
                 </goals>
               </execution>
-              <execution>
-                <id>build</id>
-                <goals>
-                  <goal>build</goal>
-                </goals>
-              </execution>
             </executions>
           </plugin>
           <plugin>
             <artifactId>maven-dependency-plugin</artifactId>
-            <version>3.0.0</version>
             <executions>
               <execution>
                 <goals>
-                  <goal>copy-dependencies</goal>
+                  <goal>copy</goal>
                 </goals>
               </execution>
             </executions>
           </plugin>
         </plugins>
       </build>
-      <dependencies>
-        <dependency>
-          <groupId>org.opengis.cite.teamengine</groupId>
-          <artifactId>teamengine-web</artifactId>
-          <version>${docker.teamengine.version}</version>
-          <type>war</type>
-        </dependency>
-        <dependency>
-          <groupId>org.opengis.cite.teamengine</groupId>
-          <artifactId>teamengine-web</artifactId>
-          <version>${docker.teamengine.version}</version>
-          <classifier>common-libs</classifier>
-          <type>zip</type>
-        </dependency>
-        <dependency>
-          <groupId>org.opengis.cite.teamengine</groupId>
-          <artifactId>teamengine-console</artifactId>
-          <version>${docker.teamengine.version}</version>
-          <classifier>base</classifier>
-          <type>zip</type>
-        </dependency>
-      </dependencies>
+    </profile>
+    <profile>
+      <id>docker</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>io.fabric8</groupId>
+            <artifactId>docker-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>build</id>
+                <goals>
+                  <goal>build</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>push</id>
+                <goals>
+                  <goal>push</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>copy</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
   </profiles>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>smartbear-sweden-plugin-repository</id>
+      <url>http://www.soapui.org/repository/maven2/</url>
+    </pluginRepository>
+  </pluginRepositories>
 
   <distributionManagement>
     <repository>
