@@ -111,7 +111,7 @@ public class TestNGController implements TestSuiteController {
         if (null == outputDir || outputDir.isEmpty()) {
             resultsDir = new File(FilenameUtils.normalize(System.getProperty("user.home")));
         } else if (outputDir.startsWith("file:")) {
-            resultsDir = new File(FilenameUtils.normalize(outputDir));
+            resultsDir = new File(URI.create(outputDir));
         } else {
             resultsDir = new File(outputDir);
         }
