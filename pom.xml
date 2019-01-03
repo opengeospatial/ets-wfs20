@@ -204,7 +204,7 @@
           <configuration>
             <images>
               <image>
-                <name>opengeospatial/${project.artifactId}</name>
+                <name>ogccite/${project.artifactId}</name>
                 <build>
                   <dockerFileDir>${project.basedir}/src/docker</dockerFileDir>
                   <tags>
