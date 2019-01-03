@@ -139,7 +139,10 @@ public class StoredQueryTests extends BaseFixture {
                             || statusCode == ClientResponse.Status.FORBIDDEN.getStatusCode(),
                     "Expected status code 404 or 403. Received: " + statusCode);
         } else {
-            Assert.assertEquals(statusCode, ClientResponse.Status.NOT_FOUND.getStatusCode(),
+            Assert.assertTrue(
+                    statusCode == ClientResponse.Status.INTERNAL_SERVER_ERROR.getStatusCode()
+                            || statusCode == ClientResponse.Status.BAD_REQUEST.getStatusCode()
+                            || statusCode == ClientResponse.Status.FORBIDDEN.getStatusCode(),
                     ErrorMessageKeys.UNEXPECTED_STATUS);
         }
     }
