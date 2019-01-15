@@ -94,32 +94,49 @@ public class ETSAssert {
      *            (value). It may be {@code null}.
      */
     public static void assertXPath(String expr, Node context, Map<String, String> nsBindings) {
-        if (null == context) {
-            throw new NullPointerException("Context node is null.");
-        }
-        LOGR.log(Level.FINE, "Evaluating \"{0}\" against context node:\n{1}",
-                new Object[] { expr, XMLUtils.writeNodeToString(context) });
-        NamespaceBindings bindings = NamespaceBindings.withStandardBindings();
-        bindings.addAllBindings(nsBindings);
-        XPathFactory factory = null;
-        try {
-            factory = XPathFactory.newInstance(XPathConstants.DOM_OBJECT_MODEL);
-        } catch (XPathFactoryConfigurationException e) {
-            // An implementation for the W3C DOM is always available
-        }
-        XPath xpath = factory.newXPath();
-        LOGR.log(Level.FINER, "Using XPath implementation: " + xpath.getClass().getName());
-        xpath.setNamespaceContext(bindings);
-        Boolean result;
-        try {
-            result = (Boolean) xpath.evaluate(expr, context, XPathConstants.BOOLEAN);
-        } catch (XPathExpressionException xpe) {
-            String msg = ErrorMessage.format(ErrorMessageKeys.XPATH_ERROR, expr);
-            LOGR.log(Level.WARNING, msg, xpe);
-            throw new AssertionError(msg);
-        }
-        LOGR.log(Level.FINE, "XPath result: " + result);
+        Boolean result = evaluateXPath(expr, context, nsBindings);
         Assert.assertTrue(result, ErrorMessage.format(ErrorMessageKeys.XPATH_RESULT, context.getNodeName(), expr));
+    }
+    
+    /**
+     * The XPath is evaluated for given expr and context.
+     * 
+     * @param expr 
+     *              A valid XPath expression.
+     * @param context 
+     *              A context node.
+     * @param nsBindings 
+     *              The list of namespace required for the expr.
+     * @return True if XPath is evaluated successfully otherwise false.
+     */
+    public static Boolean evaluateXPath(String expr, Node context, Map<String, String> nsBindings) {
+      if (null == context) {
+        throw new NullPointerException("Context node is null.");
+      }
+      LOGR.log(Level.FINE, "Evaluating \"{0}\" against context node:\n{1}",
+          new Object[] { expr, XMLUtils.writeNodeToString(context) });
+      NamespaceBindings bindings = NamespaceBindings.withStandardBindings();
+      bindings.addAllBindings(nsBindings);
+      XPathFactory factory = null;
+      try {
+        factory = XPathFactory.newInstance(XPathConstants.DOM_OBJECT_MODEL);
+      } catch (XPathFactoryConfigurationException e) {
+        // An implementation for the W3C DOM is always available
+      }
+      XPath xpath = factory.newXPath();
+      LOGR.log(Level.FINER, "Using XPath implementation: "
+          + xpath.getClass().getName());
+      xpath.setNamespaceContext(bindings);
+      Boolean result = false;
+      try {
+        result = (Boolean) xpath.evaluate(expr, context, XPathConstants.BOOLEAN);
+      } catch (XPathExpressionException xpe) {
+        String msg = ErrorMessage.format(ErrorMessageKeys.XPATH_ERROR, expr);
+        LOGR.log(Level.WARNING, msg, xpe);
+        throw new AssertionError(msg);
+      }
+      LOGR.log(Level.FINE, "XPath result: " + result);
+      return result;
     }
 
     /**
