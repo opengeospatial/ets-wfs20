@@ -50,7 +50,7 @@
       <xsl:value-of select="@outputFormat" />
     </xsl:if>
     <xsl:if test="wfs:TypeName">
-      <xsl:call-template name="TypeNamesParam">
+      <xsl:call-template name="TypeNameParam">
         <xsl:with-param name="typeNames" select="wfs:TypeName/text()" />
       </xsl:call-template>
       <xsl:call-template name="NamespacesParam">
@@ -220,6 +220,14 @@
     <xsl:param name="typeNames" as="xs:string*" />
     <xsl:if test="exists($typeNames)">
       <xsl:text>&amp;typenames=</xsl:text>
+      <xsl:value-of select="$typeNames" separator="," />
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template name="TypeNameParam">
+    <xsl:param name="typeNames" as="xs:string*" />
+    <xsl:if test="exists($typeNames)">
+      <xsl:text>&amp;typename=</xsl:text>
       <xsl:value-of select="$typeNames" separator="," />
     </xsl:if>
   </xsl:template>

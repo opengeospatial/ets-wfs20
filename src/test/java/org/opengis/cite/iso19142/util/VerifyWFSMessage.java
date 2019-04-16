@@ -91,8 +91,8 @@ public class VerifyWFSMessage {
         InputStream inStream = getClass().getResourceAsStream("/DescribeFeatureType.xml");
         String kvp = WFSMessage.transformEntityToKVP(new StreamSource(inStream));
         assertTrue("Expected result to contain 'version=2.0.0'", kvp.contains("version=2.0.0"));
-        assertTrue("Expected result to contain 'typenames=tns:ComplexGeoFeature,tns:AggregateGeoFeature'",
-                kvp.contains("typenames=tns:ComplexGeoFeature,tns:AggregateGeoFeature"));
+        assertTrue("Expected result to contain 'typename=tns:ComplexGeoFeature,tns:AggregateGeoFeature'",
+                kvp.contains("typename=tns:ComplexGeoFeature,tns:AggregateGeoFeature"));
         assertTrue("Expected result to contain 'xmlns(tns,http://cite.opengeospatial.org/gmlsf)'",
                 kvp.contains("xmlns(tns,http://cite.opengeospatial.org/gmlsf)"));
     }
