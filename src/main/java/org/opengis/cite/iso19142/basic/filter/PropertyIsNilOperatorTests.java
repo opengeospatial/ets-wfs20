@@ -60,6 +60,8 @@ public class PropertyIsNilOperatorTests extends QueryFilterFixture {
      * 
      * @param binding
      *            The ProtocolBinding to use for this request.
+     * @param featureType
+     *            The FeatureType to use for this test.
      */
     @Test(description = "See ISO 19143: 7.7.3.6, A.6", dataProvider = "protocol-featureType")
     public void propertyIsNil( ProtocolBinding binding, QName featureType ) {

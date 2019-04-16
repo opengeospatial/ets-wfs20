@@ -181,6 +181,9 @@ public class BBOXTests extends QueryFilterFixture {
 
     /**
      * Work around for Extents{@link #envelopeAsGML(Envelope)} only using 2 decimals
+     *
+     * @param extent the envelope
+     * @return the envelope as GML
      */
     public Document envelopeAsGML(Envelope extent) {
         double[] low = new double[extent.getDimension()];
