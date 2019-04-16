@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<wfs:GetFeature version="2.0.0" service="WFS" 
-  startIndex="0" count="10" 
+<wfs:GetFeature version="2.0.0" service="WFS" count="10"
   xmlns:wfs="http://www.opengis.net/wfs/2.0">
 </wfs:GetFeature>

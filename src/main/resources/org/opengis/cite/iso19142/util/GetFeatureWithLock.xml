@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <wfs:GetFeatureWithLock version="2.0.0" service="WFS" 
-  expiry="300" lockAction="ALL"
-  startIndex="0" count="10" resultType="results"
+  expiry="300" lockAction="ALL" count="10" resultType="results"
   xmlns:wfs="http://www.opengis.net/wfs/2.0">
 </wfs:GetFeatureWithLock>
