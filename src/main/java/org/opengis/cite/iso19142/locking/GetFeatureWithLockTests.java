@@ -14,6 +14,7 @@ import org.opengis.cite.iso19142.WFS2;
 import org.opengis.cite.iso19142.util.WFSMessage;
 import org.testng.Assert;
 import org.testng.ITestContext;
+import org.testng.SkipException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -50,7 +51,11 @@ public class GetFeatureWithLockTests extends LockingFixture {
 	public void sutImplementsGetFeatureWithLock(ITestContext testContext) {
 		String xpath = String.format("//ows:Operation[@name='%s']",
 				WFS2.GET_FEATURE_WITH_LOCK);
-		ETSAssert.assertXPath(xpath, this.wfsMetadata, null);
+        boolean xpathResult = ETSAssert.evaluateXPathToBoolean( xpath, this.wfsMetadata, null );
+        if ( !xpathResult ) {
+            throw new SkipException( "The service does not support " + WFS2.GET_FEATURE_WITH_LOCK
+                                     + " operation so tests are skipped." );
+		}
 	}
 
 	/**
