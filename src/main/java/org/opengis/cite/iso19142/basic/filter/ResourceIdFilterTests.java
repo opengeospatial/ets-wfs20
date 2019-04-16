@@ -104,7 +104,7 @@ public class ResourceIdFilterTests extends QueryFilterFixture {
     public void inconsistentFeatureIdentifierAndType(QName featureType) {
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
         Set<String> idSet = new HashSet<String>();
-        String featureId = this.dataSampler.getFeatureId(featureType, false);
+        String featureId = this.dataSampler.getFeatureIdNotOfType(featureType);
         if (null == featureId) {
             throw new SkipException("Unable to find id of feature instance that is NOT of type " + featureType);
         }

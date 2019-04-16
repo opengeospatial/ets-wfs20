@@ -159,21 +159,25 @@ public class StoredQueryTests extends BaseFixture {
      * @see "ISO 19142:2010, cl. 7.9.3.6: GetFeatureById stored query"
      */
     @Test(description = "See ISO 19142: 7.9.3.6", dataProvider = "protocol-binding")
-    public void invokeGetFeatureById(ProtocolBinding binding) {
-        if (null == this.featureId || this.featureId.isEmpty()) {
-            this.featureId = this.dataSampler.getFeatureId(this.featureTypes.get(0), true);
-        }
-        Assert.assertFalse(null == this.featureId || this.featureId.isEmpty(),
-                ErrorMessage.get(ErrorMessageKeys.FID_NOT_FOUND));
-        WFSMessage.appendStoredQuery(this.reqEntity, this.queryId,
-                Collections.singletonMap("id", (Object) this.featureId));
-        URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.GET_FEATURE, binding);
-        ClientResponse rsp = wfsClient.submitRequest(new DOMSource(this.reqEntity), binding, endpoint);
-        this.rspEntity = extractBodyAsDocument(rsp);
-        Assert.assertTrue(rsp.hasEntity(), ErrorMessage.get(ErrorMessageKeys.MISSING_XML_ENTITY));
+    public void invokeGetFeatureById( ProtocolBinding binding ) {
+        String featureIdToRequest = retrieveFeatureIdToRequest();
+        Assert.assertTrue( featureIdToRequest != null && !featureIdToRequest.isEmpty(),
+                           ErrorMessage.get( ErrorMessageKeys.FID_NOT_FOUND ) );
+        WFSMessage.appendStoredQuery( this.reqEntity, this.queryId, Collections.singletonMap( "id", featureIdToRequest ) );
+        URI endpoint = ServiceMetadataUtils.getOperationEndpoint( this.wfsMetadata, WFS2.GET_FEATURE, binding );
+        ClientResponse rsp = wfsClient.submitRequest( new DOMSource( this.reqEntity ), binding, endpoint );
+        this.rspEntity = extractBodyAsDocument( rsp );
+        Assert.assertTrue( rsp.hasEntity(), ErrorMessage.get( ErrorMessageKeys.MISSING_XML_ENTITY ) );
         Element feature = this.rspEntity.getDocumentElement();
-        Assert.assertEquals(feature.getAttributeNS(Namespaces.GML, "id"), this.featureId,
-                ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_ID));
+        Assert.assertEquals( feature.getAttributeNS( Namespaces.GML, "id" ), featureIdToRequest,
+                             ErrorMessage.get( ErrorMessageKeys.UNEXPECTED_ID ) );
+    }
+
+    private String retrieveFeatureIdToRequest() {
+        if ( this.featureId == null || this.featureId.isEmpty() ) {
+            return this.dataSampler.getFeatureId();
+        }
+        return this.featureId;
     }
 
 }

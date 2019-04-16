@@ -1,8 +1,12 @@
 package org.opengis.cite.iso19142.util;
 
+import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -122,7 +126,7 @@ public class VerifyDataSampler {
     }
 
     @Test
-    public void testGetFeatureId_matchTrue()
+    public void testGetFeatureId()
                             throws Exception {
         Document capabilitiesDoc = docBuilder.parse( getClass().getResourceAsStream( "/wfs/capabilities-acme.xml" ) );
         QName simpleFt = new QName( TNS, "SimpleFeature" );
@@ -130,8 +134,8 @@ public class VerifyDataSampler {
         DataSampler iut = new DataSampler( capabilitiesDoc );
         setSampleData( iut, simpleFt, "/wfs/FeatureCollection-SimpleFeature.xml" );
         setSampleData( iut, complexFt, "/wfs/FeatureCollection-ComplexFeature.xml" );
-        String id = iut.getFeatureId( complexFt, true );
-        assertThat( id, is( "CF01" ) );
+        String id = iut.getFeatureId();
+        assertThat( id, anyOf( is( "CF01" ), is( "SF-01" ) ) );
     }
 
     @Test
@@ -143,7 +147,7 @@ public class VerifyDataSampler {
         DataSampler iut = new DataSampler( capabilitiesDoc );
         setSampleData( iut, simpleFt, "/wfs/FeatureCollection-SimpleFeature.xml" );
         setSampleData( iut, complexFt, "/wfs/FeatureCollection-ComplexFeature.xml" );
-        String id = iut.getFeatureId( simpleFt, false );
+        String id = iut.getFeatureIdNotOfType( simpleFt );
         assertThat( id, is( "CF01" ) );
     }
     
