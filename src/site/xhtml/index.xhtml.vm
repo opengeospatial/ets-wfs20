@@ -303,13 +303,6 @@ dt {
         but it must describe the SUT. Ampersand ('&amp;') characters appearing within 
         a query parameter value must be percent-encoded as %26.</td>
         </tr>
-        <tr>
-          <td>fid</td>
-          <td>NCName</td>
-          <td>O</td>
-          <td>An identifier that matches the @gml:id attribute value of an available feature 
-          instance (may be omitted for "Basic WFS" implementations).</td>
-        </tr>
       </tbody>
     </table>
 

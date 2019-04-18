@@ -3,5 +3,4 @@
 <properties version="1.0">
     <comment>WFS 2.0 reference implementation</comment>
     <entry key="wfs">http://cite.lat-lon.de/deegree-webservices-3.3.6/services/wfs200?request=GetCapabilities&amp;service=WFS&amp;version=2.0.0</entry>
-    <entry key="fid" />
 </properties>
