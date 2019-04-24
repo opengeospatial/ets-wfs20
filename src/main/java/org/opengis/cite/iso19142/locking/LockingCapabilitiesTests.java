@@ -53,7 +53,11 @@ public class LockingCapabilitiesTests extends BaseFixture {
     public void implementsLockingWFS(ITestContext testContext) {
         this.wfsMetadata = (Document) testContext.getSuite().getAttribute(SuiteAttribute.TEST_SUBJECT.getName());
         String xpath = String.format("//ows:Constraint[@name='%s']/ows:DefaultValue = 'TRUE'", WFS2.LOCKING_WFS);
-        ETSAssert.assertXPath(xpath, this.wfsMetadata, null);
+        boolean xpathResult = ETSAssert.evaluateXPathToBoolean(xpath, this.wfsMetadata, null);
+        if(!xpathResult){
+            throw new SkipException( "The service don't have the " + WFS2.LOCKING_WFS
+                                     + " implementation so tests are skipped." );
+        }
     }
 
     /**

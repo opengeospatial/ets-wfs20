@@ -16,6 +16,7 @@ import javax.xml.validation.Validator;
 
 import org.apache.xerces.xs.XSElementDeclaration;
 import org.apache.xerces.xs.XSModel;
+import org.hamcrest.CoreMatchers;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -25,6 +26,8 @@ import org.opengis.cite.validation.XSModelBuilder;
 import org.opengis.cite.validation.XmlSchemaCompiler;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
+
+import static org.junit.Assert.assertThat;
 
 public class VerifyETSAssert extends CommonTestFixture {
 
@@ -77,6 +80,28 @@ public class VerifyETSAssert extends CommonTestFixture {
         ETSAssert.assertXPath(xpath, doc, null);
     }
 
+    @Test
+    public void evaluateXPathToBoolean()
+                            throws SAXException, IOException {
+        Document doc = BUILDER.parse( this.getClass().getResourceAsStream( "/capabilities-simple.xml" ) );
+        Map<String, String> nsBindings = new HashMap<>();
+        nsBindings.put( WADL_NS, "ns1" );
+        String xpath = "//ns1:resources";
+        boolean result = ETSAssert.evaluateXPathToBoolean( xpath, doc, nsBindings );
+        assertThat( result, CoreMatchers.is( true ) );
+    }
+
+    @Test
+    public void evaluateXPathToBoolean_expectFalse()
+                            throws SAXException, IOException {
+        Document doc = BUILDER.parse( this.getClass().getResourceAsStream( "/capabilities-simple.xml" ) );
+        Map<String, String> nsBindings = new HashMap<>();
+        nsBindings.put( WADL_NS, "ns1" );
+        String xpath = "//ns1:unknown";
+        boolean result = ETSAssert.evaluateXPathToBoolean( xpath, doc, nsBindings );
+        assertThat( result, CoreMatchers.is( false ) );
+    }
+    
     @Test
     public void assertStatusCodeMatches() {
         ETSAssert.assertStatusCode(400, new int[] { 500, 403, 400 });
