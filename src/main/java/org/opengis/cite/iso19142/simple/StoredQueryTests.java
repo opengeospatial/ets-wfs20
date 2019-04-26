@@ -25,7 +25,6 @@ import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 import org.w3c.dom.Element;
 
@@ -48,27 +47,20 @@ import com.sun.jersey.api.client.ClientResponse;
  */
 public class StoredQueryTests extends BaseFixture {
 
-    private String featureId;
     private Schema wfsSchema;
     private String queryId;
     private DataSampler dataSampler;
 
     /**
-     * Initializes the test class fixture. The (pre-compiled) WFS schema and the
-     * 'fid' parameter are retrieved from the test run context.
+     * Initializes the test class fixture. The (pre-compiled) WFS schema is retrieved from the test run context.
      * 
-     * @param fid
-     *            A String that identifies an available feature instance (gml:id
-     *            attribute).
      * @param testContext
      *            The test run context.
      */
     @BeforeClass
-    @Parameters("fid")
-    public void initClassFixture(String fid, ITestContext testContext) {
+    public void initClassFixture(ITestContext testContext) {
         this.wfsSchema = (Schema) testContext.getSuite().getAttribute(SuiteAttribute.WFS_SCHEMA.getName());
         Assert.assertNotNull(this.wfsSchema, "WFS schema not found in suite fixture.");
-        this.featureId = fid;
         this.queryId = (this.wfsVersion.equals(WFS2.V2_0_0)) ? WFS2.QRY_GET_FEATURE_BY_ID_URN
                 : WFS2.QRY_GET_FEATURE_BY_ID;
         this.dataSampler = (DataSampler) testContext.getSuite().getAttribute(SuiteAttribute.SAMPLER.getName());
@@ -159,21 +151,18 @@ public class StoredQueryTests extends BaseFixture {
      * @see "ISO 19142:2010, cl. 7.9.3.6: GetFeatureById stored query"
      */
     @Test(description = "See ISO 19142: 7.9.3.6", dataProvider = "protocol-binding")
-    public void invokeGetFeatureById(ProtocolBinding binding) {
-        if (null == this.featureId || this.featureId.isEmpty()) {
-            this.featureId = this.dataSampler.getFeatureId(this.featureTypes.get(0), true);
-        }
-        Assert.assertFalse(null == this.featureId || this.featureId.isEmpty(),
-                ErrorMessage.get(ErrorMessageKeys.FID_NOT_FOUND));
-        WFSMessage.appendStoredQuery(this.reqEntity, this.queryId,
-                Collections.singletonMap("id", (Object) this.featureId));
-        URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.GET_FEATURE, binding);
-        ClientResponse rsp = wfsClient.submitRequest(new DOMSource(this.reqEntity), binding, endpoint);
-        this.rspEntity = extractBodyAsDocument(rsp);
-        Assert.assertTrue(rsp.hasEntity(), ErrorMessage.get(ErrorMessageKeys.MISSING_XML_ENTITY));
+    public void invokeGetFeatureById( ProtocolBinding binding ) {
+        String featureIdToRequest = this.dataSampler.getFeatureId();
+        Assert.assertTrue( featureIdToRequest != null && !featureIdToRequest.isEmpty(),
+                           ErrorMessage.get( ErrorMessageKeys.FID_NOT_FOUND ) );
+        WFSMessage.appendStoredQuery( this.reqEntity, this.queryId, Collections.singletonMap( "id", featureIdToRequest ) );
+        URI endpoint = ServiceMetadataUtils.getOperationEndpoint( this.wfsMetadata, WFS2.GET_FEATURE, binding );
+        ClientResponse rsp = wfsClient.submitRequest( new DOMSource( this.reqEntity ), binding, endpoint );
+        this.rspEntity = extractBodyAsDocument( rsp );
+        Assert.assertTrue( rsp.hasEntity(), ErrorMessage.get( ErrorMessageKeys.MISSING_XML_ENTITY ) );
         Element feature = this.rspEntity.getDocumentElement();
-        Assert.assertEquals(feature.getAttributeNS(Namespaces.GML, "id"), this.featureId,
-                ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_ID));
+        Assert.assertEquals( feature.getAttributeNS( Namespaces.GML, "id" ), featureIdToRequest,
+                             ErrorMessage.get( ErrorMessageKeys.UNEXPECTED_ID ) );
     }
 
 }

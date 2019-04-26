@@ -1,22 +1,24 @@
 package org.opengis.cite.iso19142.util;
 
+import static org.opengis.cite.iso19142.Namespaces.GML;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.Map.Entry;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -29,6 +31,10 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+
+import net.sf.saxon.s9api.SaxonApiException;
+import net.sf.saxon.s9api.XdmItem;
+import net.sf.saxon.s9api.XdmValue;
 
 import org.apache.xerces.xs.XSComplexTypeDefinition;
 import org.apache.xerces.xs.XSElementDeclaration;
@@ -51,12 +57,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-
-import net.sf.saxon.s9api.SaxonApiException;
-import net.sf.saxon.s9api.XdmItem;
-import net.sf.saxon.s9api.XdmValue;
-
-import static org.opengis.cite.iso19142.Namespaces.GML;
 
 /**
  * Obtains samples of the feature data available from the WFS under test.
@@ -293,40 +293,50 @@ public class DataSampler {
     }
 
     /**
-     * Returns the identifier (gml:id attribute value) for an existing feature
-     * instance.
+     * Returns the identifier (gml:id attribute value) for an existing feature instance.
      * 
      * @param featureType
-     *            The qualified name of a supported feature type.
-     * @param matchFeatureType
-     *            A boolean value indicating whether or not the feature is an
-     *            instance of the given type.
+     *            The qualified name of a the feature type the feature should not be an instance from.
      * @return A feature identifier, or null if one cannot be found.
      */
-    public String getFeatureId(QName featureType, boolean matchFeatureType) {
-        String featureId = null;
-        for (Map.Entry<QName, FeatureTypeInfo> entry : featureInfo.entrySet()) {
-            QName typeName = entry.getKey();
-            if (typeName.equals(featureType) != matchFeatureType || !entry.getValue().isInstantiated()) {
-                continue;
-            }
-            File dataFile = entry.getValue().getSampleData();
-            String expr = "(//wfs:member/*/@gml:id)[1]";
-            Map<String, String> nsBindings = new HashMap<String, String>();
-            nsBindings.put(Namespaces.GML, "gml");
-            nsBindings.put(Namespaces.WFS, "wfs");
-            try {
-                XdmValue result = XMLUtils.evaluateXPath2(new StreamSource(dataFile), expr, nsBindings);
-                featureId = result.itemAt(0).getStringValue();
-            } catch (SaxonApiException e) {
-                LOGR.log(Level.WARNING, String.format("Failed to evaluate XPath %s against data file at %s", expr,
-                        dataFile.getAbsolutePath()));
-            }
-            break;
-        }
-        return featureId;
+    public String getFeatureIdNotOfType( QName featureType ) {
+        return getFeatureId( featureTypeInfo -> featureTypeInfo.getTypeName().equals( featureType ) );
     }
 
+    /**
+     * Returns the identifier (gml:id attribute value) for an existing feature instance.
+     *
+     * @return A feature identifier, or null if one cannot be found.
+     */
+    public String getFeatureId() {
+        return getFeatureId( featureTypeInfo -> false );
+    }
+
+    private String getFeatureId( Function<FeatureTypeInfo, Boolean> skip ) {
+        String expr = "(//wfs:member/*/@gml:id)[1]";
+        Map<String, String> nsBindings = new HashMap<>();
+        nsBindings.put( Namespaces.GML, "gml" );
+        nsBindings.put( Namespaces.WFS, "wfs" );
+        for ( FeatureTypeInfo featureTypeInfo : featureInfo.values() ) {
+            if ( !skip.apply( featureTypeInfo ) && featureTypeInfo.isInstantiated() ) {
+                File dataFile = featureTypeInfo.getSampleData();
+                try {
+                    XdmValue result = XMLUtils.evaluateXPath2( new StreamSource( dataFile ), expr, nsBindings );
+                    if ( result.size() > 0 ) {
+                        String featureId = result.itemAt( 0 ).getStringValue();
+                        if ( featureId != null && !featureId.isEmpty() )
+                            return featureId;
+                    }
+                } catch ( SaxonApiException e ) {
+                    LOGR.log( Level.WARNING,
+                              String.format( "Failed to evaluate XPath %s against data file at %s", expr,
+                                             dataFile.getAbsolutePath() ) );
+                }
+            }
+        }
+        return null;
+    }
+    
     /**
      * Determines the spatial extent of the feature instances in the sample
      * data. If a feature type defines more than one geometry property, the

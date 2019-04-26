@@ -55,11 +55,6 @@
             defining features and feature collections (ISO 19136, A.1.4).</li>
               <li>Data are available for at least one feature type advertised in the capabilities document.</li>
             </ol>
-            <p>A feature identifier may be supplied for the purpose of verifying the behavior of the 
-              <code>GetFeatureById</code> stored query. If this test run parameter is missing or does not 
-            identify an available feature instance, a "Simple WFS" implementation must also implement the 
-              <code>GetFeatureByType</code> stored query (see the test suite documentation for the definition). 
-            The parameter may be omitted if the WFS under test implements the "Basic WFS" conformance class.</p>
           </div>
           <fieldset style="background:#ccffff">
             <legend style="font-family: sans-serif; color: #000099; 
@@ -76,12 +71,6 @@
                 <h4 style="margin-bottom: 0.5em">Upload WFS capabilities document</h4>
               </label>
               <input name="wfs-doc" size="128" type="file" />
-            </p>
-            <p>
-              <label for="fid">
-                <h4 style="margin-bottom: 0.5em">Feature identifier (optional)</h4>
-              </label>
-              <input id="fid" name="fid" size="96" type="text" value="" />
             </p>
           </fieldset>
           <p>
@@ -103,7 +92,6 @@
               </xsl:otherwise>
             </xsl:choose>
           </entry>
-          <entry key="fid"><xsl:value-of select="$form-data/values/value[@key='fid']"/></entry>
         </properties>
       </xsl:variable>
       <xsl:variable name="testRunDir">

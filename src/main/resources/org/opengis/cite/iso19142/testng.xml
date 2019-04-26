@@ -2,7 +2,6 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 <suite name="${ets-code}-${project.version}" verbose="0" configfailurepolicy="skip">
   <parameter name="wfs"  value=""/>
-  <parameter name="fid"  value=""/>
 
   <listeners>
     <listener class-name="org.opengis.cite.iso19142.TestRunListener" />

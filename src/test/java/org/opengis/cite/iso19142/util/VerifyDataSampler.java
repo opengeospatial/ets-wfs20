@@ -1,8 +1,12 @@
 package org.opengis.cite.iso19142.util;
 
+import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,8 +24,6 @@ import javax.xml.validation.Schema;
 
 import org.apache.xerces.xs.XSElementDeclaration;
 import org.apache.xerces.xs.XSModel;
-import org.hamcrest.CoreMatchers;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opengis.cite.iso19142.FeatureTypeInfo;
@@ -32,7 +34,6 @@ import org.opengis.geometry.Envelope;
 import org.opengis.temporal.Period;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
-import sun.font.CoreMetrics;
 
 public class VerifyDataSampler {
 
@@ -68,14 +69,10 @@ public class VerifyDataSampler {
 
     @Test
     public void getSpatialExtentOfSimpleFeature() throws URISyntaxException, SAXException, IOException {
-        URL dataURL = getClass().getResource("/wfs/FeatureCollection-SimpleFeature.xml");
-        File dataFile = new File(dataURL.toURI());
         Document capabilitiesDoc = docBuilder.parse(getClass().getResourceAsStream("/wfs/capabilities-acme.xml"));
         QName simpleFeature = new QName(TNS, "SimpleFeature");
         DataSampler iut = new DataSampler(capabilitiesDoc);
-        FeatureTypeInfo typeInfo = iut.getFeatureTypeInfo().get(simpleFeature);
-        typeInfo.setInstantiated(true);
-        typeInfo.setSampleData(dataFile);
+        setSampleData(iut, simpleFeature, "/wfs/FeatureCollection-SimpleFeature.xml" );
         Envelope bbox = iut.getSpatialExtent(model, simpleFeature);
         assertNotNull("Envelope is null.", bbox);
         DirectPosition upperCorner = bbox.getUpperCorner();
@@ -85,17 +82,13 @@ public class VerifyDataSampler {
 
     @Test
     public void getTemporalExtentOfSimpleFeatures() throws URISyntaxException, SAXException, IOException {
-        URL dataURL = getClass().getResource("/wfs/FeatureCollection-SimpleFeature.xml");
-        File dataFile = new File(dataURL.toURI());
         Document capabilitiesDoc = docBuilder.parse(getClass().getResourceAsStream("/wfs/capabilities-acme.xml"));
         QName simpleFeature = new QName(TNS, "SimpleFeature");
         List<XSElementDeclaration> tmProps = AppSchemaUtils.getTemporalFeatureProperties(model, simpleFeature);
         XSElementDeclaration tmProp = tmProps.stream().filter(decl -> decl.getName().equals("dateTimeProperty"))
                 .findAny().orElse(null);
-        DataSampler iut = new DataSampler(capabilitiesDoc);
-        FeatureTypeInfo typeInfo = iut.getFeatureTypeInfo().get(simpleFeature);
-        typeInfo.setInstantiated(true);
-        typeInfo.setSampleData(dataFile);
+        DataSampler iut = new DataSampler( capabilitiesDoc );
+        setSampleData(iut, simpleFeature, "/wfs/FeatureCollection-SimpleFeature.xml" );
         Period period = iut.getTemporalExtentOfProperty(model, simpleFeature, tmProp);
         assertNotNull("Period is null.", period);
         assertTrue("Expected duration P8M", period.length().toString().startsWith("P8M"));
@@ -103,17 +96,13 @@ public class VerifyDataSampler {
 
     @Test
     public void getTemporalExtentOfComplexFeatures() throws URISyntaxException, SAXException, IOException {
-        URL dataURL = getClass().getResource("/wfs/FeatureCollection-ComplexFeature.xml");
-        File dataFile = new File(dataURL.toURI());
         Document capabilitiesDoc = docBuilder.parse(getClass().getResourceAsStream("/wfs/capabilities-acme.xml"));
         QName featureType = new QName(TNS, "ComplexFeature");
         List<XSElementDeclaration> tmProps = AppSchemaUtils.getTemporalFeatureProperties(model, featureType);
         XSElementDeclaration tmProp = tmProps.stream().filter(decl -> decl.getName().equals("validTime")).findAny()
                 .orElse(null);
         DataSampler iut = new DataSampler(capabilitiesDoc);
-        FeatureTypeInfo typeInfo = iut.getFeatureTypeInfo().get(featureType);
-        typeInfo.setInstantiated(true);
-        typeInfo.setSampleData(dataFile);
+        setSampleData(iut, featureType, "/wfs/FeatureCollection-ComplexFeature.xml" );
         Period period = iut.getTemporalExtentOfProperty(model, featureType, tmProp);
         assertNotNull("Period is null.", period);
         assertTrue("Expected duration P11M", period.length().toString().startsWith("P11M"));
@@ -134,6 +123,41 @@ public class VerifyDataSampler {
 
         QName selectedFeatureType = iut.selectRandomFeatureType();
         assertThat( selectedFeatureType, is( featureType ) );
+    }
+
+    @Test
+    public void testGetFeatureId()
+                            throws Exception {
+        Document capabilitiesDoc = docBuilder.parse( getClass().getResourceAsStream( "/wfs/capabilities-acme.xml" ) );
+        QName simpleFt = new QName( TNS, "SimpleFeature" );
+        QName complexFt = new QName( TNS, "ComplexFeature" );
+        DataSampler iut = new DataSampler( capabilitiesDoc );
+        setSampleData( iut, simpleFt, "/wfs/FeatureCollection-SimpleFeature.xml" );
+        setSampleData( iut, complexFt, "/wfs/FeatureCollection-ComplexFeature.xml" );
+        String id = iut.getFeatureId();
+        assertThat( id, anyOf( is( "CF01" ), is( "SF-01" ) ) );
+    }
+
+    @Test
+    public void testGetFeatureId_matchFalse()
+                            throws Exception {
+        Document capabilitiesDoc = docBuilder.parse( getClass().getResourceAsStream( "/wfs/capabilities-acme.xml" ) );
+        QName simpleFt = new QName( TNS, "SimpleFeature" );
+        QName complexFt = new QName( TNS, "ComplexFeature" );
+        DataSampler iut = new DataSampler( capabilitiesDoc );
+        setSampleData( iut, simpleFt, "/wfs/FeatureCollection-SimpleFeature.xml" );
+        setSampleData( iut, complexFt, "/wfs/FeatureCollection-ComplexFeature.xml" );
+        String id = iut.getFeatureIdNotOfType( simpleFt );
+        assertThat( id, is( "CF01" ) );
+    }
+    
+    private void setSampleData( DataSampler iut, QName featureType, String resource )
+                            throws URISyntaxException {
+        URL dataURL = getClass().getResource( resource );
+        File dataFile = new File( dataURL.toURI() );
+        FeatureTypeInfo typeInfo = iut.getFeatureTypeInfo().get( featureType );
+        typeInfo.setInstantiated( true );
+        typeInfo.setSampleData( dataFile );
     }
 
 }
