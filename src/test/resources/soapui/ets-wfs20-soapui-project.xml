@@ -47,7 +47,7 @@
           <con:settings>
             <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
           </con:settings>
-          <con:endpoint>${#Project#teamengine.endpoint}/rest/suites/wfs20/${#Project#ets.version}</con:endpoint>
+          <con:endpoint>${#Project#teamengine.endpoint}/rest/suites/wfs20/</con:endpoint>
           <con:request/>
           <con:assertion type="Valid HTTP Status Codes" id="0b7f5046-5ac7-41d0-829e-17315ac969ba" name="Valid HTTP Status Codes">
             <con:configuration>
@@ -75,7 +75,7 @@
           <con:settings>
             <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;entry key="Accept" value="application/xml" xmlns="http://eviware.com/soapui/config"/></con:setting>
           </con:settings>
-          <con:endpoint>${#Project#teamengine.endpoint}/rest/suites/wfs20/${#Project#ets.version}/run</con:endpoint>
+          <con:endpoint>${#Project#teamengine.endpoint}/rest/suites/wfs20/run</con:endpoint>
           <con:request/>
           <con:assertion type="Valid HTTP Status Codes" id="0b7f5046-5ac7-41d0-829e-17315ac969ba" name="Valid HTTP Status Codes">
             <con:configuration>
@@ -117,7 +117,7 @@ assert headers != null &amp;&amp; headers[0] != null &amp;&amp; headers[0].index
           <con:settings>
             <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;entry key="Accept" value="application/zip" xmlns="http://eviware.com/soapui/config"/></con:setting>
           </con:settings>
-          <con:endpoint>${#Project#teamengine.endpoint}/rest/suites/wfs20/${#Project#ets.version}/run</con:endpoint>
+          <con:endpoint>${#Project#teamengine.endpoint}/rest/suites/wfs20/run</con:endpoint>
           <con:request/>
           <con:assertion type="Valid HTTP Status Codes" id="0b7f5046-5ac7-41d0-829e-17315ac969ba" name="Valid HTTP Status Codes">
             <con:configuration>
@@ -159,7 +159,7 @@ assert headers != null &amp;&amp; headers[0] != null &amp;&amp; headers[0].index
           <con:settings>
             <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;entry key="Accept" value="application/rdf+xml" xmlns="http://eviware.com/soapui/config"/></con:setting>
           </con:settings>
-          <con:endpoint>${#Project#teamengine.endpoint}/rest/suites/wfs20/${#Project#ets.version}/run</con:endpoint>
+          <con:endpoint>${#Project#teamengine.endpoint}/rest/suites/wfs20/run</con:endpoint>
           <con:request/>
           <con:assertion type="Valid HTTP Status Codes" id="0b7f5046-5ac7-41d0-829e-17315ac969ba" name="Valid HTTP Status Codes">
             <con:configuration>
@@ -229,7 +229,7 @@ declare namespace cite="http://cite.opengeospatial.org/";
       
     </con:properties>
   </con:testSuite>
-  <con:properties><con:property><con:name>teamengine.endpoint</con:name><con:value>http://cite.opengeospatial.org/te2</con:value></con:property><con:property><con:name>ets.version</con:name><con:value>1.29</con:value></con:property><con:property><con:name>iut</con:name><con:value>http://cite.deegree.org/deegree-webservices-3.4.0/services/wfs200?service=WFS&amp;request=GetCapabilities</con:value></con:property><con:property><con:name>tests.passed</con:name><con:value>83</con:value></con:property><con:property><con:name>tests.skipped</con:name><con:value>42</con:value></con:property><con:property><con:name>tests.failed</con:name><con:value>3</con:value></con:property></con:properties>
+  <con:properties><con:property><con:name>teamengine.endpoint</con:name><con:value>http://cite.opengeospatial.org/te2</con:value></con:property><con:property><con:name>iut</con:name><con:value>http://cite.deegree.org/deegree-webservices-3.4.0/services/wfs200?service=WFS&amp;request=GetCapabilities</con:value></con:property><con:property><con:name>tests.passed</con:name><con:value>95</con:value></con:property><con:property><con:name>tests.skipped</con:name><con:value>32</con:value></con:property><con:property><con:name>tests.failed</con:name><con:value>1</con:value></con:property></con:properties>
   <con:wssContainer/>
   <con:oAuth2ProfileContainer/>
   <con:oAuth1ProfileContainer/>
