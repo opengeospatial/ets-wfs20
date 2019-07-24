@@ -47,12 +47,12 @@
     <ets-code>wfs20</ets-code>
     <spec-version>2.0.0</spec-version>
     <soapui.test.fail.ignore>false</soapui.test.fail.ignore>
-    <soapui.teamengine.endpoint>http://cite.opengeospatial.org/te2</soapui.teamengine.endpoint>
+    <soapui.teamengine.endpoint>http://localhost:8081/teamengine</soapui.teamengine.endpoint>
     <soapui.iut>http://cite.deegree.org/deegree-webservices-3.4.0/services/wfs200?service=WFS&amp;request=GetCapabilities</soapui.iut>
     <soapui.tests.passed>95</soapui.tests.passed>
     <soapui.tests.skipped>32</soapui.tests.skipped>
     <soapui.tests.failed>1</soapui.tests.failed>
-    <docker.teamengine.version>5.3</docker.teamengine.version>
+    <docker.teamengine.version>5.4</docker.teamengine.version>
   </properties>
 
   <dependencies>
