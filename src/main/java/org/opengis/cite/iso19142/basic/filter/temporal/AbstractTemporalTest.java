@@ -33,22 +33,18 @@ public abstract class AbstractTemporalTest extends QueryFilterFixture {
     }
 
     private TemporalProperty findTemporalExtent( QName featureType, List<XSElementDeclaration> temporalProperties ) {
-        Period temporalExtent = null;
-        XSElementDeclaration temporalProperty = null;
-
         for ( XSElementDeclaration temporalProp : temporalProperties ) {
             try {
-            	temporalProperty = temporalProp;
-                temporalExtent = this.dataSampler.getTemporalExtentOfProperty( this.model, featureType, temporalProp );
+                Period temporalExtent = this.dataSampler.getTemporalExtentOfProperty( this.model, featureType,
+                                                                                      temporalProp );
+                if ( temporalExtent != null )
+                    return new TemporalProperty( temporalProp, temporalExtent );
             } catch ( Exception e ) {
                 LOGR.warning( "Could not calculate the extent of the temporal property " + temporalProp
                               + " of the feature type " + featureType );
             }
         }
-
-        if ( temporalProperty == null || temporalExtent == null )
-            return null;
-        return new TemporalProperty( temporalProperty, temporalExtent );
+        return null;
     }
 
     class TemporalProperty {
