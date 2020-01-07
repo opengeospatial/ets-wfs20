@@ -123,7 +123,7 @@ suite in a command shell like so:
 #### Docker
 
 This test suite comes with a Dockerfile which can be used to easily setup the OGC test harness with
-the test suite. Details can be found on https://github.com/opengeospatial/cite/wiki/How-to-create-Docker-Images-of-test-suites#create-docker-image-and-create-and-start-docker-container[Create Docker Image and create and start Docker Container].
+the test suite. Details can be found on [https://github.com/opengeospatial/cite/wiki/How-to-create-Docker-Images-of-test-suites#create-docker-image-and-create-and-start-docker-container](Create Docker Image and create and start Docker Container).
 
 #### OGC test harness
 
