@@ -235,15 +235,21 @@ public class ServiceMetadataUtils {
     public static QName buildQName(Node node) {
         String localPart;
         String nsName = null;
+        String prefix = null;
         String name = node.getTextContent();
         int indexOfColon = name.indexOf(':');
         if (indexOfColon > 0) {
             localPart = name.substring(indexOfColon + 1);
             nsName = node.lookupNamespaceURI(name.substring(0, indexOfColon));
+            prefix = node.lookupPrefix(nsName);
         } else {
             localPart = name;
             // return default namespace URI if any
             nsName = node.lookupNamespaceURI(null);
+        }
+        
+        if(null != prefix) {
+          return new QName(nsName, localPart, prefix);
         }
         return new QName(nsName, localPart);
     }
