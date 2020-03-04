@@ -23,6 +23,10 @@
     <sch:active pattern="ExceptionReportPattern" />
     <sch:active pattern="InvalidParameterValuePattern" />
   </sch:phase>
+  <sch:phase id="OperationParsingFailedPhase">
+    <sch:active pattern="ExceptionReportPattern" />
+    <sch:active pattern="OperationParsingFailedPattern" />
+  </sch:phase>
 
   <sch:let name="version" value="'2.0.0'" />
 
@@ -64,6 +68,19 @@
       <sch:assert test="ows:Exception/@exceptionCode = 'InvalidParameterValue'"
         diagnostics="msg.code.en">
 	The @exceptionCode attribute must have the value 'InvalidParameterValue'.
+      </sch:assert>
+      <sch:assert test="string-length(ows:Exception/@locator) > 0">
+	The @locator attribute should provide the name of an invalid parameter.
+      </sch:assert>
+    </sch:rule>
+  </sch:pattern>
+  
+  <sch:pattern id="OperationParsingFailedPattern">
+    <sch:p xml:lang="en">Checks for an OperationParsingFailed exception.</sch:p>
+    <sch:rule context="//ows:ExceptionReport">
+      <sch:assert test="ows:Exception/@exceptionCode = 'OperationParsingFailed'"
+        diagnostics="msg.code.en">
+	The @exceptionCode attribute must have the value 'OperationParsingFailed'.
       </sch:assert>
       <sch:assert test="string-length(ows:Exception/@locator) > 0">
 	The @locator attribute should provide the name of an invalid parameter.
