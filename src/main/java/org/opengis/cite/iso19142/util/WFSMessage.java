@@ -478,38 +478,6 @@ public class WFSMessage {
     }
 
     /**
-     * Finds elements in a DOM Document that occur as values of the specified
-     * feature property.
-     * 
-     * @param doc
-     *            A Document node containing a WFS response entity.
-     * @param propertyDecl
-     *            An element declaration that defines a feature property.
-     * @param schema
-     *            A representation of an application schema.
-     * @return A list of matching element nodes (it may be empty).
-     */
-    public static List<Node> findPropertyValues(Document doc, XSElementDeclaration propertyDecl, XSModel schema) {
-        LOGR.log(Level.FINE,
-                String.format("In %s, find values of %s", doc.getDocumentElement().getNodeName(), propertyDecl));
-        XSElementDeclaration propValue = AppSchemaUtils.getComplexPropertyValue(propertyDecl);
-        XSElementDeclaration[] expectedValues = new XSElementDeclaration[1];
-        if (propValue.getAbstract()) {
-            List<XSElementDeclaration> allowedValues = XMLSchemaModelUtils.getElementsByAffiliation(schema, propValue);
-            if (allowedValues.isEmpty()) {
-                throw new AssertionError(String.format(
-                        "For property %s, no substitutable elements found for abstract property value: %s",
-                        propertyDecl, propValue));
-            }
-            expectedValues = allowedValues.toArray(expectedValues);
-        } else {
-            expectedValues[0] = propValue;
-        }
-        List<Node> valueNodes = findMatchingElements(doc, expectedValues);
-        return valueNodes;
-    }
-
-    /**
      * Returns the set of feature identifiers found in the given WFS response
      * entity.
      * 

@@ -132,7 +132,7 @@ public class IntersectsTests extends QueryFilterFixture {
      *            A QName representing the qualified name of some feature type.
      */
     @Test(description = "See OGC 09-026r2, A.8", dataProvider = "protocol-featureType")
-    public void intersectsPolygon(ProtocolBinding binding, QName featureType) {
+    public void intersectsPolygon(ProtocolBinding binding, QName featureType) throws XPathExpressionException {
         if (!this.allGeomProperties.keySet().contains(featureType)) {
             throw new SkipException("Feature type has no geometry properties: " + featureType);
         }
@@ -153,12 +153,13 @@ public class IntersectsTests extends QueryFilterFixture {
         this.rspEntity = extractBodyAsDocument(rsp);
         Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
-        List<Node> geomNodes = WFSMessage.findPropertyValues(this.rspEntity, geomProperty, this.model);
-        if (geomNodes.isEmpty()) {
+        NodeList geomNodes = findGeometryPropertyValues(featureType, geomProperty);
+        if (geomNodes.getLength() == 0) {
             TestSuiteLogger.log(Level.INFO, String.format(
                     "intersectsPolygon: No values found for geometry property %s (in %s)", geomProperty, featureType));
         }
-        for (Node geom : geomNodes) {
+        for (int i = 0; i < geomNodes.getLength(); i++) {
+            Node geom = geomNodes.item(i);
             boolean intersects = TopologicalRelationships.isSpatiallyRelated(SpatialOperator.INTERSECTS, gmlPolygonElem,
                     geom);
             Assert.assertTrue(intersects, ErrorMessage.format(ErrorMessageKeys.PREDICATE_NOT_SATISFIED, INTERSECTS_OP,
@@ -171,14 +172,14 @@ public class IntersectsTests extends QueryFilterFixture {
      * <strong>Intersects</strong> predicate with a gml:LineString or gml:Curve
      * (LineStringSegment) operand. The response entity must be schema-valid and
      * contain only matching instances.
-     * 
+     *
      * @param binding
      *            The ProtocolBinding to use for this request.
      * @param featureType
      *            A QName representing the qualified name of some feature type.
      */
     @Test(description = "See OGC 09-026r2, A.8", dataProvider = "protocol-featureType")
-    public void intersectsCurve(ProtocolBinding binding, QName featureType) {
+    public void intersectsCurve(ProtocolBinding binding, QName featureType) throws XPathExpressionException {
         if (!this.allGeomProperties.keySet().contains(featureType)) {
             throw new SkipException("Feature type has no geometry properties: " + featureType);
         }
@@ -210,12 +211,13 @@ public class IntersectsTests extends QueryFilterFixture {
         this.rspEntity = extractBodyAsDocument(rsp);
         Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
-        List<Node> geomNodes = WFSMessage.findPropertyValues(this.rspEntity, geomProperty, this.model);
-        if (geomNodes.isEmpty()) {
+        NodeList geomNodes = findGeometryPropertyValues(featureType, geomProperty);
+        if (geomNodes.getLength() == 0) {
             TestSuiteLogger.log(Level.INFO, String.format(
                     "intersectsCurve: No values found for geometry property %s (in %s)", geomProperty, featureType));
         }
-        for (Node geom : geomNodes) {
+        for (int i = 0; i < geomNodes.getLength(); i++) {
+            Node geom = geomNodes.item(i);
             boolean intersects = TopologicalRelationships.isSpatiallyRelated(SpatialOperator.INTERSECTS, gmlCurveElem,
                     geom);
             Assert.assertTrue(intersects, ErrorMessage.format(ErrorMessageKeys.PREDICATE_NOT_SATISFIED, INTERSECTS_OP,
@@ -285,4 +287,33 @@ public class IntersectsTests extends QueryFilterFixture {
         // import geometry element to avoid WRONG_DOCUMENT_ERR
         predicate.appendChild(request.importNode(gmlGeom, true));
     }
+
+    private NodeList findGeometryPropertyValues( QName featureType, XSElementDeclaration geomProperty )
+            throws XPathExpressionException {
+        String featureTypeNs = featureType.getNamespaceURI();
+        String featureTypePrefix = getFeatureTypePrefix( featureType );
+        String geomPropNs = geomProperty.getNamespace();
+        String geomPropPrefix = getGeomPropPrefix( featureTypeNs, featureTypePrefix, geomPropNs );
+        String xpath = String.format( "//%s:%s/%s:%s/*", featureTypePrefix, featureType.getLocalPart(), geomPropPrefix,
+                geomProperty.getName() );
+        Map<String, String> nsBindings = new HashMap<>();
+        nsBindings.put( featureTypeNs, featureTypePrefix );
+        if ( !geomPropPrefix.equals( featureTypePrefix ) )
+            nsBindings.put( geomPropNs, geomPropPrefix );
+        return XMLUtils.evaluateXPath( this.rspEntity, xpath, nsBindings );
+    }
+
+    private String getFeatureTypePrefix( QName featureType ) {
+        String prefix = featureType.getPrefix();
+        if ( prefix != null && !prefix.isEmpty() )
+            return prefix;
+        return "t1";
+    }
+
+    private String getGeomPropPrefix( String featureTypeNs, String featureTypePrefix, String geomPropNs ) {
+        if ( geomPropNs != null && geomPropNs.equals( featureTypeNs ) || ( geomPropNs == null && featureTypeNs == null ) )
+            return featureTypePrefix;
+        return "t2";
+    }
+
 }
