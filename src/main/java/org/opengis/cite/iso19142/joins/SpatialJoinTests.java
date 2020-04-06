@@ -203,13 +203,20 @@ public class SpatialJoinTests extends QueryFilterFixture {
             Iterator<Map.Entry<QName, List<XSElementDeclaration>>> itrPointProps = this.pointProps.entrySet().iterator();
             Entry<QName, List<XSElementDeclaration>> entryPointProps = itrPointProps.next();
             joinProperties.add(new FeatureProperty(entryPointProps.getKey(), entryPointProps.getValue().get(0)));
-        } else if (this.curveProps.size() > 1) {
-            Iterator<Map.Entry<QName, List<XSElementDeclaration>>> itr = this.curveProps.entrySet().iterator();
-            Entry<QName, List<XSElementDeclaration>> entry = itr.next();
-            joinProperties.add(new FeatureProperty(entry.getKey(), entry.getValue().get(0)));
-            entry = itr.next();
-            joinProperties.add(new FeatureProperty(entry.getKey(), entry.getValue().get(0)));
+        } else if (!this.curveProps.isEmpty() && !this.pointProps.isEmpty()) {
+            // curve property
+            Iterator<Map.Entry<QName, List<XSElementDeclaration>>> itrCurveProps = this.curveProps.entrySet().iterator();
+            Entry<QName, List<XSElementDeclaration>> entryCurveProps = itrCurveProps.next();
+            joinProperties.add(new FeatureProperty(entryCurveProps.getKey(), entryCurveProps.getValue().get(0)));
+            
+            // point property
+            Iterator<Map.Entry<QName, List<XSElementDeclaration>>> itrPointProps = this.pointProps.entrySet().iterator();
+            Entry<QName, List<XSElementDeclaration>> entryPointProps = itrPointProps.next();
+            joinProperties.add(new FeatureProperty(entryPointProps.getKey(), entryPointProps.getValue().get(0)));         
         }
+        else{
+           Assert.fail("This test has triggered an unexpected Spatial Join condition. The Spatial Join test will need to be applied manually.");       
+        } 
         JoinQueryUtils.appendSpatialJoinQuery(this.reqEntity, "Intersects", joinProperties);
         ClientResponse rsp = wfsClient.submitRequest(this.reqEntity, ProtocolBinding.ANY);
         this.rspEntity = extractBodyAsDocument(rsp);
