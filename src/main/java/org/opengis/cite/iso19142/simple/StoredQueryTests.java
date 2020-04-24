@@ -95,17 +95,17 @@ public class StoredQueryTests extends BaseFixture {
         SchematronValidator validator = ValidationUtils.buildSchematronValidator("ExceptionReport.sch",
                 "InvalidParameterValuePhase");
         Result invalidaParamValueResult = validator.validate(new DOMSource(this.rspEntity), false);
-		boolean ruleViolated = validator.ruleViolationsDetected();
-		if (!ruleViolated) {
-			Assert.assertFalse(ruleViolated, ErrorMessage.format(ErrorMessageKeys.NOT_SCHEMA_VALID,
-					validator.getRuleViolationCount(), XMLUtils.resultToString(invalidaParamValueResult)));
-		} else {
-			SchematronValidator operationParsingvalidator = ValidationUtils.buildSchematronValidator("ExceptionReport.sch",
-					"OperationParsingFailedPhase");
-			Result operationParsingResult = operationParsingvalidator.validate(new DOMSource(this.rspEntity), false);
-			Assert.assertFalse(operationParsingvalidator.ruleViolationsDetected(), ErrorMessage.format(ErrorMessageKeys.NOT_SCHEMA_VALID,
-					operationParsingvalidator.getRuleViolationCount(), XMLUtils.resultToString(operationParsingResult)));
-		}
+	boolean ruleViolated = validator.ruleViolationsDetected();
+        if (!ruleViolated) {
+            Assert.assertFalse(ruleViolated, ErrorMessage.format(ErrorMessageKeys.NOT_SCHEMA_VALID, validator.getRuleViolationCount(),
+                            XMLUtils.resultToString(invalidaParamValueResult)));
+        } else {
+            SchematronValidator operationParsingvalidator = ValidationUtils.buildSchematronValidator("ExceptionReport.sch", "OperationParsingFailedPhase");
+            Result operationParsingResult = operationParsingvalidator.validate(new DOMSource(this.rspEntity), false);
+            
+            Assert.assertFalse(operationParsingvalidator.ruleViolationsDetected(), ErrorMessage.format(ErrorMessageKeys.NOT_SCHEMA_VALID, operationParsingvalidator.getRuleViolationCount(),
+                            XMLUtils.resultToString(operationParsingResult)));
+        }
     }
 
     /**
