@@ -96,15 +96,21 @@ public class StoredQueryTests extends BaseFixture {
                 "InvalidParameterValuePhase");
         Result invalidaParamValueResult = validator.validate(new DOMSource(this.rspEntity), false);
 	boolean ruleViolated = validator.ruleViolationsDetected();
+	
+	SchematronValidator operationParsingvalidator = ValidationUtils.buildSchematronValidator("ExceptionReport.sch", "OperationParsingFailedPhase");
+        Result operationParsingResult = operationParsingvalidator.validate(new DOMSource(this.rspEntity), false);
+        
         if (!ruleViolated) {
+            //Assertion for InvalidParameterException
             Assert.assertFalse(ruleViolated, ErrorMessage.format(ErrorMessageKeys.NOT_SCHEMA_VALID, validator.getRuleViolationCount(),
                             XMLUtils.resultToString(invalidaParamValueResult)));
-        } else {
-            SchematronValidator operationParsingvalidator = ValidationUtils.buildSchematronValidator("ExceptionReport.sch", "OperationParsingFailedPhase");
-            Result operationParsingResult = operationParsingvalidator.validate(new DOMSource(this.rspEntity), false);
-            
+        } else if(!operationParsingvalidator.ruleViolationsDetected()) {     
+            //Assertion for OperationParsingFailed
             Assert.assertFalse(operationParsingvalidator.ruleViolationsDetected(), ErrorMessage.format(ErrorMessageKeys.NOT_SCHEMA_VALID, operationParsingvalidator.getRuleViolationCount(),
                             XMLUtils.resultToString(operationParsingResult)));
+        } else {
+            //Assertion fail if both exception code not found.
+            Assert.fail("Required exception code not found in response. Test expects either InvalidParameterException or OperationParsingFailed exception code.");
         }
     }
 
