@@ -128,13 +128,13 @@ public class StoredQueryTests extends BaseFixture {
         if (this.wfsVersion.equals("2.0.0")) {
             Assert.assertTrue(
                     statusCode == ClientResponse.Status.NOT_FOUND.getStatusCode()
-                            || statusCode == ClientResponse.Status.FORBIDDEN.getStatusCode(),
+                             || statusCode == ClientResponse.Status.FORBIDDEN.getStatusCode(),
                     "Expected status code 404 or 403. Received: " + statusCode);
         } else {
             Assert.assertTrue(
                     statusCode == ClientResponse.Status.INTERNAL_SERVER_ERROR.getStatusCode()
-                            || statusCode == ClientResponse.Status.BAD_REQUEST.getStatusCode()
-                            || statusCode == ClientResponse.Status.FORBIDDEN.getStatusCode(),
+                            || statusCode == ClientResponse.Status.FORBIDDEN.getStatusCode()
+                            || statusCode == ClientResponse.Status.NOT_FOUND.getStatusCode(),
                     ErrorMessageKeys.UNEXPECTED_STATUS);
         }
     }
