@@ -125,7 +125,7 @@ public class StoredQueryTests extends BaseFixture {
         ClientResponse rsp = wfsClient.submitRequest(new DOMSource(this.reqEntity), binding, endpoint);
         this.rspEntity = extractBodyAsDocument(rsp);
         int statusCode = rsp.getStatus();
-        if (this.wfsVersion.equals("2.0.0") || this.wfsVersion.equals("2.0.2")) {
+        if (this.wfsVersion.equals("2.0.0")) {
             Assert.assertTrue(
                     statusCode == ClientResponse.Status.NOT_FOUND.getStatusCode()
                              || statusCode == ClientResponse.Status.FORBIDDEN.getStatusCode(),
@@ -133,7 +133,8 @@ public class StoredQueryTests extends BaseFixture {
         } else {
             Assert.assertTrue(
                     statusCode == ClientResponse.Status.INTERNAL_SERVER_ERROR.getStatusCode()
-                            || statusCode == ClientResponse.Status.FORBIDDEN.getStatusCode(),
+                            || statusCode == ClientResponse.Status.FORBIDDEN.getStatusCode()
+                            || statusCode == ClientResponse.Status.NOT_FOUND.getStatusCode(),
                     ErrorMessageKeys.UNEXPECTED_STATUS);
         }
     }
