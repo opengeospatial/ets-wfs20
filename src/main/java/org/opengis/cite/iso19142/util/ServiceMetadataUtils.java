@@ -496,7 +496,7 @@ public class ServiceMetadataUtils {
      */
     public static boolean implementsConformanceClass(final Document wfsMetadata, String conformanceClass) {
         String expr = String.format(
-                "(//ows:Constraint | //fes:Constraint)[@name='%s' and (//ows:Value = 'TRUE' or ows:DefaultValue = 'TRUE')]",
+                "(//ows:Constraint | //fes:Constraint)[@name='%s' and (.//ows:Value = 'TRUE' or ows:DefaultValue = 'TRUE')]",
                 conformanceClass);
         NodeList result = null;
         try {
