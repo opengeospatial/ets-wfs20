@@ -64,7 +64,7 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>ets-gml32</artifactId>
-      <version>1.25</version>
+      <version>1.28</version>
     </dependency>
     <dependency>
       <groupId>org.opengis.cite.teamengine</groupId>
