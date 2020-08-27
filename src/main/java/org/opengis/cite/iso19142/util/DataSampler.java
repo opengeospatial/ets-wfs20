@@ -534,13 +534,13 @@ public class DataSampler {
     }
 
     /**
-     * Randomly selects a feature type name for which instances are available in
-     * the SUT.
+     * Sort alphabetically and selects first feature type name for which
+     * instances are available in the SUT.
      *
      * @return A QName object denoting the name of a feature type, or
      *         {@code null} if no data exist in the SUT.
      */
-    public QName selectRandomFeatureType() {
+    public QName selectFeatureType() {
         List<FeatureTypeInfo> availableTypes = new ArrayList<FeatureTypeInfo>();
         List<String> featureName =  new ArrayList<String>();
         for (FeatureTypeInfo typeInfo : this.featureInfo.values()) {

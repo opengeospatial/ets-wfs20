@@ -162,7 +162,7 @@ public class CreateStoredQueryTests extends BaseFixture {
                 ProtocolBinding.POST);
         this.reqEntity = WFSMessage.createRequestEntity(ETS_PKG + "/querymgmt/CreateStoredQuery-GetFeatureByName",
                 this.wfsVersion);
-        WFSMessage.setReturnTypesAndTypeNamesAttribute( this.reqEntity, this.dataSampler.selectRandomFeatureType() );
+        WFSMessage.setReturnTypesAndTypeNamesAttribute( this.reqEntity, this.dataSampler.selectFeatureType() );
         ClientResponse rsp = this.wfsClient.submitRequest(new DOMSource(this.reqEntity), ProtocolBinding.POST,
                 endpoint);
         this.rspEntity = rsp.getEntity(Document.class);
