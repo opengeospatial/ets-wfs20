@@ -21,6 +21,11 @@
         <exclude>xerces:xercesImpl</exclude>
         <exclude>xml-resolver:xml-resolver</exclude>
         <exclude>com.thaiopensource:jing</exclude>
+        <exclude>javax.ws.rs:jsr311-api</exclude>
+        <exclude>org.beanshell:bsh</exclude>
+        <exclude>com.beust:jcommander</exclude>
+        <exclude>org.testng:testng</exclude>
+        <exclude>xml-apis:xml-apis</exclude>
       </excludes>
       <useTransitiveDependencies>true</useTransitiveDependencies>
       <useTransitiveFiltering>true</useTransitiveFiltering>
