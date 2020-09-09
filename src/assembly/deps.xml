@@ -22,6 +22,8 @@
         <exclude>xml-resolver:xml-resolver</exclude>
         <exclude>com.thaiopensource:jing</exclude>
         <exclude>javax.ws.rs:jsr311-api</exclude>
+        <exclude>org.testng:testng</exclude>
+        <exclude>com.beust:jcommander</exclude>
       </excludes>
       <useTransitiveDependencies>true</useTransitiveDependencies>
       <useTransitiveFiltering>true</useTransitiveFiltering>
