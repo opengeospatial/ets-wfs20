@@ -336,9 +336,6 @@
                 <type>zip</type>
               </artifactItem>
             </artifactItems>
-            <ignoredUnusedDeclaredDependencies>
-              <ignoredUnusedDeclaredDependency>com.google.inject:guice</ignoredUnusedDeclaredDependency>
-            </ignoredUnusedDeclaredDependencies>
           </configuration>
         </plugin>
       </plugins>
