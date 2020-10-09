@@ -75,7 +75,7 @@ public class LockFeatureTests extends LockingFixture {
 	 */
 	@Test(description = "See ISO 19142: 12.2.4.3, 15.2.3.1.2")
 	public void lockFeatureAndAttemptDelete() {
-		QName featureType = this.dataSampler.selectRandomFeatureType();
+		QName featureType = this.dataSampler.selectFeatureType();
 		String gmlId = this.dataSampler.selectRandomFeatureIdentifiers( featureType, 1 ).iterator().next();
 		WFSMessage.appendStoredQuery(reqEntity, this.storedQueryId,
 				Collections.singletonMap("id", (Object) gmlId));
@@ -119,7 +119,7 @@ public class LockFeatureTests extends LockingFixture {
 	 */
 	@Test(description = "See ISO 19142: 12.2.3, 12.2.5")
 	public void lockFeatureAlreadyLocked() {
-		QName featureType = this.dataSampler.selectRandomFeatureType();
+		QName featureType = this.dataSampler.selectFeatureType();
 		String gmlId = this.dataSampler.selectRandomFeatureIdentifiers( featureType, 1 ).iterator().next();
 		WFSMessage.appendStoredQuery(reqEntity, this.storedQueryId,
 				Collections.singletonMap("id", (Object) gmlId));
@@ -216,7 +216,7 @@ public class LockFeatureTests extends LockingFixture {
         if(!"2.0.2".equals( this.wfsVersion) ){
             throw new SkipException( "Tested only for WFS 2.0.2" );
         }
-		QName featureType = this.dataSampler.selectRandomFeatureType();
+		QName featureType = this.dataSampler.selectFeatureType();
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
         this.reqEntity.getDocumentElement().setAttribute("expiry", "10");
         ClientResponse rsp = wfsClient.submitRequest(this.reqEntity,

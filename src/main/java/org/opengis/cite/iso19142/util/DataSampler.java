@@ -9,6 +9,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -18,6 +19,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -532,25 +534,28 @@ public class DataSampler {
     }
 
     /**
-     * Randomly selects a feature type name for which instances are available in
-     * the SUT.
+     * Sort alphabetically and selects first feature type name for which
+     * instances are available in the SUT.
      *
      * @return A QName object denoting the name of a feature type, or
      *         {@code null} if no data exist in the SUT.
      */
-    public QName selectRandomFeatureType() {
+    public QName selectFeatureType() {
         List<FeatureTypeInfo> availableTypes = new ArrayList<FeatureTypeInfo>();
+        List<String> featureName =  new ArrayList<String>();
         for (FeatureTypeInfo typeInfo : this.featureInfo.values()) {
             if (typeInfo.isInstantiated()) {
                 availableTypes.add(typeInfo);
+                featureName.add(typeInfo.getTypeName().getLocalPart());
             }
         }
         if (availableTypes.isEmpty()) {
             return null;
         }
-        Random random = new Random();
-        FeatureTypeInfo availableType = availableTypes.get(random.nextInt(availableTypes.size()));
-        return availableType.getTypeName();
+        Collections.sort(featureName);
+        Optional<FeatureTypeInfo> availableType = availableTypes.stream()
+                .filter(x -> x.getTypeName().getLocalPart().equalsIgnoreCase(featureName.get(0))).findFirst();
+        return availableType.get().getTypeName();
     }
 
     /**

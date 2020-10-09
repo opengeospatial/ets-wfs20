@@ -77,7 +77,7 @@ public class GetFeatureWithLockTests extends LockingFixture {
 	 */
 	@Test(description = "See ISO 19142: 13.2.4.3")
 	public void lockQueryResults_hits() {
-		QName featureType = this.dataSampler.selectRandomFeatureType();
+		QName featureType = this.dataSampler.selectFeatureType();
 		WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
 		this.reqEntity.getDocumentElement().setAttribute("resultType", "hits");
 		ClientResponse rsp = wfsClient.submitRequest(this.reqEntity,
@@ -106,7 +106,7 @@ public class GetFeatureWithLockTests extends LockingFixture {
 	 */
 	@Test(description = "See ISO 19142: 12.2.4.2, Table D.2")
 	public void lockAllQueryResults_20Seconds() {
-		QName featureType = this.dataSampler.selectRandomFeatureType();
+		QName featureType = this.dataSampler.selectFeatureType();
 		WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
 		this.reqEntity.getDocumentElement().setAttribute("expiry", "20");
 		ClientResponse rsp = wfsClient.submitRequest(this.reqEntity,
@@ -158,7 +158,7 @@ public class GetFeatureWithLockTests extends LockingFixture {
 	 */
 	@Test(description = "See ISO 19142: 13.2.4.2")
 	public void lockSomeFeatures() {
-		QName featureType = this.dataSampler.selectRandomFeatureType();
+		QName featureType = this.dataSampler.selectFeatureType();
 		Set<String> featureIdSet = this.dataSampler
 				.selectRandomFeatureIdentifiers(featureType, 10);
 		// Submit Q1 to lock one feature

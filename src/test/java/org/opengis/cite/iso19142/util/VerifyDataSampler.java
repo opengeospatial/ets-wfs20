@@ -115,13 +115,13 @@ public class VerifyDataSampler {
         QName featureType = new QName( TNS, "ComplexFeature" );
         DataSampler iut = new DataSampler( capabilitiesDoc );
 
-        QName selectedFeatureTypeBeforeInstantiaed = iut.selectRandomFeatureType();
+        QName selectedFeatureTypeBeforeInstantiaed = iut.selectFeatureType();
         assertThat( selectedFeatureTypeBeforeInstantiaed, nullValue());
 
         FeatureTypeInfo typeInfo = iut.getFeatureTypeInfo().get(featureType);
         typeInfo.setInstantiated(true);
 
-        QName selectedFeatureType = iut.selectRandomFeatureType();
+        QName selectedFeatureType = iut.selectFeatureType();
         assertThat( selectedFeatureType, is( featureType ) );
     }
 
