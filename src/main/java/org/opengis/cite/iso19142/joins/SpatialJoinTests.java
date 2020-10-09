@@ -215,7 +215,7 @@ public class SpatialJoinTests extends QueryFilterFixture {
             joinProperties.add(new FeatureProperty(entryPointProps.getKey(), entryPointProps.getValue().get(0)));         
         }
         else{
-           Assert.fail("This test has triggered an unexpected Spatial Join condition. The Spatial Join test will need to be applied manually.");       
+           throw new SkipException("This test has triggered an unexpected Spatial Join condition. The Spatial Join test will need to be applied manually.");       
         } 
         JoinQueryUtils.appendSpatialJoinQuery(this.reqEntity, "Intersects", joinProperties);
         ClientResponse rsp = wfsClient.submitRequest(this.reqEntity, ProtocolBinding.ANY);
