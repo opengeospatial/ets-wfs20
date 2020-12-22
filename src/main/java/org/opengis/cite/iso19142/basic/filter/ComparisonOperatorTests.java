@@ -554,6 +554,9 @@ public class ComparisonOperatorTests extends QueryFilterFixture {
             if (GregorianCalendar.class.isInstance(objValues[i])) {
                 GregorianCalendar cal = (GregorianCalendar) objValues[i];
                 values[i] = tmFormatter.format(cal.toZonedDateTime());
+                if (values[i].contains("+") && values[i].length() > 25) {
+                    values[i] = values[i].substring(0, 25);
+                }
             } else {
                 values[i] = DatatypeConverter.printDecimal(new BigDecimal(objValues[i].toString()));
             }
