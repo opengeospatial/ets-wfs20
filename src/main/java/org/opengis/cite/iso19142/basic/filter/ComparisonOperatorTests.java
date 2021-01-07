@@ -548,15 +548,12 @@ public class ComparisonOperatorTests extends QueryFilterFixture {
             }
             Arrays.sort(objValues);
         }
-        DateTimeFormatter tmFormatter = (values[0].indexOf('T') > 0) ? DateTimeFormatter.ISO_OFFSET_DATE_TIME
+        DateTimeFormatter tmFormatter = (values[0].indexOf('T') > 0) ? DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX")
                 : DateTimeFormatter.ISO_DATE;
         for (int i = 0; i < values.length; i++) {
             if (GregorianCalendar.class.isInstance(objValues[i])) {
                 GregorianCalendar cal = (GregorianCalendar) objValues[i];
                 values[i] = tmFormatter.format(cal.toZonedDateTime());
-                if (values[i].contains("+") && values[i].length() > 25) {
-                    values[i] = values[i].substring(0, 25);
-                }
             } else {
                 values[i] = DatatypeConverter.printDecimal(new BigDecimal(objValues[i].toString()));
             }
