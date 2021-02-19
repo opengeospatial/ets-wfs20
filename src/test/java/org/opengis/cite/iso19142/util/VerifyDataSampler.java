@@ -77,7 +77,7 @@ public class VerifyDataSampler {
         assertNotNull("Envelope is null.", bbox);
         DirectPosition upperCorner = bbox.getUpperCorner();
         assertEquals("Unexpected ordinate[0] for upper corner.", 51.92, upperCorner.getOrdinate(0), 0.005);
-        assertEquals("Unexpected ordinate[1] for upper corner.", 9.70, upperCorner.getOrdinate(1), 0.005);
+        assertEquals("Unexpected ordinate[1] for upper corner.", 8.541, upperCorner.getOrdinate(1), 0.005);
     }
 
     @Test
