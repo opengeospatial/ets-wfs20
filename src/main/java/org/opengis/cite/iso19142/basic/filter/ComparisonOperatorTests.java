@@ -548,7 +548,9 @@ public class ComparisonOperatorTests extends QueryFilterFixture {
             }
             Arrays.sort(objValues);
         }
-        DateTimeFormatter tmFormatter = (values[0].indexOf('T') > 0) ? DateTimeFormatter.ISO_OFFSET_DATE_TIME
+        // Earlier we using ISO_OFFSET_DATE_TIME but offset is appended with seconds due to that test is getting failed.
+        // So we have added a custom datetime formatter pattern(yyyy-MM-dd'T'HH:mm:ssXXX) which will ignore seconds from offset.
+        DateTimeFormatter tmFormatter = (values[0].indexOf('T') > 0) ? DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX")
                 : DateTimeFormatter.ISO_DATE;
         for (int i = 0; i < values.length; i++) {
             if (GregorianCalendar.class.isInstance(objValues[i])) {
