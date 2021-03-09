@@ -103,6 +103,10 @@ public class ServiceMetadataUtils {
                         endpoint = URI.create(href);
                     }
                 }
+                if (null == endpoint) {
+                    String href = xpath.evaluate(expr, wfsMetadata);
+                    endpoint = URI.create(href);
+                }
             } else {
                 String href = xpath.evaluate(expr, wfsMetadata);
                 endpoint = URI.create(href);
