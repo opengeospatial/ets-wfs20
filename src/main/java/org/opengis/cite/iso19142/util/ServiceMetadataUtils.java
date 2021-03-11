@@ -72,6 +72,7 @@ public class ServiceMetadataUtils {
         if (null == binding || binding.equals(ProtocolBinding.ANY)) {
             binding = getOperationBindings(wfsMetadata, opName).iterator().next();
         }
+        ProtocolBinding originalBinding = binding;
         if (binding.equals(ProtocolBinding.SOAP)) {
             // use POST method for SOAP request
             binding = ProtocolBinding.POST;
@@ -87,8 +88,29 @@ public class ServiceMetadataUtils {
         xpath.setNamespaceContext(nsBindings);
         URI endpoint = null;
         try {
-            String href = xpath.evaluate(expr, wfsMetadata);
-            endpoint = URI.create(href);
+            String pathToEvaluate = String.format("//ows:Operation[@name='%s']//ows:%s/ows:Constraint/ows:AllowedValues/ows:Value", opName, method.toString());
+            Object evalResult = xpath.evaluate(pathToEvaluate, wfsMetadata, XPathConstants.NODESET);
+            NodeList allowedValues = (NodeList) evalResult;
+
+            // To get SOAP end point on basis of allowed values
+            if (originalBinding.equals(ProtocolBinding.SOAP) && allowedValues.getLength() > 0) {
+                evalResult = xpath.evaluate(expr, wfsMetadata, XPathConstants.NODESET);
+                NodeList hrefList = (NodeList) evalResult;
+
+                for (int i = 0; i < hrefList.getLength(); i++) {
+                    if (allowedValues.item(i).getTextContent().equalsIgnoreCase("soap")) {
+                        String href = hrefList.item(i).getNodeValue();
+                        endpoint = URI.create(href);
+                    }
+                }
+                if (null == endpoint) {
+                    String href = xpath.evaluate(expr, wfsMetadata);
+                    endpoint = URI.create(href);
+                }
+            } else {
+                String href = xpath.evaluate(expr, wfsMetadata);
+                endpoint = URI.create(href);
+            }
         } catch (XPathExpressionException ex) {
             // XPath expression is correct
             TestSuiteLogger.log(Level.INFO, ex.getMessage());
