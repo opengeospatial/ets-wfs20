@@ -385,7 +385,7 @@ public class DataSampler {
         } while (itr.hasNext());
         if (null != geomNodes && geomNodes.getLength() > 0) {
             try {
-                envelope = Extents.calculateEnvelope(geomNodes);
+                envelope = Extents.calculateEnvelopeUsingSingleGeometry(geomNodes);
             } catch (JAXBException e) {
                 LOGR.log(Level.WARNING,
                         String.format("Failed to create envelope from geometry nodes.", e.getMessage()));
