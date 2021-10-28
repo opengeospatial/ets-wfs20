@@ -64,6 +64,8 @@ public class WFS2 {
     public static final String VALUE_COLLECTION = "ValueCollection";
     /** FeatureCollection element. */
     public static final String FEATURE_COLLECTION = "FeatureCollection";
+    /** member element. */
+    public static final String MEMBER = "member";
     /** Transaction element. */
     public static final String TRANSACTION = "Transaction";
     /** Update element (Transaction). */
