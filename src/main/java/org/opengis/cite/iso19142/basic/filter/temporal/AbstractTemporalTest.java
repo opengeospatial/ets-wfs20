@@ -35,8 +35,8 @@ public abstract class AbstractTemporalTest extends QueryFilterFixture {
     private TemporalProperty findTemporalExtent( QName featureType, List<XSElementDeclaration> temporalProperties ) {
         for ( XSElementDeclaration temporalProp : temporalProperties ) {
             try {
-                Period temporalExtent = this.dataSampler.getTemporalExtentOfProperty( this.model, featureType,
-                                                                                      temporalProp );
+                Period temporalExtent = this.dataSampler.getTemporalExtentOfProperty(getModel(), featureType,
+                                                                                      temporalProp);
                 if ( temporalExtent != null )
                     return new TemporalProperty( temporalProp, temporalExtent );
             } catch ( Exception e ) {

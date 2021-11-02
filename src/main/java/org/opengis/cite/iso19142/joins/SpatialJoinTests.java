@@ -103,9 +103,9 @@ public class SpatialJoinTests extends QueryFilterFixture {
      */
     Map<QName, List<XSElementDeclaration>> findGeometryProperties(String gmlTypeName) {
         Map<QName, List<XSElementDeclaration>> geomProps = new HashMap<QName, List<XSElementDeclaration>>();
-        XSTypeDefinition gmlGeomBaseType = model.getTypeDefinition(gmlTypeName, Namespaces.GML);
+        XSTypeDefinition gmlGeomBaseType = getModel().getTypeDefinition(gmlTypeName, Namespaces.GML);
         for (QName featureType : this.featureTypes) {
-            List<XSElementDeclaration> geomPropsList = AppSchemaUtils.getFeaturePropertiesByType(model, featureType,
+            List<XSElementDeclaration> geomPropsList = AppSchemaUtils.getFeaturePropertiesByType(getModel(), featureType,
                     gmlGeomBaseType);
             if (!geomPropsList.isEmpty()) {
                 geomProps.put(featureType, geomPropsList);

@@ -96,10 +96,10 @@ public class IntersectsTests extends QueryFilterFixture {
      */
     @BeforeClass
     public void findAllGeometryProperties() {
-        XSTypeDefinition geomBaseType = model.getTypeDefinition("AbstractGeometryType", Namespaces.GML);
+        XSTypeDefinition geomBaseType = getModel().getTypeDefinition("AbstractGeometryType", Namespaces.GML);
         this.allGeomProperties = new HashMap<>();
         for (QName featureType : this.featureTypes) {
-            List<XSElementDeclaration> geomProps = AppSchemaUtils.getFeaturePropertiesByType(model, featureType,
+            List<XSElementDeclaration> geomProps = AppSchemaUtils.getFeaturePropertiesByType(getModel(), featureType,
                     geomBaseType);
             if (!geomProps.isEmpty()) {
                 this.allGeomProperties.put(featureType, geomProps);
@@ -140,7 +140,7 @@ public class IntersectsTests extends QueryFilterFixture {
         if (!this.geomOperands.contains(gmlPolygon)) {
             throw new SkipException("Unsupported geometry operand: " + gmlPolygon);
         }
-        Envelope extent = this.dataSampler.getSpatialExtent(this.model, featureType);
+        Envelope extent = this.dataSampler.getSpatialExtent(getModel(), featureType);
         Document gmlEnv = Extents.envelopeAsGML(extent);
         Element gmlPolygonElem = XMLUtils
                 .transform(new StreamSource(getClass().getResourceAsStream(XSLT_ENV2POLYGON)), gmlEnv, null)
@@ -190,7 +190,7 @@ public class IntersectsTests extends QueryFilterFixture {
                 throw new SkipException("Unsupported geometry operands: gml:LineString, gml:Curve");
             }
         }
-        Envelope extent = this.dataSampler.getSpatialExtent(this.model, featureType);
+        Envelope extent = this.dataSampler.getSpatialExtent(getModel(), featureType);
         Document gmlEnvelope = Extents.envelopeAsGML(extent);
         Element gmlCurveElem = XMLUtils
                 .transform(new StreamSource(getClass().getResourceAsStream("envelopeTocurve.xsl")), gmlEnvelope,

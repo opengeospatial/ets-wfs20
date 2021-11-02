@@ -80,7 +80,7 @@ public class PropertyIsNullOperatorTests extends QueryFilterFixture {
 	public void propertyIsNotNull(ProtocolBinding binding, QName featureType) {
 		WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
 		List<XSElementDeclaration> props = AppSchemaUtils
-				.getAllFeatureProperties(model, featureType);
+				.getAllFeatureProperties(getModel(), featureType);
 		// get last property in document order
 		XSElementDeclaration lastProp = props.get(props.size() - 1);
 		QName propName = new QName(lastProp.getNamespace(), lastProp.getName());

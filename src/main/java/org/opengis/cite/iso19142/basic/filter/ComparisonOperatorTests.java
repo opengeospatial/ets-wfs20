@@ -88,9 +88,9 @@ public class ComparisonOperatorTests extends QueryFilterFixture {
      */
     @Test(description = "See ISO 19143: 7.7", dataProvider = "protocol-featureType")
     public void propertyIsLessThan_matchAny(ProtocolBinding binding, QName featureType) {
-        Set<XSTypeDefinition> dataTypes = getNumericDataTypes(this.model);
-        dataTypes.addAll(AppSchemaUtils.getSimpleTemporalDataTypes(this.model));
-        Map<XSElementDeclaration, String[]> propRangeMap = findFeaturePropertyValue(this.model, featureType, dataTypes);
+        Set<XSTypeDefinition> dataTypes = getNumericDataTypes(getModel());
+        dataTypes.addAll(AppSchemaUtils.getSimpleTemporalDataTypes(getModel()));
+        Map<XSElementDeclaration, String[]> propRangeMap = findFeaturePropertyValue(getModel(), featureType, dataTypes);
         if (propRangeMap.isEmpty()) {
             throw new SkipException("No numeric or temporal property values found for " + featureType);
         }
@@ -132,9 +132,9 @@ public class ComparisonOperatorTests extends QueryFilterFixture {
      */
     @Test(description = "See ISO 19143: 7.7.3.3", dataProvider = "protocol-featureType")
     public void propertyIsLessThan_matchAll(ProtocolBinding binding, QName featureType) {
-        Set<XSTypeDefinition> dataTypes = getNumericDataTypes(this.model);
-        dataTypes.addAll(AppSchemaUtils.getSimpleTemporalDataTypes(this.model));
-        Map<XSElementDeclaration, String[]> propRangeMap = findFeaturePropertyValue(this.model, featureType, dataTypes);
+        Set<XSTypeDefinition> dataTypes = getNumericDataTypes(getModel());
+        dataTypes.addAll(AppSchemaUtils.getSimpleTemporalDataTypes(getModel()));
+        Map<XSElementDeclaration, String[]> propRangeMap = findFeaturePropertyValue(getModel(), featureType, dataTypes);
         if (propRangeMap.isEmpty()) {
             throw new SkipException("No numeric or temporal property values found for " + featureType);
         }
@@ -176,9 +176,9 @@ public class ComparisonOperatorTests extends QueryFilterFixture {
      */
     @Test(description = "See ISO 19143: 7.7.3.1", dataProvider = "protocol-featureType")
     public void propertyIsGreaterThan_matchAny(ProtocolBinding binding, QName featureType) {
-        Set<XSTypeDefinition> dataTypes = getNumericDataTypes(this.model);
-        dataTypes.addAll(AppSchemaUtils.getSimpleTemporalDataTypes(this.model));
-        Map<XSElementDeclaration, String[]> propRangeMap = findFeaturePropertyValue(this.model, featureType, dataTypes);
+        Set<XSTypeDefinition> dataTypes = getNumericDataTypes(getModel());
+        dataTypes.addAll(AppSchemaUtils.getSimpleTemporalDataTypes(getModel()));
+        Map<XSElementDeclaration, String[]> propRangeMap = findFeaturePropertyValue(getModel(), featureType, dataTypes);
         if (propRangeMap.isEmpty()) {
             throw new SkipException("No numeric or temporal property values found for " + featureType);
         }
@@ -220,9 +220,9 @@ public class ComparisonOperatorTests extends QueryFilterFixture {
      */
     @Test(description = "See ISO 19143: 7.7.3.1", dataProvider = "protocol-featureType")
     public void propertyIsGreaterThanEqualTo_matchAny(ProtocolBinding binding, QName featureType) {
-        Set<XSTypeDefinition> dataTypes = getNumericDataTypes(this.model);
-        dataTypes.addAll(AppSchemaUtils.getSimpleTemporalDataTypes(this.model));
-        Map<XSElementDeclaration, String[]> propRangeMap = findFeaturePropertyValue(this.model, featureType, dataTypes);
+        Set<XSTypeDefinition> dataTypes = getNumericDataTypes(getModel());
+        dataTypes.addAll(AppSchemaUtils.getSimpleTemporalDataTypes(getModel()));
+        Map<XSElementDeclaration, String[]> propRangeMap = findFeaturePropertyValue(getModel(), featureType, dataTypes);
         if (propRangeMap.isEmpty()) {
             throw new SkipException("No numeric or temporal property values found for " + featureType);
         }
@@ -265,9 +265,9 @@ public class ComparisonOperatorTests extends QueryFilterFixture {
 
     @Test(description = "See ISO 19143: 7.7.3.1", dataProvider = "protocol-featureType")
     public void propertyIsLessThanEqualTo_matchAny(ProtocolBinding binding, QName featureType) {
-        Set<XSTypeDefinition> dataTypes = getNumericDataTypes(this.model);
-        dataTypes.addAll(AppSchemaUtils.getSimpleTemporalDataTypes(this.model));
-        Map<XSElementDeclaration, String[]> propRangeMap = findFeaturePropertyValue(this.model, featureType, dataTypes);
+        Set<XSTypeDefinition> dataTypes = getNumericDataTypes(getModel());
+        dataTypes.addAll(AppSchemaUtils.getSimpleTemporalDataTypes(getModel()));
+        Map<XSElementDeclaration, String[]> propRangeMap = findFeaturePropertyValue(getModel(), featureType, dataTypes);
         if (propRangeMap.isEmpty()) {
             throw new SkipException("No numeric or temporal property values found for " + featureType);
         }

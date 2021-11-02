@@ -234,10 +234,10 @@ public class PropertyIsEqualToOperatorTests extends QueryFilterFixture {
      */
     Map<XSElementDeclaration, String> findMatchingPropertyValue(
             QName featureType) {
-        XSTypeDefinition xsdSimpleType = model.getTypeDefinition(
+        XSTypeDefinition xsdSimpleType = getModel().getTypeDefinition(
                 "anySimpleType", XMLConstants.W3C_XML_SCHEMA_NS_URI);
         List<XSElementDeclaration> simpleProps = AppSchemaUtils
-                .getFeaturePropertiesByType(model, featureType, xsdSimpleType);
+                .getFeaturePropertiesByType(getModel(), featureType, xsdSimpleType);
         ListIterator<XSElementDeclaration> listItr = simpleProps
                 .listIterator(simpleProps.size());
         XSElementDeclaration prop = null;
