@@ -220,10 +220,18 @@ public class BBOXTests extends QueryFilterFixture {
         addBBOXPredicate(this.reqEntity, gmlEnv.getDocumentElement(), valueRef);
         ClientResponse rsp = wfsClient.submitRequest(reqEntity, ProtocolBinding.ANY);
         this.rspEntity = rsp.getEntity(Document.class);
-        Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.BAD_REQUEST.getStatusCode(),
-                ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
-        String xpath = "//ows:Exception[@exceptionCode='InvalidParameterValue']";
-        ETSAssert.assertXPath(xpath, this.rspEntity, null);
+        //https://github.com/opengeospatial/ets-wfs20/issues/147
+        //Agreed solution to this issue is to also allow OperationProcessingFailed (Status Code 403) as valid exception type.
+        int statusCode = rsp.getStatus();
+        if(statusCode == ClientResponse.Status.BAD_REQUEST.getStatusCode()) {
+            String xpath = "//ows:Exception[@exceptionCode='InvalidParameterValue']";
+            ETSAssert.assertXPath(xpath, this.rspEntity, null);
+        } else if(statusCode == ClientResponse.Status.FORBIDDEN.getStatusCode()) {
+            String xpath = "//ows:Exception[@exceptionCode='OperationProcessingFailed']";
+            ETSAssert.assertXPath(xpath, this.rspEntity, null);
+        } else {
+        	Assert.fail(ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
+        }
     }
 
     // bboxWithOtherCRS
