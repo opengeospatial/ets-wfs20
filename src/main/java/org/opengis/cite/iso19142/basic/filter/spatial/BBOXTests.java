@@ -61,7 +61,7 @@ public class BBOXTests extends QueryFilterFixture {
      */
     @BeforeClass
     public void createGeometryBaseType() {
-        this.gmlGeomBaseType = model.getTypeDefinition("AbstractGeometryType", Namespaces.GML);
+        this.gmlGeomBaseType = getModel().getTypeDefinition("AbstractGeometryType", Namespaces.GML);
     }
 
     /**
@@ -80,12 +80,12 @@ public class BBOXTests extends QueryFilterFixture {
      */
     @Test(description = "See ISO 19143: 7.8.3.2", dataProvider = "protocol-featureType")
     public void nonSpecificBBOX(ProtocolBinding binding, QName featureType) {
-        List<XSElementDeclaration> geomProps = AppSchemaUtils.getFeaturePropertiesByType(model, featureType,
+        List<XSElementDeclaration> geomProps = AppSchemaUtils.getFeaturePropertiesByType(getModel(), featureType,
                 gmlGeomBaseType);
         if (geomProps.isEmpty()) {
             throw new SkipException("Feature type has no geometry properties: " + featureType);
         }
-        Envelope extent = this.dataSampler.getSpatialExtent(this.model, featureType);
+        Envelope extent = this.dataSampler.getSpatialExtent(getModel(), featureType);
         Document gmlEnv = envelopeAsGML(extent);
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
         addBBOXPredicate(this.reqEntity, gmlEnv.getDocumentElement(), null);
@@ -132,7 +132,7 @@ public class BBOXTests extends QueryFilterFixture {
      */
     @Test(description = "See ISO 19143: 7.8.3.2, A.7", dataProvider = "protocol-featureType")
     public void bboxWithDefaultExtent(ProtocolBinding binding, QName featureType) {
-        List<XSElementDeclaration> geomProps = AppSchemaUtils.getFeaturePropertiesByType(model, featureType,
+        List<XSElementDeclaration> geomProps = AppSchemaUtils.getFeaturePropertiesByType(getModel(), featureType,
                 gmlGeomBaseType);
         if (geomProps.isEmpty()) {
             throw new SkipException("Feature type has no geometry properties: " + featureType);
@@ -140,7 +140,7 @@ public class BBOXTests extends QueryFilterFixture {
         XSElementDeclaration geomProp = geomProps.get(0);
         Element valueRef = WFSMessage.createValueReference(geomProp);
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
-        Envelope extent = this.dataSampler.getSpatialExtent(this.model, featureType);
+        Envelope extent = this.dataSampler.getSpatialExtent(getModel(), featureType);
         Document gmlEnv = envelopeAsGML(extent);
         addBBOXPredicate(this.reqEntity, gmlEnv.getDocumentElement(), valueRef);
         ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
@@ -212,7 +212,7 @@ public class BBOXTests extends QueryFilterFixture {
      */
     @Test(description = "See ISO 19142: 11.4; ISO 19143: 8.3", dataProvider = "instantiated-feature-types")
     public void invalidGeometryOperand(QName featureType) {
-        XSElementDeclaration gmlDesc = this.model.getElementDeclaration("description", Namespaces.GML);
+        XSElementDeclaration gmlDesc = getModel().getElementDeclaration("description", Namespaces.GML);
         Element valueRef = WFSMessage.createValueReference(gmlDesc);
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
         Envelope spatialExtent = featureInfo.get(featureType).getSpatialExtent();

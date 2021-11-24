@@ -88,7 +88,7 @@ public class DuringTests extends AbstractTemporalTest {
         this.rspEntity = extractBodyAsDocument(rsp);
         Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
-        List<Node> temporalNodes = TemporalQuery.extractTemporalNodes(this.rspEntity, temporalProperty.getProperty(), this.model);
+        List<Node> temporalNodes = TemporalQuery.extractTemporalNodes(this.rspEntity, temporalProperty.getProperty(), getModel());
         assertDuring(temporalNodes, temporalProperty.getProperty(), gmlTimeLiteral);
     }
 

@@ -65,7 +65,7 @@ public class PropertyIsNilOperatorTests extends QueryFilterFixture {
      */
     @Test(description = "See ISO 19143: 7.7.3.6, A.6", dataProvider = "protocol-featureType")
     public void propertyIsNil( ProtocolBinding binding, QName featureType ) {
-        List<QName> nillables = this.dataSampler.getNillableProperties( this.model, featureType );
+        List<QName> nillables = this.dataSampler.getNillableProperties(getModel(), featureType);
         if ( nillables.isEmpty() ) {
             throw new SkipException( "FeatureType " + featureType + " does not contain at least one nillable property" );
         }

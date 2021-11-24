@@ -15,6 +15,7 @@ import org.opengis.cite.iso19142.util.AppSchemaUtils;
 import org.opengis.cite.iso19142.util.DataSampler;
 import org.opengis.cite.iso19142.util.TestSuiteLogger;
 import org.opengis.cite.iso19142.util.WFSMessage;
+import org.testng.Assert;
 import org.testng.ISuite;
 import org.testng.ITestContext;
 import org.testng.annotations.BeforeClass;
@@ -94,11 +95,18 @@ public class QueryFilterFixture extends BaseFixture {
         if (tmProps != null) {
             return tmProps;
         }
-        tmProps = AppSchemaUtils.getTemporalFeatureProperties(this.model, featureType);
+        tmProps = AppSchemaUtils.getTemporalFeatureProperties(getModel(), featureType);
         this.temporalProperties.put(featureType, tmProps);
         TestSuiteLogger.log(Level.FINE,
                 String.format("Temporal properties for feature type %s: %s", featureType, tmProps));
         return tmProps;
     }
+
+	public XSModel getModel() {
+		if(model == null) {
+			Assert.fail("Test cannot be executed as no schema can be found; Please check if DescribeFeatureType returns a valid schema.");
+		}
+		return model;
+	}
 
 }

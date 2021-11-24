@@ -215,10 +215,10 @@ public class PropertyIsLikeOperatorTests extends QueryFilterFixture {
 	Map<QName, String> generateMatchingStringPattern(QName featureType) {
 		QName propName = null;
 		String pattern = null;
-		XSTypeDefinition stringType = this.model.getTypeDefinition("string",
+		XSTypeDefinition stringType = getModel().getTypeDefinition("string",
 				XMLConstants.W3C_XML_SCHEMA_NS_URI);
 		List<XSElementDeclaration> strProps = AppSchemaUtils
-				.getFeaturePropertiesByType(model, featureType, stringType);
+				.getFeaturePropertiesByType(getModel(), featureType, stringType);
 		ListIterator<XSElementDeclaration> listItr = strProps
 				.listIterator(strProps.size());
 		// start with application-specific properties at end of list
