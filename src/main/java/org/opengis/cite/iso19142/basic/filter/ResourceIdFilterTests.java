@@ -59,7 +59,7 @@ public class ResourceIdFilterTests extends QueryFilterFixture {
         this.rspEntity = extractBodyAsDocument(rsp);
         Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
-        ETSAssert.assertDescendantElementCount(this.rspEntity, featureType, idSet.size());
+        ETSAssert.assertDescendantElementCount(this.rspEntity, new QName(Namespaces.WFS, WFS2.MEMBER), idSet.size());
     }
 
     /**
