@@ -1,10 +1,13 @@
 package org.opengis.cite.iso19142.util;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.logging.Level;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -79,6 +82,24 @@ public class TimeUtils {
     }
 
     /**
+     * Builds a GML representation of the given time period.
+     * 
+     * @param period
+     *            A Period representing a temporal interval (UTC).
+     * @return A Document with gml:TimePeriod as the document element.
+     */
+    public static Document periodAsGMLSubtractOneDay(Period period) {
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXX");
+        String startOfPeriod = period.getBeginning().getPosition().getDateTime().toString();
+        ZonedDateTime startDateTime = ZonedDateTime.parse(startOfPeriod, dateTimeFormatter);
+        startDateTime = startDateTime.minus(1, ChronoUnit.DAYS);
+        String endOfPeriod = period.getEnding().getPosition().getDateTime().toString();
+        ZonedDateTime endDateTime = ZonedDateTime.parse(endOfPeriod, dateTimeFormatter);
+        endDateTime = endDateTime.minus(1, ChronoUnit.DAYS);
+        return intervalAsGML(startDateTime, endDateTime);
+    }
+
+    /**
      * Builds a GML representation of a time instant with the specified
      * time-zone offset.
      * 
@@ -103,5 +124,36 @@ public class TimeUtils {
         Node timePosition = gmlTimeInstant.getElementsByTagNameNS( Namespaces.GML, "timePosition" ).item( 0 );
         timePosition.setTextContent( timePositionValue );
         return gmlTimeInstant;
+    }
+
+    /**
+     * Builds a GML representation of a time instant with the specified
+     * time-zone offset.
+     * 
+     * @param instant
+     *            An instant representing a position in time.
+     * @param offset
+     *            A time-zone offset from UTC ('Z' if null).
+     * @return A Document with gml:TimeInstant as the document element.
+     */
+    public static Document instantAsGMLSubtractOneDay(org.opengis.temporal.Instant instant, ZoneOffset offset) {
+        if (null == offset) {
+            offset = ZoneOffset.UTC;
+        }
+        Document gmlTimeInstant;
+        try {
+            gmlTimeInstant = DOC_BUILDER.parse(TimeUtils.class.getResourceAsStream("TimeInstant.xml"));
+        } catch (SAXException | IOException e) {
+            return null;
+        }
+        OffsetDateTime tPos = ogcInstantToJavaInstantSubtractOneDay(instant).atOffset(offset);
+        String timePositionValue = tPos.format( DateTimeFormatter.ISO_OFFSET_DATE_TIME );
+        Node timePosition = gmlTimeInstant.getElementsByTagNameNS( Namespaces.GML, "timePosition" ).item( 0 );
+        timePosition.setTextContent( timePositionValue );
+        return gmlTimeInstant;
+    }
+    
+    private static Instant ogcInstantToJavaInstantSubtractOneDay(org.opengis.temporal.Instant instant) {
+    	return instant.getPosition().getDate().toInstant().minus(1, ChronoUnit.DAYS);
     }
 }
