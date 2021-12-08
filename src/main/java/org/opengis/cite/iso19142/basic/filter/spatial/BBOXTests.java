@@ -86,7 +86,12 @@ public class BBOXTests extends QueryFilterFixture {
             throw new SkipException("Feature type has no geometry properties: " + featureType);
         }
         Envelope extent = this.dataSampler.getSpatialExtent(getModel(), featureType);
-        Document gmlEnv = envelopeAsGML(extent);
+        Document gmlEnv = null;
+        try {
+            gmlEnv = envelopeAsGML(extent);
+		} catch (Exception e) {
+            throw new RuntimeException("Could not create envelope for feature type: " + featureType);
+		}
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
         addBBOXPredicate(this.reqEntity, gmlEnv.getDocumentElement(), null);
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.GET_FEATURE, binding);
@@ -141,7 +146,12 @@ public class BBOXTests extends QueryFilterFixture {
         Element valueRef = WFSMessage.createValueReference(geomProp);
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
         Envelope extent = this.dataSampler.getSpatialExtent(getModel(), featureType);
-        Document gmlEnv = envelopeAsGML(extent);
+        Document gmlEnv = null;
+        try {
+            gmlEnv = envelopeAsGML(extent);
+		} catch (Exception e) {
+            throw new RuntimeException("Could not create envelope for feature type: " + featureType);
+		}
         addBBOXPredicate(this.reqEntity, gmlEnv.getDocumentElement(), valueRef);
         ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
         this.rspEntity = extractBodyAsDocument(rsp);
@@ -215,8 +225,13 @@ public class BBOXTests extends QueryFilterFixture {
         XSElementDeclaration gmlDesc = getModel().getElementDeclaration("description", Namespaces.GML);
         Element valueRef = WFSMessage.createValueReference(gmlDesc);
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
-        Envelope spatialExtent = featureInfo.get(featureType).getSpatialExtent();
-        Document gmlEnv = envelopeAsGML(spatialExtent);
+        Envelope extent = this.dataSampler.getSpatialExtent(getModel(), featureType);
+        Document gmlEnv = null;
+        try {
+            gmlEnv = envelopeAsGML(extent);
+		} catch (Exception e) {
+            throw new RuntimeException("Could not create envelope for feature type: " + featureType);
+		}
         addBBOXPredicate(this.reqEntity, gmlEnv.getDocumentElement(), valueRef);
         ClientResponse rsp = wfsClient.submitRequest(reqEntity, ProtocolBinding.ANY);
         this.rspEntity = rsp.getEntity(Document.class);
