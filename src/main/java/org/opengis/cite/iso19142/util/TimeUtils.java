@@ -87,6 +87,7 @@ public class TimeUtils {
      * @param period
      *            A Period representing a temporal interval (UTC).
      * @return A Document with gml:TimePeriod as the document element.
+     * Subtracts one day from beginning and end, see https://github.com/opengeospatial/ets-wfs20/issues/199.
      */
     public static Document periodAsGMLSubtractOneDay(Period period) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXX");
@@ -135,6 +136,7 @@ public class TimeUtils {
      * @param offset
      *            A time-zone offset from UTC ('Z' if null).
      * @return A Document with gml:TimeInstant as the document element.
+     * Subtracts one day from the instant, see https://github.com/opengeospatial/ets-wfs20/issues/199.
      */
     public static Document instantAsGMLSubtractOneDay(org.opengis.temporal.Instant instant, ZoneOffset offset) {
         if (null == offset) {
