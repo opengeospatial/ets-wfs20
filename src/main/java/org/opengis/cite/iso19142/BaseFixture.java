@@ -21,6 +21,7 @@ import org.opengis.cite.iso19142.util.WFSClient;
 import org.opengis.cite.iso19142.util.TestSuiteLogger;
 import org.opengis.cite.iso19142.util.WFSMessage;
 import org.opengis.cite.iso19142.util.XMLUtils;
+import org.testng.Assert;
 import org.testng.ISuite;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
@@ -255,6 +256,7 @@ public class BaseFixture {
         }
         Set<ProtocolBinding> globalBindings = ServiceMetadataUtils.getGlobalBindings(wfsMetadata);
         DataSampler sampler = (DataSampler) suite.getAttribute(SuiteAttribute.SAMPLER.getName());
+        Assert.assertNotNull(sampler, "Test cannot be executed as no data samples can be found; Please check if DescribeFeatureType returns a valid schema.");
         Map<QName, FeatureTypeInfo> featureInfo = sampler.getFeatureTypeInfo();
         List<Object[]> paramList = new ArrayList<Object[]>();
         for (ProtocolBinding binding : globalBindings) {
