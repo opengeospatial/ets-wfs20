@@ -270,7 +270,7 @@ public class AppSchemaUtils {
             datatype = new QName(XMLConstants.W3C_XML_SCHEMA_NS_URI, "boolean");
             break;
         default:
-            datatype = new QName(XMLConstants.W3C_XML_SCHEMA_NS_URI, "anySimpleType");
+            datatype = new QName(XMLConstants.W3C_XML_SCHEMA_NS_URI, "string");
         }
         return datatype;
     }
