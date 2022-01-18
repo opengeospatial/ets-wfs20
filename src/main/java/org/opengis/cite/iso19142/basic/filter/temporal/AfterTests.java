@@ -78,7 +78,7 @@ public class AfterTests extends AbstractTemporalTest {
 
         List<Period> subIntervals = TemporalUtils.splitInterval(temporalProperty.getExtent(), 3);
         Period firstSubInterval = subIntervals.get(0);
-        Document gmlTimeLiteral = TimeUtils.periodAsGML(firstSubInterval);
+        Document gmlTimeLiteral = TimeUtils.periodAsGMLSubtractOneDay(firstSubInterval);
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
         Element valueRef = WFSMessage.createValueReference(temporalProperty.getProperty());
         WFSMessage.addTemporalPredicate(this.reqEntity, AFTER_OP, gmlTimeLiteral, valueRef);
@@ -108,7 +108,7 @@ public class AfterTests extends AbstractTemporalTest {
         List<Period> subIntervals = TemporalUtils.splitInterval(temporalProperty.getExtent(), 3);
         // end of first sub-interval
         Instant instant = subIntervals.get(0).getEnding();
-        Document gmlTimeLiteral = TimeUtils.instantAsGML(instant, ZoneOffset.UTC);
+        Document gmlTimeLiteral = TimeUtils.instantAsGMLSubtractOneDay(instant, ZoneOffset.UTC);
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
         Element valueRef = WFSMessage.createValueReference(temporalProperty.getProperty());
         WFSMessage.addTemporalPredicate(this.reqEntity, AFTER_OP, gmlTimeLiteral, valueRef);
@@ -139,7 +139,7 @@ public class AfterTests extends AbstractTemporalTest {
         List<Period> subIntervals = TemporalUtils.splitInterval(temporalProperty.getExtent(), 3);
         // end of first sub-interval with UTC offset +09:00 (Japan)
         Instant instant = subIntervals.get(0).getEnding();
-        Document gmlTimeLiteral = TimeUtils.instantAsGML(instant, ZoneOffset.ofHours(9));
+        Document gmlTimeLiteral = TimeUtils.instantAsGMLSubtractOneDay(instant, ZoneOffset.ofHours(9));
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
         Element valueRef = WFSMessage.createValueReference(temporalProperty.getProperty());
         WFSMessage.addTemporalPredicate(this.reqEntity, AFTER_OP, gmlTimeLiteral, valueRef);
