@@ -64,7 +64,7 @@ public class PagingTests extends BaseFixture {
 
     /**
      * [{@code Test}] Submits a GetFeature request with a very small page size
-     * (count="2") and resultType="hits". The initial response entity shall be
+     * (count="1") and resultType="hits". The initial response entity shall be
      * an empty feature collection with numberReturned = 0. The value of the
      * <code>next</code> attribute shall be a URI that refers to the first page
      * of results. Furthermore, the <code>previous</code> attribute must not
@@ -72,8 +72,9 @@ public class PagingTests extends BaseFixture {
      */
     @Test(description = "See OGC 09-025: 7.7.4.2")
     public void getFeatureWithHitsOnly() {
+    	int count = 1;
         this.reqEntity = WFSMessage.createRequestEntity("GetFeature-Minimal", this.wfsVersion);
-        this.reqEntity.getDocumentElement().setAttribute("count", "2");
+        this.reqEntity.getDocumentElement().setAttribute("count", "" + count);
         this.reqEntity.getDocumentElement().setAttribute("resultType", "hits");
         QName featureType = anyFeatureType(this.featureInfo);
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
@@ -96,7 +97,7 @@ public class PagingTests extends BaseFixture {
         ETSAssert.assertQualifiedName(rspEntity.getDocumentElement(),
                 new QName(Namespaces.WFS, WFS2.FEATURE_COLLECTION));
         numReturned = this.rspEntity.getDocumentElement().getAttribute("numberReturned");
-        assertEquals(Integer.parseInt(numReturned), 2, ErrorMessage.get(ErrorMessageKeys.NUM_RETURNED));
+        assertEquals(Integer.parseInt(numReturned), count, ErrorMessage.get(ErrorMessageKeys.NUM_RETURNED));
     }
 
     /**
