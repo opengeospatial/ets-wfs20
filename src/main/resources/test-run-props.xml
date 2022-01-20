@@ -2,5 +2,6 @@
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties version="1.0">
     <comment>WFS 2.0 reference implementation</comment>
-    <entry key="wfs">http://cite.lat-lon.de/deegree-webservices-3.3.6/services/wfs200?request=GetCapabilities&amp;service=WFS&amp;version=2.0.0</entry>
+    <entry key="wfs">http://cite.deegree.org/deegree-webservices-3.4.16/services/wfs200?request=GetCapabilities&amp;service=WFS&amp;version=2.0.0</entry>
+    <entry key="acceptMediaType">application/zip</entry>
 </properties>
