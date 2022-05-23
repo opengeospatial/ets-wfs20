@@ -69,6 +69,7 @@
     <dependency>
       <groupId>org.opengis.cite.teamengine</groupId>
       <artifactId>teamengine-spi</artifactId>
+      <version>5.4.1</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>

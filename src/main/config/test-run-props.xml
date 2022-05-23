@@ -3,4 +3,5 @@
 <properties version="1.0">
     <comment>Sample test run arguments (ets-wfs20)</comment>
     <entry key="wfs">wfs2-capabilities.xml</entry>
+    <entry key="acceptMediaType">application/zip</entry>
 </properties>
