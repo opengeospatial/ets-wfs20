@@ -141,10 +141,17 @@ public class DataSampler {
         }
         int sampleSize = result.size();
         numId = (numId > sampleSize) ? sampleSize : numId;
+        Set<Integer> randomSet = new HashSet<>();
         Random random = new Random();
-        while (idSet.size() < numId) {
+        while (randomSet.size() < numId) {
             int randomInt = random.nextInt(sampleSize);
-            idSet.add(result.itemAt(randomInt).getStringValue());
+            randomSet.add(randomInt);
+        }
+        for (int randomInt : randomSet) {
+            String featureIdentifier = result.itemAt(randomInt).getStringValue();
+            if (idSet.contains(featureIdentifier))
+                throw new IllegalArgumentException("Feature id " + featureIdentifier + " exists multiple times in Feature Type " + featureType.toString() + ". This is not allowed according to GML 3.2.1 specification (OGC 07-036; chapter 7.2.4.5).");
+            idSet.add(featureIdentifier);
         }
         return idSet;
     }
