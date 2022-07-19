@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<con:soapui-project id="1476c0be-8f92-4fc1-9925-9543b4950036" activeEnvironment="Default" name="TEAM Engine" resourceRoot="" soapui-version="5.4.0" abortOnError="false" runType="SEQUENTIAL" xmlns:con="http://eviware.com/soapui/config">
+<con:soapui-project id="1476c0be-8f92-4fc1-9925-9543b4950036" activeEnvironment="Default" name="TEAM Engine" resourceRoot="" soapui-version="5.7.0" abortOnError="false" runType="SEQUENTIAL" xmlns:con="http://eviware.com/soapui/config">
   <con:settings/>
   <con:testSuite id="c6ce07d7-2e98-4b79-8b92-044b2687a974" name="WFS 2.0">
     <con:settings/>
@@ -35,7 +35,11 @@
             </con:configuration>
           </con:assertion>
           <con:credentials>
-            <con:authType>No Authorization</con:authType>
+            <con:username>${#Project#teamengine.user}</con:username>
+            <con:password>${#Project#teamengine.password}</con:password>
+            <con:selectedAuthProfile>Basic</con:selectedAuthProfile>
+            <con:addedBasicAuthenticationTypes>Basic</con:addedBasicAuthenticationTypes>
+            <con:authType>Global HTTP Settings</con:authType>
           </con:credentials>
           <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
           <con:jmsPropertyConfig/>
@@ -63,7 +67,11 @@
             </con:configuration>
           </con:assertion>
           <con:credentials>
-            <con:authType>No Authorization</con:authType>
+            <con:username>${#Project#teamengine.user}</con:username>
+            <con:password>${#Project#teamengine.password}</con:password>
+            <con:selectedAuthProfile>Basic</con:selectedAuthProfile>
+            <con:addedBasicAuthenticationTypes>Basic</con:addedBasicAuthenticationTypes>
+            <con:authType>Global HTTP Settings</con:authType>
           </con:credentials>
           <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
           <con:jmsPropertyConfig/>
@@ -99,7 +107,11 @@ assert headers != null &amp;&amp; headers[0] != null &amp;&amp; headers[0].index
             </con:configuration>
           </con:assertion>
           <con:credentials>
-            <con:authType>No Authorization</con:authType>
+            <con:username>${#Project#teamengine.user}</con:username>
+            <con:password>${#Project#teamengine.password}</con:password>
+            <con:selectedAuthProfile>Basic</con:selectedAuthProfile>
+            <con:addedBasicAuthenticationTypes>Basic</con:addedBasicAuthenticationTypes>
+            <con:authType>Global HTTP Settings</con:authType>
           </con:credentials>
           <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
           <con:jmsPropertyConfig/>
@@ -141,7 +153,11 @@ assert headers != null &amp;&amp; headers[0] != null &amp;&amp; headers[0].index
             </con:configuration>
           </con:assertion>
           <con:credentials>
-            <con:authType>No Authorization</con:authType>
+            <con:username>${#Project#teamengine.user}</con:username>
+            <con:password>${#Project#teamengine.password}</con:password>
+            <con:selectedAuthProfile>Basic</con:selectedAuthProfile>
+            <con:addedBasicAuthenticationTypes>Basic</con:addedBasicAuthenticationTypes>
+            <con:authType>Global HTTP Settings</con:authType>
           </con:credentials>
           <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
           <con:jmsPropertyConfig/>
@@ -185,28 +201,50 @@ exists(/rdf:RDF)</path>
             </con:configuration>
           </con:assertion>
           <con:assertion type="XPath Match" id="52c5d6bd-4b82-439c-935e-83fc502c889c" name="Total tests passed">
-            <con:configuration><path>declare namespace dct="http://purl.org/dc/terms/";
+            <con:configuration>
+              <path>declare namespace dct="http://purl.org/dc/terms/";
 declare namespace rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#";
 declare namespace cite="http://cite.opengeospatial.org/";
 
-/rdf:RDF/cite:TestRun/cite:testsPassed</path><content>${#Project#tests.passed}</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration>
+/rdf:RDF/cite:TestRun/cite:testsPassed</path>
+              <content>${#Project#tests.passed}</content>
+              <allowWildcards>false</allowWildcards>
+              <ignoreNamspaceDifferences>false</ignoreNamspaceDifferences>
+              <ignoreComments>false</ignoreComments>
+            </con:configuration>
           </con:assertion>
           <con:assertion type="XPath Match" id="52c5d6bd-4b82-439c-935e-83fc502c889c" name="Total tests skipped">
-            <con:configuration><path>declare namespace dct="http://purl.org/dc/terms/";
+            <con:configuration>
+              <path>declare namespace dct="http://purl.org/dc/terms/";
 declare namespace rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#";
 declare namespace cite="http://cite.opengeospatial.org/";
 
-/rdf:RDF/cite:TestRun/cite:testsSkipped</path><content>${#Project#tests.skipped}</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration>
+/rdf:RDF/cite:TestRun/cite:testsSkipped</path>
+              <content>${#Project#tests.skipped}</content>
+              <allowWildcards>false</allowWildcards>
+              <ignoreNamspaceDifferences>false</ignoreNamspaceDifferences>
+              <ignoreComments>false</ignoreComments>
+            </con:configuration>
           </con:assertion>
           <con:assertion type="XPath Match" id="52c5d6bd-4b82-439c-935e-83fc502c889c" name="Total tests failed">
-            <con:configuration><path>declare namespace dct="http://purl.org/dc/terms/";
+            <con:configuration>
+              <path>declare namespace dct="http://purl.org/dc/terms/";
 declare namespace rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#";
 declare namespace cite="http://cite.opengeospatial.org/";
 
-/rdf:RDF/cite:TestRun/cite:testsFailed</path><content>${#Project#tests.failed}</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration>
+/rdf:RDF/cite:TestRun/cite:testsFailed</path>
+              <content>${#Project#tests.failed}</content>
+              <allowWildcards>false</allowWildcards>
+              <ignoreNamspaceDifferences>false</ignoreNamspaceDifferences>
+              <ignoreComments>false</ignoreComments>
+            </con:configuration>
           </con:assertion>
           <con:credentials>
-            <con:authType>No Authorization</con:authType>
+            <con:username>${#Project#teamengine.user}</con:username>
+            <con:password>${#Project#teamengine.password}</con:password>
+            <con:selectedAuthProfile>Basic</con:selectedAuthProfile>
+            <con:addedBasicAuthenticationTypes>Basic</con:addedBasicAuthenticationTypes>
+            <con:authType>Global HTTP Settings</con:authType>
           </con:credentials>
           <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
           <con:jmsPropertyConfig/>
@@ -221,16 +259,38 @@ declare namespace cite="http://cite.opengeospatial.org/";
       </con:testStep>
       <con:properties/>
     </con:testCase>
-    <con:properties>
-      
-      
-      
-      
-      
-      
-    </con:properties>
+    <con:properties></con:properties>
   </con:testSuite>
-  <con:properties><con:property><con:name>teamengine.endpoint</con:name><con:value>http://cite.opengeospatial.org/te2</con:value></con:property><con:property><con:name>iut</con:name><con:value>http://cite.deegree.org/deegree-webservices-3.4.0/services/wfs200?service=WFS&amp;request=GetCapabilities</con:value></con:property><con:property><con:name>tests.passed</con:name><con:value>95</con:value></con:property><con:property><con:name>tests.skipped</con:name><con:value>32</con:value></con:property><con:property><con:name>tests.failed</con:name><con:value>1</con:value></con:property></con:properties>
+  <con:properties>
+    <con:property>
+      <con:name>teamengine.endpoint</con:name>
+      <con:value>http://cite.opengeospatial.org/te2</con:value>
+    </con:property>
+    <con:property>
+      <con:name>iut</con:name>
+      <con:value>http://cite.deegree.org/deegree-webservices-3.4.0/services/wfs200?service=WFS&amp;request=GetCapabilities</con:value>
+    </con:property>
+    <con:property>
+      <con:name>tests.passed</con:name>
+      <con:value>95</con:value>
+    </con:property>
+    <con:property>
+      <con:name>tests.skipped</con:name>
+      <con:value>32</con:value>
+    </con:property>
+    <con:property>
+      <con:name>tests.failed</con:name>
+      <con:value>1</con:value>
+    </con:property>
+    <con:property>
+      <con:name>teamengine.user</con:name>
+      <con:value>ogctest</con:value>
+    </con:property>
+    <con:property>
+      <con:name>teamengine.password</con:name>
+      <con:value>ogctest</con:value>
+    </con:property>
+  </con:properties>
   <con:wssContainer/>
   <con:oAuth2ProfileContainer/>
   <con:oAuth1ProfileContainer/>
