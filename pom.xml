@@ -48,7 +48,9 @@
     <spec-version>2.0.0</spec-version>
     <soapui.test.fail.ignore>false</soapui.test.fail.ignore>
     <soapui.teamengine.endpoint>http://localhost:8081/teamengine</soapui.teamengine.endpoint>
-    <soapui.iut>http://cite.deegree.org/deegree-webservices-3.4.16/services/wfs200?service=WFS&amp;request=GetCapabilities</soapui.iut>
+    <soapui.teamengine.user>ogctest</soapui.teamengine.user>
+    <soapui.teamengine.password>ogctest</soapui.teamengine.password>
+    <soapui.iut>https://cite.deegree.org/deegree-webservices-3.4.30/services/wfs200?service=WFS&amp;request=GetCapabilities</soapui.iut>
     <soapui.tests.passed>95</soapui.tests.passed>
     <soapui.tests.skipped>26</soapui.tests.skipped>
     <soapui.tests.failed>7</soapui.tests.failed>
@@ -260,6 +262,8 @@
             <testFailIgnore>${soapui.test.fail.ignore}</testFailIgnore>
             <projectProperties>
               <value>teamengine.endpoint=${soapui.teamengine.endpoint}</value>
+              <value>teamengine.user=${soapui.teamengine.user}</value>
+              <value>teamengine.password=${soapui.teamengine.password}</value>
               <value>iut=${soapui.iut}</value>
               <value>tests.passed=${soapui.tests.passed}</value>
               <value>tests.skipped=${soapui.tests.skipped}</value>
