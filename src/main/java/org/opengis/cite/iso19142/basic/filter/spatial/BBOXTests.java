@@ -225,7 +225,7 @@ public class BBOXTests extends QueryFilterFixture {
         XSElementDeclaration gmlDesc = getModel().getElementDeclaration("description", Namespaces.GML);
         Element valueRef = WFSMessage.createValueReference(gmlDesc);
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
-        Envelope extent = this.dataSampler.getSpatialExtent(getModel(), featureType);
+        Envelope extent = featureInfo.get(featureType).getSpatialExtent();
         Document gmlEnv = null;
         try {
             gmlEnv = envelopeAsGML(extent);
