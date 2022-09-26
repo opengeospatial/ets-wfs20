@@ -75,7 +75,7 @@ public class BeforeTests extends AbstractTemporalTest {
 
         List<Period> subIntervals = TemporalUtils.splitInterval(temporalProperty.getExtent(), 3);
         Period lastSubInterval = subIntervals.get(2);
-        Document gmlTimeLiteral = TimeUtils.periodAsGML(lastSubInterval);
+        Document gmlTimeLiteral = TimeUtils.periodAsGMLAddOneDay(lastSubInterval);
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
         Element valueRef = WFSMessage.createValueReference(temporalProperty.getProperty());
         WFSMessage.addTemporalPredicate(this.reqEntity, BEFORE_OP, gmlTimeLiteral, valueRef);

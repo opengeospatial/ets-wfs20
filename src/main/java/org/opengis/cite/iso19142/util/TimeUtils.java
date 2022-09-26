@@ -158,4 +158,15 @@ public class TimeUtils {
     private static Instant ogcInstantToJavaInstantSubtractOneDay(org.opengis.temporal.Instant instant) {
     	return instant.getPosition().getDate().toInstant().minus(1, ChronoUnit.DAYS);
     }
+
+	public static Document periodAsGMLAddOneDay(Period period) {
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXX");
+        String startOfPeriod = period.getBeginning().getPosition().getDateTime().toString();
+        ZonedDateTime startDateTime = ZonedDateTime.parse(startOfPeriod, dateTimeFormatter);
+        startDateTime = startDateTime.plus(1, ChronoUnit.DAYS);
+        String endOfPeriod = period.getEnding().getPosition().getDateTime().toString();
+        ZonedDateTime endDateTime = ZonedDateTime.parse(endOfPeriod, dateTimeFormatter);
+        endDateTime = endDateTime.plus(1, ChronoUnit.DAYS);
+        return intervalAsGML(startDateTime, endDateTime);
+	}
 }
