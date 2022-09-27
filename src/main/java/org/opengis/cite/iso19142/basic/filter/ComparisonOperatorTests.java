@@ -113,9 +113,14 @@ public class ComparisonOperatorTests extends QueryFilterFixture {
                 propTypeName, propValue);
         Map<String, String> nsBindings = new HashMap<String, String>();
         nsBindings.put(propName.getNamespaceURI(), "ns1");
+        boolean anyMatch = false;
         for (int i = 0; i < features.getLength(); i++) {
-            ETSAssert.assertXPath2(xpath, new DOMSource(features.item(i)), nsBindings);
+            if(ETSAssert.evaluateXPath2ToBoolean(xpath, new DOMSource(features.item(i)), nsBindings)) {
+            	anyMatch = true;
+            	break;
+            }
         }
+        Assert.assertTrue(anyMatch, String.format("No matching property value found for XPath: %s.", xpath));
     }
 
     /**

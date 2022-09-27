@@ -123,6 +123,35 @@ public class ETSAssert {
     }
 
     /**
+     * The XPath 2.0 is evaluated for given expr and context.
+     *
+     * @param expr
+     *              A valid XPath 2.0 expression.
+     * @param context
+     *              A context node.
+     * @param nsBindings
+     *              The list of namespaces required for the expr.
+     * @return True if XPath 2.0 is evaluated successfully otherwise false.
+     */
+    public static boolean evaluateXPath2ToBoolean(String expr, Source source, Map<String, String> nsBindings ) {
+        if ( null == source ) {
+            throw new NullPointerException( "Context source is null." );
+        }
+        TestSuiteLogger.log(Level.FINE, "Evaluating XPath expression {0} against {1} ({2})",
+                new Object[] { expr, source.getClass().getName(), source.getSystemId() });
+        XdmValue result = null;
+        try {
+            result = XMLUtils.evaluateXPath2( source, expr, nsBindings );
+            LOGR.log( Level.FINE, "XPath result: " + result );
+            return result.size() > 0;
+        } catch (SaxonApiException e ) {
+            String msg = ErrorMessage.format( ErrorMessageKeys.XPATH_ERROR, expr );
+            LOGR.log( Level.WARNING, msg, e );
+            return false;
+        }
+    }
+
+    /**
      * Asserts that an XPath 2.0 expression evaluates to {@code true} for the
      * given XML source. That is, the result set is not empty.
      * 
