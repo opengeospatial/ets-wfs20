@@ -343,6 +343,31 @@ public class XMLUtils {
     }
 
     /**
+     * Returns a descendant Element node having the specified
+     * [namespace name]  and [local part] property. 
+     * 
+     * @param node
+     *            The node to search from.
+     * @param namespaceURI
+     *            An absolute URI denoting a namespace name.
+     * @param localPart
+     *            The local part.
+     * @return The matching Node with the specified namespace and local part; null, if no matching node is found.
+     */
+    public static Node getElementByNamespaceURIandLocalPart(Node node, String namespaceURI, String localPart) {
+        NodeList children = node.getChildNodes();
+        for (int i = 0; i < children.getLength(); i++) {
+            Node child = children.item(i);
+            if (child.getNodeType() != Node.ELEMENT_NODE)
+                continue;
+            if (child.getNamespaceURI().equals(namespaceURI) && child.getLocalName().equals(localPart)) {
+                return child;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Transforms the content of a DOM Node using a specified XSLT stylesheet.
      * 
      * @param xslt

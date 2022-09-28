@@ -14,11 +14,13 @@ import org.opengis.cite.iso19142.Namespaces;
 import org.opengis.cite.iso19142.ProtocolBinding;
 import org.opengis.cite.iso19142.WFS2;
 import org.opengis.cite.iso19142.util.WFSMessage;
+import org.opengis.cite.iso19142.util.XMLUtils;
 import org.testng.Assert;
 import org.testng.SkipException;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.sun.jersey.api.client.ClientResponse;
@@ -78,13 +80,20 @@ public class PropertyIsNilOperatorTests extends QueryFilterFixture {
         this.rspEntity = extractBodyAsDocument( rsp );
         Assert.assertEquals( rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
                              ErrorMessage.get( ErrorMessageKeys.UNEXPECTED_STATUS ) );
-        NodeList features = this.rspEntity.getElementsByTagNameNS( featureType.getNamespaceURI(),
-                                                                   featureType.getLocalPart() );
+        NodeList features = this.rspEntity.getElementsByTagNameNS(Namespaces.WFS, WFS2.MEMBER);
+        
         String xpath = String.format( "ns1:%s[@xsi:nil='true']", propName.getLocalPart() );
         Map<String, String> nsBindings = new HashMap<String, String>();
         nsBindings.put( propName.getNamespaceURI(), "ns1" );
+        Node featureNode = null;
         for ( int i = 0; i < features.getLength(); i++ ) {
-            ETSAssert.assertXPath( xpath, features.item( i ), nsBindings );
+        	featureNode = XMLUtils.getElementByNamespaceURIandLocalPart(features.item( i ), featureType.getNamespaceURI(), featureType.getLocalPart());
+        	if(featureNode != null) {
+                ETSAssert.assertXPath( xpath, featureNode, nsBindings );
+        	} else {
+        		//TODO
+        		Assert.fail("No node found.");
+        	}
         }
     }
 
