@@ -86,7 +86,6 @@ public class TemporalQuery {
      * @return A TemporalGeometricPrimitive instance (instant or period).
      */
     public static TemporalGeometricPrimitive parseTemporalValue(String value, XSTypeDefinition typeDefinition) {
-//    	value = value.replace("Z", "");
         if ( typeDefinition.getTypeCategory() != XSTypeDefinition.SIMPLE_TYPE
              && !( ( (XSComplexTypeDefinition) typeDefinition ).getContentType() == XSComplexTypeDefinition.CONTENTTYPE_SIMPLE ) ) {
             throw new IllegalArgumentException( "Not a simple type definition: " + typeDefinition.getName() );
@@ -104,7 +103,7 @@ public class TemporalQuery {
             DateTimeFormatter xsdDateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss[.SSS][XXX]");
             TemporalAccessor tm = xsdDateTimeFormatter.parseBest(value, ZonedDateTime::from, LocalDateTime::from);
             if (tm instanceof LocalDateTime) {
-            	throw new SkipException("Local timezones currently not supported.");
+            	throw new SkipException("{%s uses date values without timezone, which are currently not supported by this test suite.");
             }
             ZonedDateTime dateTime = (ZonedDateTime) tm;
             tmPrimitive = tmFactory.createInstant(new DefaultPosition(Date.from(dateTime.toInstant())));
@@ -112,7 +111,7 @@ public class TemporalQuery {
         case XSConstants.DATE_DT:
             ZoneOffset zone = DateTimeFormatter.ISO_DATE.parse(value, TemporalQueries.offset());
             if (null == zone) {
-                zone = ZonedDateTime.now().getOffset();
+            	throw new SkipException("{%s uses date values without timezone, which are currently not supported by this test suite.");
             }
             LocalDate date = LocalDate.parse(value, DateTimeFormatter.ISO_DATE);
             Temporal startOfDay = date.atStartOfDay(zone);

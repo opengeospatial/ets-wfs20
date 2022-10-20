@@ -455,7 +455,9 @@ public class DataSampler {
             } catch (RuntimeException re) {
                 LOGR.log(Level.WARNING, re.getMessage());
                 if(re instanceof SkipException) {
-                	throw re;
+                	String message = re.getMessage();
+                	message = String.format(message, featureType.toString());
+                	throw new SkipException(message);
                 }
                 continue;
             }
