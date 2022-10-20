@@ -54,6 +54,7 @@ import org.opengis.cite.iso19142.basic.filter.temporal.TemporalQuery;
 import org.opengis.geometry.Envelope;
 import org.opengis.temporal.Period;
 import org.opengis.temporal.TemporalGeometricPrimitive;
+import org.testng.SkipException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -453,6 +454,9 @@ public class DataSampler {
                 tmSet.add(tVal);
             } catch (RuntimeException re) {
                 LOGR.log(Level.WARNING, re.getMessage());
+                if(re instanceof SkipException) {
+                	throw re;
+                }
                 continue;
             }
         }
