@@ -212,7 +212,7 @@ public class IntersectsTests extends QueryFilterFixture {
         while (itr.hasNext()) {
             geomProperty = itr.next();
             XSElementDeclaration value = AppSchemaUtils.getComplexPropertyValue(geomProperty);
-            if (!value.getName().equals(GML32.POINT))
+            if (!value.getName().contains(GML32.POINT))
                 break; // ignore point property--unlikely to intersect line
         }
         this.reqEntity = buildGetFeatureRequest(featureType, INTERSECTS_OP, geomProperty, gmlCurveElem);
