@@ -157,6 +157,7 @@ public class IntersectsTests extends QueryFilterFixture {
         while (itr.hasNext()) {
             geomProperty = itr.next();
             value = AppSchemaUtils.getComplexPropertyValue(geomProperty);
+	    // this also filters out MultiPoint geometry types, see https://github.com/opengeospatial/ets-wfs20/issues/236
             if (!value.getName().contains(GML32.POINT))
                 break;
         }
@@ -226,6 +227,7 @@ public class IntersectsTests extends QueryFilterFixture {
         while (itr.hasNext()) {
             geomProperty = itr.next();
             value = AppSchemaUtils.getComplexPropertyValue(geomProperty);
+	    // this also filters out MultiPoint geometry types, see https://github.com/opengeospatial/ets-wfs20/issues/236
             if (!value.getName().contains(GML32.POINT))
                 break;
         }
