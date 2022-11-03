@@ -1,6 +1,8 @@
 package org.opengis.cite.iso19142;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Map;
@@ -86,6 +88,8 @@ public class SuiteFixtureListener implements ISuiteListener {
                 throw new RuntimeException("Not a WFS2 capabilities document: " + qName);
             }
             suite.setAttribute(SuiteAttribute.WFS_VERSION.getName(), docElem.getAttribute("version"));
+        } catch (ConnectException | FileNotFoundException e) {
+            throw new RuntimeException("Failed to connect to resource located at " + wfsURI, e);
         } catch (SAXException | IOException ex) {
             // push exception up through TestNG ISuiteListener interface
             throw new RuntimeException("Failed to parse resource located at " + wfsURI, ex);
