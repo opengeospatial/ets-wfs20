@@ -120,6 +120,8 @@ suite in a command shell like so:
 
 `java -jar ets-wfs20-${version}-aio.jar  [test-run-props.xml]`
 
+Please note that you will have to set the TE_BASE environment variable. This needs to point to a directory containing a config.xml file. The config.xml can be found in the file ets-wfs20-1.XX-ctl.zip under /wfs/2.0.0/.
+
 #### Docker
 
 This test suite comes with a Dockerfile which can be used to easily setup the OGC test harness with
