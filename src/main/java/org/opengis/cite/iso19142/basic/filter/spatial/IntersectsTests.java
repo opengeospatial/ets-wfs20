@@ -151,7 +151,21 @@ public class IntersectsTests extends QueryFilterFixture {
                 .transform(new StreamSource(getClass().getResourceAsStream(XSLT_ENV2POLYGON)), gmlEnv, null)
                 .getDocumentElement();
         List<XSElementDeclaration> geomProps = this.allGeomProperties.get(featureType);
-        XSElementDeclaration geomProperty = geomProps.get(0);
+        Iterator<XSElementDeclaration> itr = geomProps.iterator();
+        XSElementDeclaration geomProperty = null;
+        XSElementDeclaration value = null;
+        while (itr.hasNext()) {
+            geomProperty = itr.next();
+            value = AppSchemaUtils.getComplexPropertyValue(geomProperty);
+	    // this also filters out MultiPoint geometry types, see https://github.com/opengeospatial/ets-wfs20/issues/236
+            if (!value.getName().contains(GML32.POINT))
+                break;
+        }
+
+        if(value.getName().contains(GML32.POINT)){
+        	// ignore point property--unlikely to intersect line
+        	throw new SkipException("Intersects tests are not supported for point geometry types.");
+        }
         this.reqEntity = buildGetFeatureRequest(featureType, INTERSECTS_OP, geomProperty, gmlPolygonElem);
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.GET_FEATURE, binding);
         ClientResponse rsp = wfsClient.submitRequest(new DOMSource(reqEntity), binding, endpoint);
@@ -209,12 +223,20 @@ public class IntersectsTests extends QueryFilterFixture {
         List<XSElementDeclaration> geomProps = this.allGeomProperties.get(featureType);
         Iterator<XSElementDeclaration> itr = geomProps.iterator();
         XSElementDeclaration geomProperty = null;
+        XSElementDeclaration value = null;
         while (itr.hasNext()) {
             geomProperty = itr.next();
-            XSElementDeclaration value = AppSchemaUtils.getComplexPropertyValue(geomProperty);
-            if (!value.getName().equals(GML32.POINT))
-                break; // ignore point property--unlikely to intersect line
+            value = AppSchemaUtils.getComplexPropertyValue(geomProperty);
+	    // this also filters out MultiPoint geometry types, see https://github.com/opengeospatial/ets-wfs20/issues/236
+            if (!value.getName().contains(GML32.POINT))
+                break;
         }
+
+        if(value.getName().contains(GML32.POINT)){
+        	// ignore point property--unlikely to intersect line
+        	throw new SkipException("Intersects tests are not supported for point geometry types.");
+        }
+
         this.reqEntity = buildGetFeatureRequest(featureType, INTERSECTS_OP, geomProperty, gmlCurveElem);
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.GET_FEATURE, binding);
         ClientResponse rsp = wfsClient.submitRequest(new DOMSource(this.reqEntity), binding, endpoint);
