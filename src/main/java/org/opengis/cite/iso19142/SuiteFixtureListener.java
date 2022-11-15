@@ -3,6 +3,7 @@ package org.opengis.cite.iso19142;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.ConnectException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.UnknownHostException;
 import java.util.HashSet;
@@ -89,7 +90,7 @@ public class SuiteFixtureListener implements ISuiteListener {
                 throw new RuntimeException("Not a WFS2 capabilities document: " + qName);
             }
             suite.setAttribute(SuiteAttribute.WFS_VERSION.getName(), docElem.getAttribute("version"));
-        } catch (ConnectException | FileNotFoundException | UnknownHostException e) {
+        } catch (ConnectException | FileNotFoundException | UnknownHostException | MalformedURLException e) {
             throw new RuntimeException("Failed to connect to resource located at " + wfsURI, e);
         } catch (SAXException | IOException ex) {
             // push exception up through TestNG ISuiteListener interface
