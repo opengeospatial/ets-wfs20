@@ -51,9 +51,9 @@
     <soapui.teamengine.user>ogctest</soapui.teamengine.user>
     <soapui.teamengine.password>ogctest</soapui.teamengine.password>
     <soapui.iut>https://cite.deegree.org/deegree-webservices-3.4.30/services/wfs200?service=WFS&amp;request=GetCapabilities</soapui.iut>
-    <soapui.tests.passed>132</soapui.tests.passed>
-    <soapui.tests.skipped>38</soapui.tests.skipped>
-    <soapui.tests.failed>3</soapui.tests.failed>
+    <soapui.tests.passed>120</soapui.tests.passed>
+    <soapui.tests.skipped>53</soapui.tests.skipped>
+    <soapui.tests.failed>0</soapui.tests.failed>
     <docker.teamengine.version>5.4.1</docker.teamengine.version>
   </properties>
 
