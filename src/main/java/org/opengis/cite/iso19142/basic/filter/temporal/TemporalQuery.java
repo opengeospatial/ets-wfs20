@@ -28,6 +28,7 @@ import org.opengis.cite.iso19142.Namespaces;
 import org.opengis.cite.iso19142.util.WFSMessage;
 import org.opengis.temporal.TemporalFactory;
 import org.opengis.temporal.TemporalGeometricPrimitive;
+import org.testng.SkipException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -102,8 +103,7 @@ public class TemporalQuery {
             DateTimeFormatter xsdDateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss[.SSS][XXX]");
             TemporalAccessor tm = xsdDateTimeFormatter.parseBest(value, ZonedDateTime::from, LocalDateTime::from);
             if (tm instanceof LocalDateTime) {
-                // set local time zone
-                tm = LocalDateTime.class.cast(tm).atZone(ZonedDateTime.now().getOffset());
+            	throw new SkipException("{%s uses date values without timezone, which are currently not supported by this test suite.");
             }
             ZonedDateTime dateTime = (ZonedDateTime) tm;
             tmPrimitive = tmFactory.createInstant(new DefaultPosition(Date.from(dateTime.toInstant())));
@@ -111,7 +111,7 @@ public class TemporalQuery {
         case XSConstants.DATE_DT:
             ZoneOffset zone = DateTimeFormatter.ISO_DATE.parse(value, TemporalQueries.offset());
             if (null == zone) {
-                zone = ZonedDateTime.now().getOffset();
+            	throw new SkipException("{%s uses date values without timezone, which are currently not supported by this test suite.");
             }
             LocalDate date = LocalDate.parse(value, DateTimeFormatter.ISO_DATE);
             Temporal startOfDay = date.atStartOfDay(zone);

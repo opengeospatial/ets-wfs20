@@ -23,7 +23,16 @@ public abstract class AbstractTemporalTest extends QueryFilterFixture {
             throw new SkipException( "Feature type has no temporal properties: " + featureType );
         }
 
-        TemporalProperty temporalExtent = findTemporalExtent( featureType, temporalProperties );
+        TemporalProperty temporalExtent = null;
+        
+        try {
+        	temporalExtent = findTemporalExtent( featureType, temporalProperties );
+		} catch (Exception e) {
+            if(e instanceof SkipException) {
+            	throw e;
+            }
+		}
+        
         if ( temporalExtent == null )
             throw new SkipException(
                                      "Feature type + "
@@ -42,6 +51,9 @@ public abstract class AbstractTemporalTest extends QueryFilterFixture {
             } catch ( Exception e ) {
                 LOGR.warning( "Could not calculate the extent of the temporal property " + temporalProp
                               + " of the feature type " + featureType );
+                if(e instanceof SkipException) {
+                	throw e;
+                }
             }
         }
         return null;

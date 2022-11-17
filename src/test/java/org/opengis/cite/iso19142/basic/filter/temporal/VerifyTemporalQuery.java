@@ -26,6 +26,7 @@ import org.opengis.cite.validation.XmlSchemaCompiler;
 import org.opengis.temporal.Instant;
 import org.opengis.temporal.Period;
 import org.opengis.temporal.TemporalGeometricPrimitive;
+import org.testng.SkipException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
@@ -58,10 +59,16 @@ public class VerifyTemporalQuery extends CommonTestFixture {
     @Test
     public void parseDate() {
         XSTypeDefinition typeDef = model.getTypeDefinition("date", XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        TemporalGeometricPrimitive result = TemporalQuery.parseTemporalValue("2016-05-15", typeDef);
+        TemporalGeometricPrimitive result = TemporalQuery.parseTemporalValue("2016-05-15Z", typeDef);
         assertTrue("Expected result: " + Period.class.getName(), Period.class.isInstance(result));
         Period period = Period.class.cast(result);
         assertTrue("Expected duration: PT23H59M59S", period.length().toString().equals("PT23H59M59S"));
+    }
+
+    @Test(expected = SkipException.class)
+    public void parseDateWithoutTimezone() {
+        XSTypeDefinition typeDef = model.getTypeDefinition("date", XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        TemporalQuery.parseTemporalValue("2016-05-15", typeDef);
     }
 
     @Test
