@@ -1,5 +1,6 @@
 package org.opengis.cite.iso19142;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -44,6 +45,7 @@ public class BaseFixture {
     /** Maximum length of response (string) added as result attribute. */
     private static final int MAX_RSP_ATTR_LENGTH = 4096;
     private static final String REQ_ATTR = "request";
+    private static final String REQ_POST_ATTR = "post-request";
     private static final String RSP_ATTR = "response";
     /** A DOM document containing service metadata (OGC capabilities). */
     protected Document wfsMetadata;
@@ -136,11 +138,22 @@ public class BaseFixture {
             return;
         }
         if (null != this.reqEntity) {
-            String request = null;
+            String request = "";
             Object[] params = result.getParameters();
             if (WFSMessage.containsGetProtocolBinding(params)) {
                 request = WFSMessage.transformEntityToKVP(new DOMSource(this.reqEntity));
             } else {
+            	// https://github.com/opengeospatial/ets-wfs20/issues/233 
+            	// Get requested URI endpoint from ProtocolBinding, assume POST
+	            ProtocolBinding binding = ProtocolBinding.POST;
+	            try {
+		           	String methodName = this.reqEntity.getFirstChild().getLocalName();
+					URI endpoint = ServiceMetadataUtils.getOperationEndpoint(
+							this.wfsMetadata, methodName, binding);
+				          result.setAttribute(REQ_POST_ATTR, endpoint.toString());
+				} catch (Exception e) {
+		            TestSuiteLogger.log(Level.WARNING, "Could not get POST endpoint URI", e);
+				}
                 request = XMLUtils.writeNodeToString(this.reqEntity);
             }
             result.setAttribute(REQ_ATTR, request);
