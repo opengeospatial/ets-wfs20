@@ -15,7 +15,8 @@ import org.apache.xerces.xs.XSModel;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mockito.Matchers;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import org.opengis.cite.iso19142.SuiteAttribute;
 import org.opengis.cite.iso19142.util.DataSampler;
 import org.opengis.cite.iso19142.util.VerifyAppSchemaUtils;
@@ -71,8 +72,8 @@ public class VerifyPropertyIsLikeOperatorTests {
 				suite.getAttribute(org.opengis.cite.iso19136.SuiteAttribute.XSMODEL
 						.getName())).thenReturn(model);
 		when(
-				dataSampler.getSimplePropertyValues(Matchers.any(QName.class),
-						Matchers.any(QName.class), Matchers.anyString()))
+				dataSampler.getSimplePropertyValues(any(QName.class),
+						any(QName.class), anyString()))
 				.thenReturn(valueList);
 		QName featureType = new QName(NS1, "SimpleFeature");
 		PropertyIsLikeOperatorTests iut = new PropertyIsLikeOperatorTests();
@@ -96,8 +97,8 @@ public class VerifyPropertyIsLikeOperatorTests {
 				suite.getAttribute(org.opengis.cite.iso19136.SuiteAttribute.XSMODEL
 						.getName())).thenReturn(model);
 		when(
-				dataSampler.getSimplePropertyValues(Matchers.any(QName.class),
-						Matchers.any(QName.class), Matchers.anyString()))
+				dataSampler.getSimplePropertyValues(any(QName.class),
+						any(QName.class), anyString()))
 				.thenReturn(valueList);
 		QName featureType = new QName(NS1, "ComplexFeature");
 		PropertyIsLikeOperatorTests iut = new PropertyIsLikeOperatorTests();
