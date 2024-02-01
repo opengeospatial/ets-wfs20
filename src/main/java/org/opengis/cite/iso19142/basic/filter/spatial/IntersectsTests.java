@@ -179,6 +179,9 @@ public class IntersectsTests extends QueryFilterFixture {
         }
         for (int i = 0; i < geomNodes.getLength(); i++) {
             Node geom = geomNodes.item(i);
+            if(this.dataSampler.checkForAbstractSurfacePatchTypes(geom)) {
+                geom = this.dataSampler.handleAbstractSurfacePatch(geom);
+            }
             boolean intersects = TopologicalRelationships.isSpatiallyRelated(SpatialOperator.INTERSECTS, gmlPolygonElem,
                     geom);
             Assert.assertTrue(intersects, ErrorMessage.format(ErrorMessageKeys.PREDICATE_NOT_SATISFIED, INTERSECTS_OP,
@@ -250,6 +253,9 @@ public class IntersectsTests extends QueryFilterFixture {
         }
         for (int i = 0; i < geomNodes.getLength(); i++) {
             Node geom = geomNodes.item(i);
+            if(this.dataSampler.checkForAbstractSurfacePatchTypes(geom)) {
+                geom = this.dataSampler.handleAbstractSurfacePatch(geom);
+            }
             boolean intersects = TopologicalRelationships.isSpatiallyRelated(SpatialOperator.INTERSECTS, gmlCurveElem,
                     geom);
             Assert.assertTrue(intersects, ErrorMessage.format(ErrorMessageKeys.PREDICATE_NOT_SATISFIED, INTERSECTS_OP,

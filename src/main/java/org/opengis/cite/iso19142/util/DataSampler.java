@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.stream.StreamSource;
@@ -43,6 +44,7 @@ import org.apache.xerces.xs.XSElementDeclaration;
 import org.apache.xerces.xs.XSModel;
 import org.apache.xerces.xs.XSTypeDefinition;
 import org.opengis.cite.geomatics.Extents;
+import org.opengis.cite.geomatics.GeodesyUtils;
 import org.opengis.cite.geomatics.gml.GmlUtils;
 import org.opengis.cite.geomatics.time.TemporalComparator;
 import org.opengis.cite.geomatics.time.TemporalUtils;
@@ -57,6 +59,8 @@ import org.opengis.temporal.TemporalGeometricPrimitive;
 import org.testng.SkipException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -76,6 +80,7 @@ public class DataSampler {
     private Map<QName, Envelope> spatialExtents;
     private Map<FeatureProperty, Period> temporalPropertyExtents;
     private final Map<QName, List<QName>> nillableProperties = new HashMap<>();
+    private DocumentBuilder documentBuilder;
 
     /**
      * Constructs a new DataSampler for a particular WFS implementation.
@@ -96,6 +101,14 @@ public class DataSampler {
         }
         this.spatialExtents = new HashMap<>();
         this.temporalPropertyExtents = new HashMap<>();
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+
+        try {
+            documentBuilder = dbf.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+
         LOGR.config("Created DataSampler - GetCapabilities (GET) endpoint is " + ServiceMetadataUtils
                 .getOperationEndpoint(wfsCapabilities, WFS2.GET_CAPABILITIES, ProtocolBinding.GET));
     }
@@ -392,6 +405,10 @@ public class DataSampler {
             }
         } while (itr.hasNext());
         if (null != geomNodes && geomNodes.getLength() > 0) {
+            Node geomNode = geomNodes.item(0);
+            if(checkForAbstractSurfacePatchTypes(geomNode)) {
+                geomNodes = wrapSingleNode(handleAbstractSurfacePatch(geomNode));
+            }
             try {
                 envelope = Extents.calculateEnvelopeUsingSingleGeometry(geomNodes);
             } catch (JAXBException e) {
@@ -637,6 +654,109 @@ public class DataSampler {
         } catch (Exception e) {
             LOGR.log(Level.WARNING, "Failed to save feature data.", e);
         }
+    }
+    
+    /**
+     * Rewrites a Geometry Node that contain AbstractSurfacePatch elements. 
+     * See https://github.com/opengeospatial/ets-wfs20/issues/260
+     * 
+     * @param geomNode a Geometry Node containing AbstractSurfacePatch elements.
+     * @return The rewritten Geometry Node.
+     */
+    public Node handleAbstractSurfacePatch(Node geomNode) {
+        String typeName = geomNode.getLocalName();
+        String geomMemberType = geomNode.getLocalName().equalsIgnoreCase("Curve") ? "curveMember" : "surfaceMember";
+        
+        Document document = documentBuilder.newDocument();
+        Element multiGeom = document.createElementNS(geomNode.getNamespaceURI(), typeName);
+        Element memberType = document.createElementNS(geomNode.getNamespaceURI(), geomMemberType);
+        Node importNode = document.importNode(geomNode, true);
+        NamedNodeMap attributes = geomNode.getAttributes();
+        String srsName = null;
+
+        for (Integer i = 0; i < attributes.getLength(); i++) {
+            String attributeNamespace = attributes.item(i).getNamespaceURI();
+            String attributeName = attributes.item(i).getLocalName();
+            String attributeValue = attributes.item(i).getNodeValue();
+
+            multiGeom.setAttributeNS(attributeNamespace, attributeName, attributeValue);
+            if (attributeName.equalsIgnoreCase("srsName")) {
+                srsName = GeodesyUtils.convertSRSNameToURN(attributeValue);
+            }
+        }
+
+        Element newGeomNode = null;
+        if (typeName.equalsIgnoreCase("MultiCurve")) {
+            newGeomNode = document.createElementNS(geomNode.getNamespaceURI(), "LineString");
+        } else {
+            newGeomNode = document.createElementNS(geomNode.getNamespaceURI(), "Polygon");
+        }
+        newGeomNode.setAttribute("srsName", srsName);
+
+        NodeList nodeList = importNode.getChildNodes();
+        for (Integer i = 0; i < nodeList.getLength(); i++) {
+            Node currentNode = nodeList.item(i);
+            if (currentNode.getNodeType() == Node.ELEMENT_NODE) {
+                if (typeName.equalsIgnoreCase("MultiCurve")) {
+                    if (currentNode.getLocalName().equalsIgnoreCase("posList")) {
+                        importNode = currentNode;
+                        break;
+                    }
+                } else {
+                    if (currentNode.getLocalName().equalsIgnoreCase("exterior")) {
+                        importNode = currentNode;
+                        break;
+                    }
+                }
+                nodeList = currentNode.getChildNodes();
+                i = -1;
+            }
+        }
+        newGeomNode.appendChild(importNode);
+        memberType.appendChild(newGeomNode);
+        multiGeom.appendChild(memberType);
+        return multiGeom;
+    }
+    
+    public NodeList wrapSingleNode(Node node) {
+        Document document = documentBuilder.newDocument();
+        Element root = document.createElement("root");
+        document.appendChild(root);
+        Node newGeom = document.importNode(node, true);
+        root.appendChild(newGeom);
+        return root.getChildNodes();
+    }
+
+    public boolean checkForAbstractSurfacePatchTypes(Node node) {
+        boolean result = false;
+
+        if (node.getLocalName().contains("Multi")) {
+            NodeList childNodes = node.getChildNodes();
+            for (int i = 0; i < childNodes.getLength(); i++) {
+                Node childNode = childNodes.item(i);
+                result = result || checkForAbstractSurfacePatchTypesRecursively(childNode);
+            }
+        }
+        return result;
+    }
+
+    private boolean checkForAbstractSurfacePatchTypesRecursively(Node node) {
+        boolean result = false;
+        if (node.getNodeType() == Node.TEXT_NODE) {
+            return false;
+        }
+        if (node.getLocalName().contains("patch")) {
+            return true;
+        }
+        if (!node.hasChildNodes()) {
+            return false;
+        }
+        NodeList childNodes = node.getChildNodes();
+        for (int i = 0; i < childNodes.getLength(); i++) {
+            Node childNode = childNodes.item(i);
+            result = result || checkForAbstractSurfacePatchTypesRecursively(childNode);
+        }
+        return result;
     }
 
 }
