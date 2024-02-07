@@ -19,6 +19,7 @@ import org.apache.xerces.xs.XSTypeDefinition;
 import org.opengis.cite.geomatics.Extents;
 import org.opengis.cite.geomatics.SpatialOperator;
 import org.opengis.cite.geomatics.TopologicalRelationships;
+import org.opengis.cite.geomatics.gml.GmlUtils;
 import org.opengis.cite.iso19136.GML32;
 import org.opengis.cite.iso19142.ErrorMessage;
 import org.opengis.cite.iso19142.ErrorMessageKeys;
@@ -179,8 +180,8 @@ public class IntersectsTests extends QueryFilterFixture {
         }
         for (int i = 0; i < geomNodes.getLength(); i++) {
             Node geom = geomNodes.item(i);
-            if(this.dataSampler.checkForAbstractSurfacePatchTypes(geom)) {
-                geom = this.dataSampler.handleAbstractSurfacePatch(geom);
+            if (GmlUtils.checkForAbstractSurfacePatchTypes(geom)) {
+                geom = GmlUtils.handleAbstractSurfacePatch(geom);
             }
             boolean intersects = TopologicalRelationships.isSpatiallyRelated(SpatialOperator.INTERSECTS, gmlPolygonElem,
                     geom);
@@ -253,8 +254,8 @@ public class IntersectsTests extends QueryFilterFixture {
         }
         for (int i = 0; i < geomNodes.getLength(); i++) {
             Node geom = geomNodes.item(i);
-            if(this.dataSampler.checkForAbstractSurfacePatchTypes(geom)) {
-                geom = this.dataSampler.handleAbstractSurfacePatch(geom);
+            if (GmlUtils.checkForAbstractSurfacePatchTypes(geom)) {
+                geom = GmlUtils.handleAbstractSurfacePatch(geom);
             }
             boolean intersects = TopologicalRelationships.isSpatiallyRelated(SpatialOperator.INTERSECTS, gmlCurveElem,
                     geom);

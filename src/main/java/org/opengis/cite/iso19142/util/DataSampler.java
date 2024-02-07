@@ -405,10 +405,6 @@ public class DataSampler {
             }
         } while (itr.hasNext());
         if (null != geomNodes && geomNodes.getLength() > 0) {
-            Node geomNode = geomNodes.item(0);
-            if(checkForAbstractSurfacePatchTypes(geomNode)) {
-                geomNodes = wrapSingleNode(handleAbstractSurfacePatch(geomNode));
-            }
             try {
                 envelope = Extents.calculateEnvelopeUsingSingleGeometry(geomNodes);
             } catch (JAXBException e) {
