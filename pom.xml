@@ -118,7 +118,7 @@
     <dependency>
       <groupId>org.opengis.cite</groupId>
       <artifactId>geomatics-geotk</artifactId>
-      <version>1.16</version>
+      <version>1.17</version>
     </dependency>
     <dependency>
       <groupId>org.opengis.cite.saxon</groupId>
