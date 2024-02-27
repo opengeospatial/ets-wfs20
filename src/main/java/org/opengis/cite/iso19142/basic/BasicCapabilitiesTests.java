@@ -2,7 +2,7 @@ package org.opengis.cite.iso19142.basic;
 
 import java.net.URI;
 
-import javax.xml.soap.SOAPException;
+import jakarta.xml.soap.SOAPException;
 import javax.xml.transform.Result;
 import javax.xml.transform.dom.DOMSource;
 
@@ -32,7 +32,7 @@ import com.sun.jersey.api.client.ClientResponse;
 /**
  * Tests the service response to a GetCapabilities request for "Basic WFS"
  * conformance.
- * 
+ *
  * @see "ISO 19142:2010, cl. 8: GetCapabilities operation"
  */
 public class BasicCapabilitiesTests extends BaseFixture {
@@ -52,7 +52,7 @@ public class BasicCapabilitiesTests extends BaseFixture {
      * Run the tests for the "Basic WFS" conformance class only if the service
      * constraint {@value org.opengis.cite.iso19142.WFS2#BASIC_WFS} has the
      * value 'TRUE'. Otherwise the constituent tests will be skipped.
-     * 
+     *
      * @param testContext
      *            The test (set) context.
      */
@@ -82,12 +82,12 @@ public class BasicCapabilitiesTests extends BaseFixture {
      * filtering options must be implemented. The applicable rules are
      * incorporated into the {@value #BASIC_WFS_PHASE} phase of the Schematron
      * schema {@code wfs-capabilities-2.0.sch}.
-     * 
+     *
      * @param binding
      *            The ProtocolBinding to use.
      * @throws SOAPException
      *             If an error occurs while processing a SOAP response message.
-     * 
+     *
      * @see "ISO 19142:2010, Table 1: Conformance classes"
      * @see "ISO 19142:2010, Table 13: Service constraints"
      * @see "ISO 19142:2010, cl. A.1.2: Basic WFS"

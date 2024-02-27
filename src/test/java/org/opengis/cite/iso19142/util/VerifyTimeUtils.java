@@ -9,7 +9,6 @@ import java.time.ZonedDateTime;
 import java.util.Date;
 
 import org.geotoolkit.temporal.factory.DefaultTemporalFactory;
-import org.geotoolkit.temporal.object.DefaultPosition;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -35,8 +34,8 @@ public class VerifyTimeUtils {
     @Test
     public void periodInUTCAsGML() {
         ZonedDateTime t1 = ZonedDateTime.of(2016, 05, 3, 10, 15, 30, 0, ZoneId.of("Z"));
-        Instant startPeriod = tmFactory.createInstant(new DefaultPosition(Date.from(t1.minusMonths(1).toInstant())));
-        Instant endPeriod = tmFactory.createInstant(new DefaultPosition(Date.from(t1.plusMonths(1).toInstant())));
+        Instant startPeriod = tmFactory.createInstant(Date.from(t1.minusMonths(1).toInstant()));
+        Instant endPeriod = tmFactory.createInstant(Date.from(t1.plusMonths(1).toInstant()));
         Period period = tmFactory.createPeriod(startPeriod, endPeriod);
         Document doc = TimeUtils.periodAsGML(period);
         Node endPosition = doc.getElementsByTagNameNS(Namespaces.GML, "endPosition").item(0);
@@ -46,8 +45,8 @@ public class VerifyTimeUtils {
     @Test
     public void periodWithOffsetAsGML() {
         ZonedDateTime t1 = ZonedDateTime.of(2016, 05, 3, 10, 15, 30, 0, ZoneOffset.of("-07:00"));
-        Instant startPeriod = tmFactory.createInstant(new DefaultPosition(Date.from(t1.minusMonths(1).toInstant())));
-        Instant endPeriod = tmFactory.createInstant(new DefaultPosition(Date.from(t1.plusMonths(1).toInstant())));
+        Instant startPeriod = tmFactory.createInstant(Date.from(t1.minusMonths(1).toInstant()));
+        Instant endPeriod = tmFactory.createInstant(Date.from(t1.plusMonths(1).toInstant()));
         Period period = tmFactory.createPeriod(startPeriod, endPeriod);
         Document doc = TimeUtils.periodAsGML(period);
         Node beginPosition = doc.getElementsByTagNameNS(Namespaces.GML, "beginPosition").item(0);
@@ -57,7 +56,7 @@ public class VerifyTimeUtils {
     @Test
     public void instantInUTCAsGML() {
         ZonedDateTime t1 = ZonedDateTime.of(2016, 05, 3, 10, 15, 30, 0, ZoneId.of("Z"));
-        Instant instant = tmFactory.createInstant(new DefaultPosition(Date.from(t1.minusMonths(1).toInstant())));
+        Instant instant = tmFactory.createInstant(Date.from(t1.minusMonths(1).toInstant()));
         Document doc = TimeUtils.instantAsGML(instant, ZoneOffset.UTC);
         Node timePosition = doc.getElementsByTagNameNS(Namespaces.GML, "timePosition").item(0);
         assertEquals("Unexpected date-time", timePosition.getTextContent().trim(), "2016-04-03T10:15:30Z");
@@ -66,7 +65,7 @@ public class VerifyTimeUtils {
     @Test
     public void instantWithOffsetAsGML() {
         ZonedDateTime t1 = ZonedDateTime.of(2016, 05, 3, 10, 15, 30, 0, ZoneOffset.of("-07:00"));
-        Instant instant = tmFactory.createInstant(new DefaultPosition(Date.from(t1.toInstant())));
+        Instant instant = tmFactory.createInstant(Date.from(t1.toInstant()));
         Document doc = TimeUtils.instantAsGML(instant, ZoneOffset.of("-0700"));
         Node timePosition = doc.getElementsByTagNameNS(Namespaces.GML, "timePosition").item(0);
         assertEquals("Unexpected date-time", timePosition.getTextContent().trim(), "2016-05-03T10:15:30-07:00");
@@ -75,7 +74,7 @@ public class VerifyTimeUtils {
     @Test
     public void instantDateTimeWithoutSecond() {
         ZonedDateTime t1 = ZonedDateTime.of(2016, 05, 3, 0, 0, 0, 0, ZoneId.of("Z"));
-        Instant instant = tmFactory.createInstant(new DefaultPosition(Date.from(t1.minusMonths(1).toInstant())));
+        Instant instant = tmFactory.createInstant(Date.from(t1.minusMonths(1).toInstant()));
         Document doc = TimeUtils.instantAsGML(instant, ZoneOffset.UTC);
         Node timePosition = doc.getElementsByTagNameNS(Namespaces.GML, "timePosition").item(0);
         assertEquals("Unexpected date-time", timePosition.getTextContent().trim(), "2016-04-03T00:00:00Z");

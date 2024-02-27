@@ -7,7 +7,6 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 import java.util.logging.Level;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -43,7 +42,7 @@ public class TimeUtils {
     /**
      * Builds a GML representation of a time interval delimited by the given
      * time instants. The temporal reference system is ISO 8601 (UTC).
-     * 
+     *
      * @param startDateTime
      *            The starting instant.
      * @param endDateTime
@@ -67,23 +66,23 @@ public class TimeUtils {
 
     /**
      * Builds a GML representation of the given time period.
-     * 
+     *
      * @param period
      *            A Period representing a temporal interval (UTC).
      * @return A Document with gml:TimePeriod as the document element.
      */
     public static Document periodAsGML(Period period) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXX");
-        String startOfPeriod = period.getBeginning().getPosition().getDateTime().toString();
+        String startOfPeriod = period.getBeginning().getDate().toInstant().toString();
         ZonedDateTime startDateTime = ZonedDateTime.parse(startOfPeriod, dateTimeFormatter);
-        String endOfPeriod = period.getEnding().getPosition().getDateTime().toString();
+        String endOfPeriod = period.getEnding().getDate().toInstant().toString();
         ZonedDateTime endDateTime = ZonedDateTime.parse(endOfPeriod, dateTimeFormatter);
         return intervalAsGML(startDateTime, endDateTime);
     }
 
     /**
      * Builds a GML representation of the given time period.
-     * 
+     *
      * @param period
      *            A Period representing a temporal interval (UTC).
      * @return A Document with gml:TimePeriod as the document element.
@@ -91,10 +90,10 @@ public class TimeUtils {
      */
     public static Document periodAsGMLSubtractOneDay(Period period) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXX");
-        String startOfPeriod = period.getBeginning().getPosition().getDateTime().toString();
+        String startOfPeriod = period.getBeginning().getDate().toInstant().toString();
         ZonedDateTime startDateTime = ZonedDateTime.parse(startOfPeriod, dateTimeFormatter);
         startDateTime = startDateTime.minus(1, ChronoUnit.DAYS);
-        String endOfPeriod = period.getEnding().getPosition().getDateTime().toString();
+        String endOfPeriod = period.getEnding().getDate().toInstant().toString();
         ZonedDateTime endDateTime = ZonedDateTime.parse(endOfPeriod, dateTimeFormatter);
         endDateTime = endDateTime.minus(1, ChronoUnit.DAYS);
         return intervalAsGML(startDateTime, endDateTime);
@@ -102,7 +101,7 @@ public class TimeUtils {
 
     /**
      * Builds a GML representation of the given time period.
-     * 
+     *
      * @param period
      *            A Period representing a temporal interval (UTC).
      * @return A Document with gml:TimePeriod as the document element.
@@ -111,10 +110,10 @@ public class TimeUtils {
 
 	public static Document periodAsGMLAddOneDay(Period period) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXX");
-        String startOfPeriod = period.getBeginning().getPosition().getDateTime().toString();
+        String startOfPeriod = period.getBeginning().getDate().toInstant().toString();
         ZonedDateTime startDateTime = ZonedDateTime.parse(startOfPeriod, dateTimeFormatter);
         startDateTime = startDateTime.plus(1, ChronoUnit.DAYS);
-        String endOfPeriod = period.getEnding().getPosition().getDateTime().toString();
+        String endOfPeriod = period.getEnding().getDate().toInstant().toString();
         ZonedDateTime endDateTime = ZonedDateTime.parse(endOfPeriod, dateTimeFormatter);
         endDateTime = endDateTime.plus(1, ChronoUnit.DAYS);
         return intervalAsGML(startDateTime, endDateTime);
@@ -123,7 +122,7 @@ public class TimeUtils {
     /**
      * Builds a GML representation of a time instant with the specified
      * time-zone offset.
-     * 
+     *
      * @param instant
      *            An instant representing a position in time.
      * @param offset
@@ -140,7 +139,7 @@ public class TimeUtils {
         } catch (SAXException | IOException e) {
             return null;
         }
-        OffsetDateTime tPos = instant.getPosition().getDate().toInstant().atOffset(offset);
+        OffsetDateTime tPos = instant.getDate().toInstant().atOffset(offset);
         String timePositionValue = tPos.format( DateTimeFormatter.ISO_OFFSET_DATE_TIME );
         Node timePosition = gmlTimeInstant.getElementsByTagNameNS( Namespaces.GML, "timePosition" ).item( 0 );
         timePosition.setTextContent( timePositionValue );
@@ -150,7 +149,7 @@ public class TimeUtils {
     /**
      * Builds a GML representation of a time instant with the specified
      * time-zone offset.
-     * 
+     *
      * @param instant
      *            An instant representing a position in time.
      * @param offset
@@ -174,8 +173,8 @@ public class TimeUtils {
         timePosition.setTextContent( timePositionValue );
         return gmlTimeInstant;
     }
-    
+
     private static Instant ogcInstantToJavaInstantSubtractOneDay(org.opengis.temporal.Instant instant) {
-    	return instant.getPosition().getDate().toInstant().minus(1, ChronoUnit.DAYS);
+    	return instant.getDate().toInstant().minus(1, ChronoUnit.DAYS);
     }
 }

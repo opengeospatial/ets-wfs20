@@ -11,17 +11,17 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
-import javax.xml.soap.MessageFactory;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPMessage;
-import javax.xml.soap.SOAPPart;
+import jakarta.xml.soap.MessageFactory;
+import jakarta.xml.soap.SOAPException;
+import jakarta.xml.soap.SOAPMessage;
+import jakarta.xml.soap.SOAPPart;
 import javax.xml.transform.stream.StreamSource;
 
 /**
  * A W3C SOAP message consumer that converts an input stream to a
  * {@link SOAPMessage} object. It is suitable for reading SOAP 1.2 entities
  * (media type "application/soap+xml").
- * 
+ *
  * @see <a href="http://tools.ietf.org/html/rfc3902" target="_blank">RFC 3902:
  *      The "application/soap+xml" media type</a>
  */

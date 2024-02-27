@@ -17,7 +17,7 @@ import java.util.Set;
 import java.util.logging.Level;
 
 import javax.xml.XMLConstants;
-import javax.xml.bind.DatatypeConverter;
+import jakarta.xml.bind.DatatypeConverter;
 import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMSource;
 
