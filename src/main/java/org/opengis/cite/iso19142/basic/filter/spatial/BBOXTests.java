@@ -11,7 +11,7 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPathExpressionException;
 import org.apache.xerces.xs.XSElementDeclaration;
 import org.apache.xerces.xs.XSTypeDefinition;
-import org.geotoolkit.geometry.GeneralEnvelope;
+import org.apache.sis.geometry.GeneralEnvelope;
 import org.opengis.cite.geomatics.Extents;
 import org.opengis.cite.geomatics.SpatialOperator;
 import org.opengis.cite.geomatics.TopologicalRelationships;
@@ -39,7 +39,7 @@ import org.w3c.dom.NodeList;
  * Tests the response to a GetFeature request that includes a BBOX predicate.
  * All conforming "Basic WFS" implementations must support this spatial
  * operator.
- * 
+ *
  * <p style="margin-bottom: 0.5em">
  * <strong>Sources</strong>
  * </p>
@@ -70,12 +70,12 @@ public class BBOXTests extends QueryFilterFixture {
      * all spatial properties. The response entity (wfs:FeatureCollection) must
      * be schema-valid and contain only instances of the requested type that
      * satisfy the spatial predicate.
-     * 
+     *
      * @param binding
      *            The ProtocolBinding to use for this request.
      * @param featureType
      *            A QName representing the qualified name of some feature type.
-     * 
+     *
      * @see "ISO 19143:2010, 7.8.3.2: BBOX operator"
      */
     @Test(description = "See ISO 19143: 7.8.3.2", dataProvider = "protocol-featureType")
@@ -120,7 +120,7 @@ public class BBOXTests extends QueryFilterFixture {
      * referring to a valid geometry property. The response shall contain only
      * features possessing a geometry value that spatially interacts (i.e. is
      * not disjoint) with the given envelope.
-     * 
+     *
      * <p style="margin-bottom: 0.5em">
      * <strong>Sources</strong>
      * </p>
@@ -128,12 +128,12 @@ public class BBOXTests extends QueryFilterFixture {
      * <li>ISO 19143:2010, cl. A.7: Test cases for minimum spatial filter</li>
      * <li>ISO 19143:2010, 7.8.3.2: BBOX operator</li>
      * </ul>
-     * 
+     *
      * @param binding
      *            The ProtocolBinding to use for this request.
      * @param featureType
      *            A QName representing the qualified name of some feature type.
-     * 
+     *
      */
     @Test(description = "See ISO 19143: 7.8.3.2, A.7", dataProvider = "protocol-featureType")
     public void bboxWithDefaultExtent(ProtocolBinding binding, QName featureType) {
@@ -212,11 +212,11 @@ public class BBOXTests extends QueryFilterFixture {
      * refers to a feature property (gml:description) that is not
      * geometry-valued. An exception is expected in response with status code
      * 400 and exception code {@code InvalidParameterValue}.
-     * 
+     *
      * @param featureType
      *            A QName representing the qualified name of a feature type for
      *            which instances exist.
-     * 
+     *
      * @see "ISO 19142:2010, 11.4: GetFeature - Exceptions"
      * @see "ISO 19143:2010, 8.3: Exceptions"
      */
@@ -256,12 +256,12 @@ public class BBOXTests extends QueryFilterFixture {
      * Replaces gml:Surface elements having a single gml:PolygonPatch with a
      * gml:Polygon element. Such a simplification facilitates a binding to JTS
      * geometry objects.
-     * 
+     *
      * @param geometry
      *            A GML geometry collection.
      * @return A new DOM Element containing a simplified representation of the
      *         original geometry collection.
-     * 
+     *
      * @see "ISO 19125-1: Geographic information -- Simple feature access --
      *      Part 1: Common architecture"
      */
@@ -275,7 +275,7 @@ public class BBOXTests extends QueryFilterFixture {
      * Adds a BBOX spatial predicate to a GetFeature request entity. If the
      * envelope has no spatial reference (srsName) it is assumed to be the
      * default CRS specified in the capabilities document.
-     * 
+     *
      * @param request
      *            The request entity (/wfs:GetFeature).
      * @param envelope
