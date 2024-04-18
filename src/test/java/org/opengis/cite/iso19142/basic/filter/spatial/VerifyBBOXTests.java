@@ -4,20 +4,18 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-
 import javax.xml.namespace.QName;
 
+import org.apache.sis.referencing.CommonCRS;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
-import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
+
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opengis.cite.iso19142.CommonTestFixture;
 import org.opengis.cite.iso19142.Namespaces;
-import org.opengis.cite.iso19142.basic.filter.spatial.BBOXTests;
 import org.opengis.cite.iso19142.util.WFSMessage;
 import org.opengis.cite.iso19142.util.XMLUtils;
-import org.opengis.referencing.crs.GeographicCRS;
 import org.testng.ISuite;
 import org.testng.ITestContext;
 import org.w3c.dom.Document;
@@ -78,10 +76,10 @@ public class VerifyBBOXTests extends CommonTestFixture {
 		Assert.assertEquals("Unexpected fes:ValueReference.", "tns:geom",
 				node.getTextContent());
 	}
-	
+
 	@Test
 	public void bboxExpansion() {
-		JTSEnvelope2D envelope = new JTSEnvelope2D(0, 1, 0, 1, DefaultGeographicCRS.WGS84);
+		JTSEnvelope2D envelope = new JTSEnvelope2D(0, 1, 0, 1, CommonCRS.WGS84.normalizedGeographic());
 		BBOXTests iut = new BBOXTests();
 		Document document = iut.envelopeAsGML(envelope);
 		Node nodeLower = document.getElementsByTagNameNS(Namespaces.GML, "lowerCorner").item(0);

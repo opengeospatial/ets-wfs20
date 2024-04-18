@@ -12,9 +12,6 @@ import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalQueries;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-
-import org.apache.xerces.impl.dv.XSSimpleType;
 import org.apache.xerces.xs.XSComplexTypeDefinition;
 import org.apache.xerces.xs.XSConstants;
 import org.apache.xerces.xs.XSElementDeclaration;
@@ -22,7 +19,6 @@ import org.apache.xerces.xs.XSModel;
 import org.apache.xerces.xs.XSSimpleTypeDefinition;
 import org.apache.xerces.xs.XSTypeDefinition;
 import org.geotoolkit.temporal.factory.DefaultTemporalFactory;
-import org.geotoolkit.temporal.object.DefaultPosition;
 import org.opengis.cite.iso19136.util.XMLSchemaModelUtils;
 import org.opengis.cite.iso19142.Namespaces;
 import org.opengis.cite.iso19142.util.WFSMessage;
@@ -106,7 +102,7 @@ public class TemporalQuery {
             	throw new SkipException("{%s uses date values without timezone, which are currently not supported by this test suite.");
             }
             ZonedDateTime dateTime = (ZonedDateTime) tm;
-            tmPrimitive = tmFactory.createInstant(new DefaultPosition(Date.from(dateTime.toInstant())));
+            tmPrimitive = tmFactory.createInstant(Date.from(dateTime.toInstant()));
             break;
         case XSConstants.DATE_DT:
             ZoneOffset zone = DateTimeFormatter.ISO_DATE.parse(value, TemporalQueries.offset());
@@ -118,8 +114,8 @@ public class TemporalQuery {
             // date is top-open interval (ends at 23:59:59.999)
             Temporal endOfDay = startOfDay.plus(1, ChronoUnit.DAYS).minus(1, ChronoUnit.MILLIS);
             tmPrimitive = tmFactory.createPeriod(
-                    tmFactory.createInstant(new DefaultPosition(Date.from(Instant.from(startOfDay)))),
-                    tmFactory.createInstant(new DefaultPosition(Date.from(Instant.from(endOfDay)))));
+                    tmFactory.createInstant(Date.from(Instant.from(startOfDay))),
+                    tmFactory.createInstant(Date.from(Instant.from(endOfDay))));
             break;
         default:
             throw new IllegalArgumentException("Unsupported datatype: " + typeDefinition.getName());

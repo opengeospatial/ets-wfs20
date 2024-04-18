@@ -53,7 +53,7 @@ public class VerifyTemporalQuery extends CommonTestFixture {
         TemporalGeometricPrimitive result = TemporalQuery.parseTemporalValue("2016-05-15T12:00:00Z", typeDef);
         assertTrue("Expected result: " + Instant.class.getName(), Instant.class.isInstance(result));
         Instant instant = Instant.class.cast(result);
-        assertTrue(instant.getPosition().getDateTime().toString().startsWith("2016-05"));
+        assertTrue(instant.getDate().toInstant().toString().startsWith("2016-05"));
     }
 
     @Test
@@ -78,7 +78,7 @@ public class VerifyTemporalQuery extends CommonTestFixture {
         assertTrue("Expected result: " + Period.class.getName(), Period.class.isInstance(result));
         Period period = Period.class.cast(result);
         DateTimeFormatter xsdDateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
-        ZonedDateTime actualStart = ZonedDateTime.parse(period.getBeginning().getPosition().getDateTime().toString(),
+        ZonedDateTime actualStart = ZonedDateTime.parse(period.getBeginning().getDate().toInstant().toString(),
                 xsdDateTimeFormatter);
         ZonedDateTime expectedStart = ZonedDateTime.parse("2016-05-15T00:00:00-04:00");
         assertTrue(actualStart.isEqual(expectedStart));

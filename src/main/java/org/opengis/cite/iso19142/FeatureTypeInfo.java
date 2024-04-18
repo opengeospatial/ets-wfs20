@@ -8,9 +8,9 @@ import java.util.logging.Level;
 
 import javax.xml.namespace.QName;
 
-import org.geotoolkit.geometry.Envelopes;
-import org.geotoolkit.geometry.ImmutableEnvelope;
-import org.geotoolkit.referencing.CRS;
+import org.apache.sis.geometry.Envelopes;
+import org.apache.sis.geometry.ImmutableEnvelope;
+import org.apache.sis.referencing.CRS;
 import org.opengis.cite.geomatics.GeodesyUtils;
 import org.opengis.cite.geomatics.time.TemporalUtils;
 import org.opengis.cite.iso19142.util.TestSuiteLogger;
@@ -41,7 +41,7 @@ public class FeatureTypeInfo {
     /**
      * Returns of list of supported CRS identifiers. The first entry denotes the
      * default CRS.
-     * 
+     *
      * @return A list of CRS identifiers (absolute URI values).
      */
     public List<String> getSupportedCRSIdentifiers() {
@@ -51,7 +51,7 @@ public class FeatureTypeInfo {
     /**
      * Adds the given sequence of identifiers to the list of supported
      * coordinate reference systems.
-     * 
+     *
      * @param crsIdentifiers
      *            A sequence of CRS identifiers (absolute URI values that comply
      *            with OGC 09-048r3, 4.4).
@@ -62,7 +62,7 @@ public class FeatureTypeInfo {
 
     /**
      * Get the qualified name of the feature type.
-     * 
+     *
      * @return A QName object.
      */
     public QName getTypeName() {
@@ -71,7 +71,7 @@ public class FeatureTypeInfo {
 
     /**
      * Sets the feature type name.
-     * 
+     *
      * @param typeName
      *            A QName object.
      */
@@ -82,7 +82,7 @@ public class FeatureTypeInfo {
     /**
      * Indicates whether or not there are any instances of this feature type
      * available in the data store.
-     * 
+     *
      * @return {@code true} if at least one feature instance exists;
      *         {@code false} otherwise.
      */
@@ -92,7 +92,7 @@ public class FeatureTypeInfo {
 
     /**
      * Sets the availability of this feature type.
-     * 
+     *
      * @param available
      *            A boolean value indicating if any instances of this type are
      *            available in the data store.
@@ -103,7 +103,7 @@ public class FeatureTypeInfo {
 
     /**
      * Gets the identifier of the default CRS for this feature type.
-     * 
+     *
      * @return A String representing a CRS reference (an absolute URI value).
      */
     public String getDefaultCRS() {
@@ -118,7 +118,7 @@ public class FeatureTypeInfo {
      * capabilities document;</li>
      * <li>from the valid area of the default CRS.</li>
      * </ol>
-     * 
+     *
      * @return An Envelope defining a bounding box.
      */
     public Envelope getSpatialExtent() {
@@ -131,7 +131,7 @@ public class FeatureTypeInfo {
     /**
      * Sets the geographic extent of the feature instances. The CRS of the given
      * envelope will be changed to the default CRS if necessary.
-     * 
+     *
      * @param geoExtent
      *            An envelope defining a bounding box in some CRS.
      */
@@ -140,7 +140,7 @@ public class FeatureTypeInfo {
         try {
             // http-based identifier is not recognized by Geotk v3
             String crsId = GeodesyUtils.getAbbreviatedCRSIdentifier(getDefaultCRS());
-            defaultCRS = CRS.decode(crsId);
+            defaultCRS = CRS.forCode(crsId);
         } catch (FactoryException fex) {
             throw new RuntimeException("Default CRS not recognized. " + fex.getMessage());
         }catch (IllegalArgumentException iae) {
@@ -163,7 +163,7 @@ public class FeatureTypeInfo {
     /**
      * Returns a File containing sample data. This is an XML entity where the
      * document element is wfs:FeatureCollection.
-     * 
+     *
      * @return A File for reading the GML data, or {@code null} if no data are
      *         available.
      */
@@ -174,7 +174,7 @@ public class FeatureTypeInfo {
     /**
      * Sets the location of a sample data file containing instances of this
      * feature type.
-     * 
+     *
      * @param sampleData
      *            A File object.
      */
@@ -188,7 +188,7 @@ public class FeatureTypeInfo {
         sb.append("\n typeName: '").append(typeName);
         sb.append("',\n supportedCRS: '").append(supportedCRSList);
         sb.append("',\n instantiated: ").append(instantiated);
-        sb.append(",\n spatial extent: '").append(Envelopes.toWKT(getSpatialExtent()));
+        sb.append(",\n spatial extent: '").append(Envelopes.toPolygonWKT(getSpatialExtent()));
         if (temporalExtent != null) {
             sb.append("',\n temporal extent: '");
             sb.append(TemporalUtils.temporalGeometricPrimitiveToString(temporalExtent));
@@ -202,7 +202,7 @@ public class FeatureTypeInfo {
 
     /**
      * Gets the temporal extent for the instances of this feature type.
-     * 
+     *
      * @return A period representing a time interval, or null if the feature has
      *         no temporal properties.
      */
@@ -212,7 +212,7 @@ public class FeatureTypeInfo {
 
     /**
      * Sets the temporal extent of the feature instances.
-     * 
+     *
      * @param period
      *            A period representing a time interval.
      */
@@ -223,11 +223,11 @@ public class FeatureTypeInfo {
     /**
      * Creates an envelope representing the valid area of use for the specified
      * coordinate reference system (CRS).
-     * 
+     *
      * @param crsRef
      *            An absolute URI ('http' or 'urn' scheme) that identifies a CRS
      *            in accord with OGC 09-048r3.
-     * 
+     *
      * @return An ImmutableEnvelope defining the domain of validity for the CRS,
      *         or {@code null} if no CRS definition can be found.
      */
