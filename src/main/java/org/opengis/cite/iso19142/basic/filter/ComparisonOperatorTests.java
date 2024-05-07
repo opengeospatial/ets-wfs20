@@ -17,7 +17,6 @@ import java.util.Set;
 import java.util.logging.Level;
 
 import javax.xml.XMLConstants;
-import jakarta.xml.bind.DatatypeConverter;
 import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMSource;
 
@@ -41,7 +40,10 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import com.sun.jersey.api.client.ClientResponse;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
+import jakarta.xml.bind.DatatypeConverter;
+
 
 /**
  * Tests the response to a GetFeature request that includes a filter predicate
@@ -100,9 +102,9 @@ public class ComparisonOperatorTests extends QueryFilterFixture {
         QName propName = new QName(propDecl.getNamespace(), propDecl.getName());
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
         addComparisonPredicate(this.reqEntity, FES2.LESS_THAN, propName, propValue, true, MATCH_ANY);
-        ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
+        Response rsp = wfsClient.submitRequest(reqEntity, binding);
         this.rspEntity = extractBodyAsDocument(rsp);
-        Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
+        Assert.assertEquals(rsp.getStatus(), Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
         NodeList features = this.rspEntity.getElementsByTagNameNS(featureType.getNamespaceURI(),
                 featureType.getLocalPart());
@@ -144,9 +146,9 @@ public class ComparisonOperatorTests extends QueryFilterFixture {
         QName propName = new QName(propDecl.getNamespace(), propDecl.getName());
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
         addComparisonPredicate(this.reqEntity, FES2.LESS_THAN, propName, propValue, true, MATCH_ALL);
-        ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
+        Response rsp = wfsClient.submitRequest(reqEntity, binding);
         this.rspEntity = extractBodyAsDocument(rsp);
-        Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
+        Assert.assertEquals(rsp.getStatus(), Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
         NodeList features = this.rspEntity.getElementsByTagNameNS(featureType.getNamespaceURI(),
                 featureType.getLocalPart());
@@ -188,9 +190,9 @@ public class ComparisonOperatorTests extends QueryFilterFixture {
         QName propName = new QName(propDecl.getNamespace(), propDecl.getName());
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
         addComparisonPredicate(this.reqEntity, FES2.GREATER_THAN, propName, propValue, true, MATCH_ANY);
-        ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
+        Response rsp = wfsClient.submitRequest(reqEntity, binding);
         this.rspEntity = extractBodyAsDocument(rsp);
-        Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
+        Assert.assertEquals(rsp.getStatus(), Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
         NodeList features = this.rspEntity.getElementsByTagNameNS(featureType.getNamespaceURI(),
                 featureType.getLocalPart());
@@ -232,9 +234,9 @@ public class ComparisonOperatorTests extends QueryFilterFixture {
         QName propName = new QName(propDecl.getNamespace(), propDecl.getName());
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
         addComparisonPredicate(this.reqEntity, FES2.GREATER_THAN_OR_EQUAL, propName, propValue, true, MATCH_ANY);
-        ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
+        Response rsp = wfsClient.submitRequest(reqEntity, binding);
         this.rspEntity = extractBodyAsDocument(rsp);
-        Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
+        Assert.assertEquals(rsp.getStatus(), Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
         NodeList features = this.rspEntity.getElementsByTagNameNS(featureType.getNamespaceURI(),
                 featureType.getLocalPart());
@@ -277,9 +279,9 @@ public class ComparisonOperatorTests extends QueryFilterFixture {
         QName propName = new QName(propDecl.getNamespace(), propDecl.getName());
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
         addComparisonPredicate(this.reqEntity, FES2.LESS_THAN_OR_EQUAL, propName, propValue, true, MATCH_ANY);
-        ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
+        Response rsp = wfsClient.submitRequest(reqEntity, binding);
         this.rspEntity = extractBodyAsDocument(rsp);
-        Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
+        Assert.assertEquals(rsp.getStatus(), Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
         NodeList features = this.rspEntity.getElementsByTagNameNS(featureType.getNamespaceURI(),
                 featureType.getLocalPart());
@@ -314,9 +316,9 @@ public class ComparisonOperatorTests extends QueryFilterFixture {
         int index = rnd.nextInt(this.featureTypes.size());
         WFSMessage.appendSimpleQuery(this.reqEntity, this.featureTypes.get(index));
         addComparisonPredicate(this.reqEntity, FES2.LESS_THAN_OR_EQUAL, propName, "1355941270", true, MATCH_ANY);
-        ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
-        this.rspEntity = rsp.getEntity(Document.class);
-        Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.BAD_REQUEST.getStatusCode(),
+        Response rsp = wfsClient.submitRequest(reqEntity, binding);
+        this.rspEntity = rsp.readEntity(Document.class);
+        Assert.assertEquals(rsp.getStatus(), Status.BAD_REQUEST.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
         String xpath = "//ows:Exception[@exceptionCode='InvalidParameterValue']";
         ETSAssert.assertXPath(xpath, this.rspEntity, null);
@@ -350,8 +352,8 @@ public class ComparisonOperatorTests extends QueryFilterFixture {
         WFSMessage.appendSimpleQuery(this.reqEntity, this.featureTypes.get(index));
         Document gmlEnv = WFSMessage.createGMLEnvelope();
         addComparisonPredicate(this.reqEntity, FES2.LESS_THAN_OR_EQUAL, propName, gmlEnv, true, MATCH_ANY);
-        ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
-        this.rspEntity = rsp.getEntity(Document.class);
+        Response rsp = wfsClient.submitRequest(reqEntity, binding);
+        this.rspEntity = rsp.readEntity(Document.class);
         ETSAssert.assertStatusCode(rsp.getStatus(), new int[] { 500, 400, 403 });
         String xpath = "//ows:Exception[@exceptionCode='OperationProcessingFailed']";
         ETSAssert.assertXPath(xpath, this.rspEntity, null);

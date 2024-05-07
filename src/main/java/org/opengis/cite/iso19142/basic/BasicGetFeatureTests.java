@@ -35,7 +35,9 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.ls.LSResourceResolver;
 import org.xml.sax.SAXException;
 
-import com.sun.jersey.api.client.ClientResponse;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
+
 
 /**
  * Tests the response to a GetFeature request that returns a selection of
@@ -119,11 +121,11 @@ public class BasicGetFeatureTests extends BaseFixture {
 		WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
 		URI endpoint = ServiceMetadataUtils.getOperationEndpoint(
 				this.wfsMetadata, WFS2.GET_FEATURE, binding);
-		ClientResponse rsp = wfsClient.submitRequest(new DOMSource(reqEntity),
+		Response rsp = wfsClient.submitRequest(new DOMSource(reqEntity),
 				binding, endpoint);
 		this.rspEntity = extractBodyAsDocument(rsp);
 		Assert.assertEquals(rsp.getStatus(),
-				ClientResponse.Status.OK.getStatusCode(),
+				Status.OK.getStatusCode(),
 				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
 		ETSAssert.assertQualifiedName(rspEntity.getDocumentElement(),
 				FEATURE_COLL);
@@ -163,10 +165,10 @@ public class BasicGetFeatureTests extends BaseFixture {
 		Element qry = (Element) this.reqEntity.getElementsByTagNameNS(
 				WFS2.NS_URI, WFS2.QUERY_ELEM).item(0);
 		qry.setAttribute(WFS2.SRSNAME_PARAM, otherCRSId);
-		ClientResponse rsp = wfsClient.submitRequest(this.reqEntity,
+		Response rsp = wfsClient.submitRequest(this.reqEntity,
 				ProtocolBinding.ANY);
 		Assert.assertEquals(rsp.getStatus(),
-				ClientResponse.Status.OK.getStatusCode(),
+				Status.OK.getStatusCode(),
 				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
 		this.rspEntity = extractBodyAsDocument(rsp);
 		ETSAssert.assertSpatialReference(this.rspEntity, otherCRSId);
@@ -190,10 +192,10 @@ public class BasicGetFeatureTests extends BaseFixture {
 		Element qry = (Element) this.reqEntity.getElementsByTagNameNS(
 				WFS2.NS_URI, WFS2.QUERY_ELEM).item(0);
 		qry.setAttribute(WFS2.SRSNAME_PARAM, crsId);
-		ClientResponse rsp = wfsClient.submitRequest(this.reqEntity,
+		Response rsp = wfsClient.submitRequest(this.reqEntity,
 				ProtocolBinding.ANY);
 		Assert.assertEquals(rsp.getStatus(),
-				ClientResponse.Status.BAD_REQUEST.getStatusCode(),
+				Status.BAD_REQUEST.getStatusCode(),
 				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
 		this.rspEntity = extractBodyAsDocument(rsp);
 		ETSAssert.assertExceptionReport(this.rspEntity,

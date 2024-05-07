@@ -26,7 +26,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import com.sun.jersey.api.client.ClientResponse;
+import jakarta.ws.rs.core.Response;
+
 
 /**
  * Tests the service response to a GetPropertyValue request. The
@@ -81,7 +82,7 @@ public class GetPropertyValueTests extends BaseFixture {
 		addQuery(this.reqEntity, this.featureTypes.get(0));
 		URI endpoint = ServiceMetadataUtils.getOperationEndpoint(
 				this.wfsMetadata, WFS2.GET_PROP_VALUE, binding);
-		ClientResponse rsp = wfsClient.submitRequest(new DOMSource(reqEntity),
+		Response rsp = wfsClient.submitRequest(new DOMSource(reqEntity),
 				binding, endpoint);
 		Assert.assertTrue(rsp.hasEntity(),
 				ErrorMessage.get(ErrorMessageKeys.MISSING_XML_ENTITY));
@@ -112,7 +113,7 @@ public class GetPropertyValueTests extends BaseFixture {
 		addQuery(reqEntity, this.featureTypes.get(0));
 		URI endpoint = ServiceMetadataUtils.getOperationEndpoint(
 				this.wfsMetadata, WFS2.GET_PROP_VALUE, binding);
-		ClientResponse rsp = wfsClient.submitRequest(new DOMSource(reqEntity),
+		Response rsp = wfsClient.submitRequest(new DOMSource(reqEntity),
 				binding, endpoint);
 		Assert.assertTrue(rsp.hasEntity(),
 				ErrorMessage.get(ErrorMessageKeys.MISSING_XML_ENTITY));

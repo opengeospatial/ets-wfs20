@@ -32,7 +32,8 @@ import org.testng.annotations.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import com.sun.jersey.api.client.ClientResponse;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 /**
  * Provides test methods that verify the creation of stored queries. A
@@ -111,10 +112,10 @@ public class CreateStoredQueryTests extends BaseFixture {
                 this.wfsVersion);
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.CREATE_STORED_QRY,
                 ProtocolBinding.POST);
-        ClientResponse rsp = this.wfsClient.submitRequest(new DOMSource(this.reqEntity), ProtocolBinding.POST,
+        Response rsp = this.wfsClient.submitRequest(new DOMSource(this.reqEntity), ProtocolBinding.POST,
                 endpoint);
-        this.rspEntity = rsp.getEntity(Document.class);
-        assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
+        this.rspEntity = rsp.readEntity(Document.class);
+        assertEquals(rsp.getStatus(), Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
         ETSAssert.assertQualifiedName(this.rspEntity.getDocumentElement(),
                 new QName(WFS2.NS_URI, "CreateStoredQueryResponse"));
@@ -144,9 +145,9 @@ public class CreateStoredQueryTests extends BaseFixture {
         qryExpr.setAttribute("language", "http://qry.example.org");
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.CREATE_STORED_QRY,
                 ProtocolBinding.POST);
-        ClientResponse rsp = this.wfsClient.submitRequest(new DOMSource(this.reqEntity), ProtocolBinding.POST,
+        Response rsp = this.wfsClient.submitRequest(new DOMSource(this.reqEntity), ProtocolBinding.POST,
                 endpoint);
-        this.rspEntity = rsp.getEntity(Document.class);
+        this.rspEntity = rsp.readEntity(Document.class);
         ETSAssert.assertExceptionReport(this.rspEntity, "InvalidParameterValue", "language");
     }
 
@@ -163,15 +164,15 @@ public class CreateStoredQueryTests extends BaseFixture {
         this.reqEntity = WFSMessage.createRequestEntity(ETS_PKG + "/querymgmt/CreateStoredQuery-GetFeatureByName",
                 this.wfsVersion);
         WFSMessage.setReturnTypesAndTypeNamesAttribute( this.reqEntity, this.dataSampler.selectFeatureType() );
-        ClientResponse rsp = this.wfsClient.submitRequest(new DOMSource(this.reqEntity), ProtocolBinding.POST,
+        Response rsp = this.wfsClient.submitRequest(new DOMSource(this.reqEntity), ProtocolBinding.POST,
                 endpoint);
-        this.rspEntity = rsp.getEntity(Document.class);
+        this.rspEntity = rsp.readEntity(Document.class);
         ETSAssert.assertQualifiedName(this.rspEntity.getDocumentElement(),
                 new QName(WFS2.NS_URI, "CreateStoredQueryResponse"));
         this.createdStoredQueries.add(QRY_GET_FEATURE_BY_NAME);
         // resubmit
         rsp = this.wfsClient.submitRequest(new DOMSource(this.reqEntity), ProtocolBinding.POST, endpoint);
-        this.rspEntity = rsp.getEntity(Document.class);
+        this.rspEntity = rsp.readEntity(Document.class);
         ETSAssert.assertExceptionReport(this.rspEntity, "DuplicateStoredQueryIdValue", QRY_GET_FEATURE_BY_NAME);
     }
 }

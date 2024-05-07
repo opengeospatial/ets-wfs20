@@ -2,7 +2,6 @@ package org.opengis.cite.iso19142.basic;
 
 import java.net.URI;
 
-import jakarta.xml.soap.SOAPException;
 import javax.xml.transform.Result;
 import javax.xml.transform.dom.DOMSource;
 
@@ -27,7 +26,9 @@ import org.testng.annotations.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import com.sun.jersey.api.client.ClientResponse;
+import jakarta.ws.rs.core.Response;
+import jakarta.xml.soap.SOAPException;
+
 
 /**
  * Tests the service response to a GetCapabilities request for "Basic WFS"
@@ -96,7 +97,7 @@ public class BasicCapabilitiesTests extends BaseFixture {
     @Test(description = "See ISO 19142: Table 1, Table 13, A.1.2", dataProvider = "protocol-binding")
     public void describesBasicWFS(ProtocolBinding binding) throws SOAPException {
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.GET_CAPABILITIES, binding);
-        ClientResponse rsp = wfsClient.submitRequest(new DOMSource(reqEntity), binding, endpoint);
+        Response rsp = wfsClient.submitRequest(new DOMSource(reqEntity), binding, endpoint);
         Assert.assertTrue(rsp.hasEntity(), ErrorMessage.get(ErrorMessageKeys.MISSING_XML_ENTITY));
         Document entity = extractBodyAsDocument(rsp);
         SchematronValidator validator = ValidationUtils.buildSchematronValidator(SCHEMATRON_METADATA, BASIC_WFS_PHASE);

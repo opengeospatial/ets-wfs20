@@ -3,6 +3,7 @@ package org.opengis.cite.iso19142.basic.filter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 
@@ -19,7 +20,9 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import com.sun.jersey.api.client.ClientResponse;
+
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 /**
  * Tests the response to a GetFeature request that includes a
@@ -53,10 +56,10 @@ public class PropertyIsNullOperatorTests extends QueryFilterFixture {
 		WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
 		QName gmlName = new QName(Namespaces.GML, "name", "gml");
 		addPropertyIsNullPredicate(this.reqEntity, gmlName, false);
-		ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
+		Response rsp = wfsClient.submitRequest(reqEntity, binding);
 		this.rspEntity = extractBodyAsDocument(rsp);
 		Assert.assertEquals(rsp.getStatus(),
-				ClientResponse.Status.OK.getStatusCode(),
+				Status.OK.getStatusCode(),
 				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
 		Map<String, String> nsBindings = new HashMap<String, String>();
 		nsBindings.put(featureType.getNamespaceURI(), "tns");
@@ -85,10 +88,10 @@ public class PropertyIsNullOperatorTests extends QueryFilterFixture {
 		XSElementDeclaration lastProp = props.get(props.size() - 1);
 		QName propName = new QName(lastProp.getNamespace(), lastProp.getName());
 		addPropertyIsNullPredicate(this.reqEntity, propName, true);
-		ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
+		Response rsp = wfsClient.submitRequest(reqEntity, binding);
 		this.rspEntity = extractBodyAsDocument(rsp);
 		Assert.assertEquals(rsp.getStatus(),
-				ClientResponse.Status.OK.getStatusCode(),
+				Status.OK.getStatusCode(),
 				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
 		Map<String, String> nsBindings = new HashMap<String, String>();
 		nsBindings.put(featureType.getNamespaceURI(), "ns1");

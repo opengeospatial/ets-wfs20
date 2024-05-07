@@ -35,7 +35,9 @@ import org.testng.annotations.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
-import com.sun.jersey.api.client.ClientResponse;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
+
 
 /**
  * A spatial join includes a spatial predicate. One or more of the following
@@ -218,9 +220,9 @@ public class SpatialJoinTests extends QueryFilterFixture {
            throw new SkipException("This test has triggered an unexpected Spatial Join condition. The Spatial Join test will need to be applied manually.");       
         } 
         JoinQueryUtils.appendSpatialJoinQuery(this.reqEntity, "Intersects", joinProperties);
-        ClientResponse rsp = wfsClient.submitRequest(this.reqEntity, ProtocolBinding.ANY);
+        Response rsp = wfsClient.submitRequest(this.reqEntity, ProtocolBinding.ANY);
         this.rspEntity = extractBodyAsDocument(rsp);
-        Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
+        Assert.assertEquals(rsp.getStatus(), Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
         // TODO check entity body: F1 intersects F2
     }

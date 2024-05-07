@@ -17,7 +17,8 @@ import org.testng.Assert;
 import org.testng.SkipException;
 import org.testng.annotations.Test;
 
-import com.sun.jersey.api.client.ClientResponse;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 /**
  * Tests the response to a GetFeature request that includes a ResourceId filter
@@ -55,9 +56,9 @@ public class ResourceIdFilterTests extends QueryFilterFixture {
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
         Set<String> idSet = this.dataSampler.selectRandomFeatureIdentifiers(featureType, 2);
         WFSMessage.addResourceIdPredicate(this.reqEntity, idSet);
-        ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
+        Response rsp = wfsClient.submitRequest(reqEntity, binding);
         this.rspEntity = extractBodyAsDocument(rsp);
-        Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
+        Assert.assertEquals(rsp.getStatus(), Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
         ETSAssert.assertDescendantElementCount(this.rspEntity, new QName(Namespaces.WFS, WFS2.MEMBER), idSet.size());
     }
@@ -80,9 +81,9 @@ public class ResourceIdFilterTests extends QueryFilterFixture {
         Set<String> idSet = new HashSet<String>();
         idSet.add("test-" + UUID.randomUUID());
         WFSMessage.addResourceIdPredicate(this.reqEntity, idSet);
-        ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
+        Response rsp = wfsClient.submitRequest(reqEntity, binding);
         this.rspEntity = extractBodyAsDocument(rsp);
-        Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
+        Assert.assertEquals(rsp.getStatus(), Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
         ETSAssert.assertQualifiedName(this.rspEntity.getDocumentElement(),
                 new QName(Namespaces.WFS, WFS2.FEATURE_COLLECTION));
@@ -110,9 +111,9 @@ public class ResourceIdFilterTests extends QueryFilterFixture {
         }
         idSet.add(featureId);
         WFSMessage.addResourceIdPredicate(this.reqEntity, idSet);
-        ClientResponse rsp = wfsClient.submitRequest(reqEntity, ProtocolBinding.GET);
+        Response rsp = wfsClient.submitRequest(reqEntity, ProtocolBinding.GET);
         this.rspEntity = extractBodyAsDocument(rsp);
-        Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.BAD_REQUEST.getStatusCode(),
+        Assert.assertEquals(rsp.getStatus(), Status.BAD_REQUEST.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
         ETSAssert.assertExceptionReport(this.rspEntity, "InvalidParameterValue", "RESOURCEID");
     }

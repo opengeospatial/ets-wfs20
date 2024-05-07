@@ -10,9 +10,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.UriBuilder;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
@@ -21,6 +18,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 
+import org.glassfish.jersey.client.ClientConfig;
 import org.opengis.cite.iso19142.Namespaces;
 import org.opengis.cite.iso19142.ProtocolBinding;
 import org.opengis.cite.iso19142.WFS2;
@@ -31,13 +29,15 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
-import com.sun.jersey.api.client.filter.LoggingFilter;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.client.Invocation.Builder;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriBuilder;
+
 
 /**
  * A WFS 2.0 client component.
@@ -58,13 +58,14 @@ public class WFSClient {
     /**
      * Default client constructor. The client is configured to consume SOAP
      * message entities. The request and response may be logged to a default JDK
-     * logger (in the namespace "com.sun.jersey.api.client").
+     * logger (in the namespace "com.sun.jersey.api.client"). TODO
      */
     public WFSClient() {
-        ClientConfig config = new DefaultClientConfig();
-        config.getClasses().add(SOAPMessageConsumer.class);
-        this.client = Client.create(config);
-        this.client.addFilter(new LoggingFilter());
+        ClientConfig config = new ClientConfig();
+//        config.getClasses().add(SOAPMessageConsumer.class);
+        this.client = ClientBuilder.newClient(config);
+        this.client.register(new LoggingFilter());
+        this.client.register(new SOAPMessageConsumer());
     }
 
     /**
@@ -190,7 +191,7 @@ public class WFSClient {
      *            The HTTP method binding to use.
      * @return A client response context.
      */
-    public ClientResponse getFeature(Source reqEntity, ProtocolBinding binding) {
+    public Response getFeature(Source reqEntity, ProtocolBinding binding) {
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.GET_FEATURE, binding);
         return submitRequest(reqEntity, binding, endpoint);
     }
@@ -240,7 +241,7 @@ public class WFSClient {
      *            The type name of the feature.
      * @return A representation of the HTTP response.
      */
-    public ClientResponse deleteFeature(Document reqEntity, String id, QName typeName) {
+    public Response deleteFeature(Document reqEntity, String id, QName typeName) {
         Element delete = reqEntity.createElementNS(Namespaces.WFS, "Delete");
         delete.setPrefix("wfs");
         delete.setAttribute(XMLConstants.XMLNS_ATTRIBUTE + ":tns", typeName.getNamespaceURI());
@@ -265,7 +266,7 @@ public class WFSClient {
      *            The name of a feature type.
      * @return The (JAX-RS) client response message.
      */
-    public ClientResponse GetFeatureVersion(ResourceId rid, QName typeName) {
+    public Response GetFeatureVersion(ResourceId rid, QName typeName) {
         Document req = WFSMessage.createRequestEntity("GetFeature-Minimal", this.wfsVersion);
         Element qry = WFSMessage.appendSimpleQuery(req, typeName);
         Element filter = req.createElementNS(Namespaces.FES, "Filter");
@@ -386,29 +387,30 @@ public class WFSClient {
      *            The {@link ProtocolBinding} to use.
      * @param endpoint
      *            The service endpoint.
-     * @return A ClientResponse object representing the response message.
+     * @return A Response object representing the response message.
      */
-    public ClientResponse submitRequest(Source entity, ProtocolBinding binding, URI endpoint) {
-        WebResource resource = client.resource(endpoint);
-        WebResource.Builder builder = resource.accept(MediaType.APPLICATION_XML_TYPE,
-                MediaType.valueOf(WFS2.APPLICATION_SOAP));
-        LOGR.log(Level.FINE, String.format("Submitting %s request to URI %s", binding, resource.getURI()));
-        ClientResponse response = null;
+    public Response submitRequest(Source entity, ProtocolBinding binding, URI endpoint) {
+        
+        WebTarget target = client.target(endpoint);
+        target = target.queryParam(WFS2.REQUEST_PARAM, WFS2.GET_CAPABILITIES);
+        Builder builder = target.request();
+        LOGR.log(Level.FINE, String.format("Submitting %s request to URI %s", binding, target.getUri()));
+        Response response = null;
         switch (binding) {
         case GET:
             String queryString = WFSMessage.transformEntityToKVP(entity);
-            URI requestURI = UriBuilder.fromUri(resource.getURI()).replaceQuery(queryString).build();
+            URI requestURI = UriBuilder.fromUri(target.getUri()).replaceQuery(queryString).build();
             LOGR.log(Level.FINE, String.format("Request URI: %s", requestURI));
-            resource = resource.uri(requestURI);
-            response = resource.get(ClientResponse.class);
+            target = client.target(requestURI);
+            builder = target.request();
+            response = builder.accept(MediaType.APPLICATION_XML_TYPE).buildGet().invoke();
             break;
         case POST:
-            response = builder.type(MediaType.APPLICATION_XML_TYPE).post(ClientResponse.class, entity);
+            response = builder.accept(MediaType.APPLICATION_XML_TYPE).buildPost(Entity.entity(entity, MediaType.APPLICATION_XML_TYPE)).invoke();
             break;
         case SOAP:
             Document soapEnv = WFSMessage.wrapEntityInSOAPEnvelope( entity, determineSoapVersion() );
-            response = builder.type(MediaType.valueOf(WFS2.APPLICATION_SOAP)).post(ClientResponse.class,
-                    new DOMSource(soapEnv));
+            response = builder.accept(MediaType.valueOf(WFS2.APPLICATION_SOAP)).buildPost(Entity.entity(new DOMSource(soapEnv), MediaType.valueOf(WFS2.APPLICATION_SOAP))).invoke();
             break;
         default:
             throw new IllegalArgumentException("Unsupported message binding: " + binding);
@@ -426,9 +428,9 @@ public class WFSClient {
      * @param binding
      *            The ProtocolBinding to use; may be {@link ProtocolBinding#ANY}
      *            if any supported binding can be used.
-     * @return A ClientResponse object representing the response message.
+     * @return A Response object representing the response message.
      */
-    public ClientResponse submitRequest(Document reqEntity, ProtocolBinding binding) {
+    public Response submitRequest(Document reqEntity, ProtocolBinding binding) {
         String requestName = reqEntity.getDocumentElement().getLocalName();
         Map<String, URI> endpoints = ServiceMetadataUtils.getRequestEndpoints(this.wfsMetadata, requestName);
         if (null == endpoints) {
@@ -458,11 +460,11 @@ public class WFSClient {
         }
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.GET_CAPABILITIES,
                 ProtocolBinding.GET);
-        WebResource resource = client.resource(endpoint);
-        MultivaluedMap<String, String> queryParams = new MultivaluedMapImpl();
-        queryParams.add(WFS2.REQUEST_PARAM, WFS2.GET_CAPABILITIES);
-        queryParams.add(WFS2.SERVICE_PARAM, WFS2.SERVICE_TYPE_CODE);
-        return resource.queryParams(queryParams).get(Document.class);
+        WebTarget target = client.target(endpoint);
+        target = target.queryParam(WFS2.REQUEST_PARAM, WFS2.GET_CAPABILITIES);
+        target = target.queryParam(WFS2.SERVICE_PARAM, WFS2.SERVICE_TYPE_CODE);
+        Builder builder = target.request();
+        return builder.buildGet().invoke(Document.class);
     }
 
     /**
@@ -496,10 +498,10 @@ public class WFSClient {
         }
         LOGR.log(Level.FINE, String.format("Submitting request entity to URI %s \n%s", endpoint,
                 XMLUtils.writeNodeToString(request)));
-        ClientResponse rsp = submitRequest(new DOMSource(request), binding, endpoint);
+        Response rsp = submitRequest(new DOMSource(request), binding, endpoint);
         Document entity = null;
         if (rsp.hasEntity()) {
-            entity = rsp.getEntity(Document.class);
+            entity = rsp.readEntity(Document.class);
         }
         return entity;
     }
@@ -522,14 +524,14 @@ public class WFSClient {
         }
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata,
                 request.getDocumentElement().getLocalName(), binding);
-        ClientResponse rsp = submitRequest(new DOMSource(request), binding, endpoint);
+        Response rsp = submitRequest(new DOMSource(request), binding, endpoint);
         Document rspEntity = null;
         if (rsp.hasEntity()) {
-            MediaType mediaType = rsp.getType();
+            MediaType mediaType = rsp.getMediaType();
             if (!mediaType.getSubtype().endsWith("xml")) {
                 throw new RuntimeException("Did not receive an XML entity: " + mediaType);
             }
-            rspEntity = rsp.getEntity(Document.class);
+            rspEntity = rsp.readEntity(Document.class);
             if (LOGR.isLoggable(Level.FINE)) {
                 LOGR.fine("Response entity:\n" + XMLUtils.writeNodeToString(rspEntity));
             }
@@ -550,7 +552,7 @@ public class WFSClient {
         ProtocolBinding binding = ProtocolBinding.POST;
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata,
                 req.getDocumentElement().getLocalName(), binding);
-        ClientResponse rsp = submitRequest(new DOMSource(req), binding, endpoint);
+        Response rsp = submitRequest(new DOMSource(req), binding, endpoint);
         return rsp.getStatus();
     }
 
@@ -565,8 +567,8 @@ public class WFSClient {
         ProtocolBinding binding = ServiceMetadataUtils.getOperationBindings(wfsMetadata, WFS2.LIST_STORED_QUERIES)
                 .iterator().next();
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.LIST_STORED_QUERIES, binding);
-        ClientResponse rsp = submitRequest(new DOMSource(req), binding, endpoint);
-        Document rspEntity = rsp.getEntity(Document.class);
+        Response rsp = submitRequest(new DOMSource(req), binding, endpoint);
+        Document rspEntity = rsp.readEntity(Document.class);
         NodeList qryList = rspEntity.getElementsByTagNameNS(Namespaces.WFS, "StoredQuery");
         List<String> idList = new ArrayList<>();
         for (int i = 0; i < qryList.getLength(); i++) {

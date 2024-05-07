@@ -5,9 +5,11 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
+
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMSource;
+
 import org.apache.xerces.xs.XSElementDeclaration;
 import org.apache.xerces.xs.XSTypeDefinition;
 import org.opengis.cite.iso19142.ETSAssert;
@@ -25,7 +27,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import com.sun.jersey.api.client.ClientResponse;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
+
 
 /**
  * Tests the response to a GetFeature request that includes a
@@ -69,10 +73,10 @@ public class PropertyIsLikeOperatorTests extends QueryFilterFixture {
 				.next();
 		addPropertyIsLikePredicate(this.reqEntity, propPattern.getKey(),
 				propPattern.getValue(), true);
-		ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
+		Response rsp = wfsClient.submitRequest(reqEntity, binding);
 		this.rspEntity = extractBodyAsDocument(rsp);
 		Assert.assertEquals(rsp.getStatus(),
-				ClientResponse.Status.OK.getStatusCode(),
+				Status.OK.getStatusCode(),
 				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
 		NodeList features = this.rspEntity.getElementsByTagNameNS(
 				featureType.getNamespaceURI(), featureType.getLocalPart());
@@ -112,10 +116,10 @@ public class PropertyIsLikeOperatorTests extends QueryFilterFixture {
 				.next();
 		addPropertyIsLikePredicate(this.reqEntity, propPattern.getKey(),
 				propPattern.getValue(), false);
-		ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
+		Response rsp = wfsClient.submitRequest(reqEntity, binding);
 		this.rspEntity = extractBodyAsDocument(rsp);
 		Assert.assertEquals(rsp.getStatus(),
-				ClientResponse.Status.OK.getStatusCode(),
+				Status.OK.getStatusCode(),
 				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
 		NodeList features = this.rspEntity.getElementsByTagNameNS(
 				featureType.getNamespaceURI(), featureType.getLocalPart());

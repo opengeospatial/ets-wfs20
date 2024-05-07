@@ -188,7 +188,7 @@ public class FeatureTypeInfo {
         sb.append("\n typeName: '").append(typeName);
         sb.append("',\n supportedCRS: '").append(supportedCRSList);
         sb.append("',\n instantiated: ").append(instantiated);
-        sb.append(",\n spatial extent: '").append(Envelopes.toPolygonWKT(getSpatialExtent()));
+//        sb.append(",\n spatial extent: '").append(Envelopes.toPolygonWKT(getSpatialExtent()));
         if (temporalExtent != null) {
             sb.append("',\n temporal extent: '");
             sb.append(TemporalUtils.temporalGeometricPrimitiveToString(temporalExtent));

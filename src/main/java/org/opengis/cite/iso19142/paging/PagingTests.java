@@ -1,6 +1,8 @@
 package org.opengis.cite.iso19142.paging;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -9,7 +11,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.ws.rs.core.MediaType;
 import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMSource;
 
@@ -30,8 +31,11 @@ import org.testng.SkipException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
+import jakarta.ws.rs.client.Invocation.Builder;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 /**
  * Provides test methods that verify the pagination of search results. This
@@ -80,7 +84,7 @@ public class PagingTests extends BaseFixture {
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.GET_FEATURE,
                 ProtocolBinding.GET);
-        ClientResponse rsp = wfsClient.submitRequest(new DOMSource(this.reqEntity), ProtocolBinding.GET, endpoint);
+        Response rsp = wfsClient.submitRequest(new DOMSource(this.reqEntity), ProtocolBinding.GET, endpoint);
         this.rspEntity = extractBodyAsDocument(rsp);
         ETSAssert.assertQualifiedName(rspEntity.getDocumentElement(),
                 new QName(Namespaces.WFS, WFS2.FEATURE_COLLECTION));
@@ -92,7 +96,7 @@ public class PagingTests extends BaseFixture {
         assertFalse(next.isEmpty(), "Expected attribute not found in response entity: 'next'.");
         rsp = retrieveResource(next);
         this.rspEntity = extractBodyAsDocument(rsp);
-        assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(rsp.getStatus(), Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
         ETSAssert.assertQualifiedName(rspEntity.getDocumentElement(),
                 new QName(Namespaces.WFS, WFS2.FEATURE_COLLECTION));
@@ -118,7 +122,7 @@ public class PagingTests extends BaseFixture {
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.GET_FEATURE,
                 ProtocolBinding.GET);
-        ClientResponse rsp = wfsClient.submitRequest(new DOMSource(this.reqEntity), ProtocolBinding.GET, endpoint);
+        Response rsp = wfsClient.submitRequest(new DOMSource(this.reqEntity), ProtocolBinding.GET, endpoint);
         this.rspEntity = extractBodyAsDocument(rsp);
         ETSAssert.assertQualifiedName(rspEntity.getDocumentElement(),
                 new QName(Namespaces.WFS, WFS2.FEATURE_COLLECTION));
@@ -152,7 +156,7 @@ public class PagingTests extends BaseFixture {
      *            A String denoting an absolute 'http' URI.
      * @return A representation of the HTTP response message.
      */
-    ClientResponse retrieveResource(String uriRef) {
+    Response retrieveResource(String uriRef) {
         Logger.getLogger(getClass().getName()).log(Level.FINE, "Attempting to retrieve XML resource from {0}", uriRef);
         URI uri;
         try {
@@ -160,8 +164,9 @@ public class PagingTests extends BaseFixture {
         } catch (URISyntaxException e) {
             throw new AssertionError(e.getMessage());
         }
-        WebResource resource = this.wfsClient.getClient().resource(uri);
-        ClientResponse rsp = resource.accept(MediaType.APPLICATION_XML_TYPE).get(ClientResponse.class);
+        WebTarget target = this.wfsClient.getClient().target(uri);
+        Builder builder = target.request();
+        Response rsp = builder.accept(MediaType.APPLICATION_XML_TYPE).buildGet().invoke(Response.class);
         return rsp;
     }
 

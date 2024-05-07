@@ -14,7 +14,6 @@ import org.opengis.cite.geomatics.time.TemporalUtils;
 import org.opengis.cite.iso19142.ErrorMessage;
 import org.opengis.cite.iso19142.ErrorMessageKeys;
 import org.opengis.cite.iso19142.ProtocolBinding;
-import org.opengis.cite.iso19142.basic.filter.QueryFilterFixture;
 import org.opengis.cite.iso19142.util.ServiceMetadataUtils;
 import org.opengis.cite.iso19142.util.TimeUtils;
 import org.opengis.cite.iso19142.util.WFSMessage;
@@ -30,7 +29,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import com.sun.jersey.api.client.ClientResponse;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
+
 
 /**
  * Tests the response to a GetFeature request that includes the temporal
@@ -82,9 +83,9 @@ public class AfterTests extends AbstractTemporalTest {
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
         Element valueRef = WFSMessage.createValueReference(temporalProperty.getProperty());
         WFSMessage.addTemporalPredicate(this.reqEntity, AFTER_OP, gmlTimeLiteral, valueRef);
-        ClientResponse rsp = wfsClient.getFeature(new DOMSource(this.reqEntity), binding);
+        Response rsp = wfsClient.getFeature(new DOMSource(this.reqEntity), binding);
         this.rspEntity = extractBodyAsDocument(rsp);
-        Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
+        Assert.assertEquals(rsp.getStatus(), Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
         List<Node> temporalNodes = TemporalQuery.extractTemporalNodes(this.rspEntity, temporalProperty.getProperty(), getModel());
         assertAfter(temporalNodes, temporalProperty.getProperty(), gmlTimeLiteral);
@@ -112,9 +113,9 @@ public class AfterTests extends AbstractTemporalTest {
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
         Element valueRef = WFSMessage.createValueReference(temporalProperty.getProperty());
         WFSMessage.addTemporalPredicate(this.reqEntity, AFTER_OP, gmlTimeLiteral, valueRef);
-        ClientResponse rsp = wfsClient.getFeature(new DOMSource(this.reqEntity), binding);
+        Response rsp = wfsClient.getFeature(new DOMSource(this.reqEntity), binding);
         this.rspEntity = extractBodyAsDocument(rsp);
-        Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
+        Assert.assertEquals(rsp.getStatus(), Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
         List<Node> temporalNodes = TemporalQuery.extractTemporalNodes(this.rspEntity, temporalProperty.getProperty(), getModel());
         assertAfter(temporalNodes, temporalProperty.getProperty(), gmlTimeLiteral);
@@ -143,9 +144,9 @@ public class AfterTests extends AbstractTemporalTest {
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
         Element valueRef = WFSMessage.createValueReference(temporalProperty.getProperty());
         WFSMessage.addTemporalPredicate(this.reqEntity, AFTER_OP, gmlTimeLiteral, valueRef);
-        ClientResponse rsp = wfsClient.getFeature(new DOMSource(this.reqEntity), binding);
+        Response rsp = wfsClient.getFeature(new DOMSource(this.reqEntity), binding);
         this.rspEntity = extractBodyAsDocument(rsp);
-        Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
+        Assert.assertEquals(rsp.getStatus(), Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
         List<Node> temporalNodes = TemporalQuery.extractTemporalNodes(this.rspEntity, temporalProperty.getProperty(), getModel());
         assertAfter(temporalNodes, temporalProperty.getProperty(), gmlTimeLiteral);

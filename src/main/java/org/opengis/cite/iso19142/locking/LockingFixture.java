@@ -16,7 +16,8 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.w3c.dom.Document;
 
-import com.sun.jersey.api.client.ClientResponse;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 /**
  * Provides configuration methods that facilitate the testing of locking
@@ -65,9 +66,9 @@ public class LockingFixture extends BaseFixture {
         trxEntity.getDocumentElement().setAttribute("releaseAction", "ALL");
         for (String lockId : locks) {
             trxEntity.getDocumentElement().setAttribute("lockId", lockId);
-            ClientResponse rsp = this.wfsClient.submitRequest(trxEntity, ProtocolBinding.ANY);
-            if (rsp.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
-                String entity = rsp.getEntity(String.class);
+            Response rsp = this.wfsClient.submitRequest(trxEntity, ProtocolBinding.ANY);
+            if (rsp.getStatus() != Status.OK.getStatusCode()) {
+                String entity = rsp.readEntity(String.class);
                 TestSuiteLogger.log(Level.WARNING, "Failed to release lock " + lockId + "\n" + entity);
             }
         }

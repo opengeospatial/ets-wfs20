@@ -8,6 +8,7 @@ import java.util.Map;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
+
 import org.opengis.cite.iso19142.Namespaces;
 
 /**

@@ -1,17 +1,18 @@
 package org.opengis.cite.iso19142.basic.filter.spatial;
 
-import com.sun.jersey.api.client.ClientResponse;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPathExpressionException;
+
+import org.apache.sis.geometry.GeneralEnvelope;
 import org.apache.xerces.xs.XSElementDeclaration;
 import org.apache.xerces.xs.XSTypeDefinition;
-import org.apache.sis.geometry.GeneralEnvelope;
 import org.opengis.cite.geomatics.Extents;
 import org.opengis.cite.geomatics.SpatialOperator;
 import org.opengis.cite.geomatics.TopologicalRelationships;
@@ -34,6 +35,9 @@ import org.testng.annotations.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 /**
  * Tests the response to a GetFeature request that includes a BBOX predicate.
@@ -95,9 +99,9 @@ public class BBOXTests extends QueryFilterFixture {
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
         addBBOXPredicate(this.reqEntity, gmlEnv.getDocumentElement(), null);
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.GET_FEATURE, binding);
-        ClientResponse rsp = wfsClient.submitRequest(new DOMSource(reqEntity), binding, endpoint);
+        Response rsp = wfsClient.submitRequest(new DOMSource(reqEntity), binding, endpoint);
         this.rspEntity = extractBodyAsDocument(rsp);
-        Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
+        Assert.assertEquals(rsp.getStatus(), Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
         Map<String, String> nsBindings = new HashMap<String, String>();
         nsBindings.put(Namespaces.WFS, "wfs");
@@ -153,9 +157,9 @@ public class BBOXTests extends QueryFilterFixture {
             throw new RuntimeException("Could not create envelope for feature type: " + featureType);
 		}
         addBBOXPredicate(this.reqEntity, gmlEnv.getDocumentElement(), valueRef);
-        ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
+        Response rsp = wfsClient.submitRequest(reqEntity, binding);
         this.rspEntity = extractBodyAsDocument(rsp);
-        Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
+        Assert.assertEquals(rsp.getStatus(), Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
         Map<String, String> nsBindings = new HashMap<String, String>();
         nsBindings.put(featureType.getNamespaceURI(), "ns1");
@@ -233,15 +237,15 @@ public class BBOXTests extends QueryFilterFixture {
             throw new RuntimeException("Could not create envelope for feature type: " + featureType);
 		}
         addBBOXPredicate(this.reqEntity, gmlEnv.getDocumentElement(), valueRef);
-        ClientResponse rsp = wfsClient.submitRequest(reqEntity, ProtocolBinding.ANY);
-        this.rspEntity = rsp.getEntity(Document.class);
+        Response rsp = wfsClient.submitRequest(reqEntity, ProtocolBinding.ANY);
+        this.rspEntity = rsp.readEntity(Document.class);
         //https://github.com/opengeospatial/ets-wfs20/issues/147
         //Agreed solution to this issue is to also allow OperationProcessingFailed (Status Code 403) as valid exception type.
         int statusCode = rsp.getStatus();
-        if(statusCode == ClientResponse.Status.BAD_REQUEST.getStatusCode()) {
+        if(statusCode == Status.BAD_REQUEST.getStatusCode()) {
             String xpath = "//ows:Exception[@exceptionCode='InvalidParameterValue']";
             ETSAssert.assertXPath(xpath, this.rspEntity, null);
-        } else if(statusCode == ClientResponse.Status.FORBIDDEN.getStatusCode()) {
+        } else if(statusCode == Status.FORBIDDEN.getStatusCode()) {
             String xpath = "//ows:Exception[@exceptionCode='OperationProcessingFailed']";
             ETSAssert.assertXPath(xpath, this.rspEntity, null);
         } else {

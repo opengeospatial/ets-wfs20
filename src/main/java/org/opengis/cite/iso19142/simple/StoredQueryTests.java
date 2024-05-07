@@ -28,7 +28,8 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.w3c.dom.Element;
 
-import com.sun.jersey.api.client.ClientResponse;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 /**
  * Tests the service response to a GetFeature request that invokes a stored
@@ -89,9 +90,9 @@ public class StoredQueryTests extends BaseFixture {
         WFSMessage.appendStoredQuery(this.reqEntity, "http://docbook.org/ns/docbook",
                 Collections.<String, Object>emptyMap());
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.GET_FEATURE, binding);
-        ClientResponse rsp = wfsClient.submitRequest(new DOMSource(this.reqEntity), binding, endpoint);
-        this.rspEntity = extractBodyAsDocument(rsp);
+        Response rsp = wfsClient.submitRequest(new DOMSource(this.reqEntity), binding, endpoint);
         Assert.assertTrue(rsp.hasEntity(), ErrorMessage.get(ErrorMessageKeys.MISSING_XML_ENTITY));
+        this.rspEntity = extractBodyAsDocument(rsp);
         SchematronValidator validator = ValidationUtils.buildSchematronValidator("ExceptionReport.sch",
                 "InvalidParameterValuePhase");
         Result invalidaParamValueResult = validator.validate(new DOMSource(this.rspEntity), false);
@@ -137,19 +138,19 @@ public class StoredQueryTests extends BaseFixture {
         String id = "uuid-" + UUID.randomUUID().toString();
         WFSMessage.appendStoredQuery(this.reqEntity, this.queryId, Collections.singletonMap("id", (Object) id));
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.GET_FEATURE, binding);
-        ClientResponse rsp = wfsClient.submitRequest(new DOMSource(this.reqEntity), binding, endpoint);
+        Response rsp = wfsClient.submitRequest(new DOMSource(this.reqEntity), binding, endpoint);
         this.rspEntity = extractBodyAsDocument(rsp);
         int statusCode = rsp.getStatus();
         if (this.wfsVersion.equals("2.0.0")) {
             Assert.assertTrue(
-                    statusCode == ClientResponse.Status.NOT_FOUND.getStatusCode()
-                             || statusCode == ClientResponse.Status.FORBIDDEN.getStatusCode(),
+                    statusCode == Status.NOT_FOUND.getStatusCode()
+                             || statusCode == Status.FORBIDDEN.getStatusCode(),
                     "Expected status code 404 or 403. Received: " + statusCode);
         } else {
             Assert.assertTrue(
-                    statusCode == ClientResponse.Status.INTERNAL_SERVER_ERROR.getStatusCode()
-                            || statusCode == ClientResponse.Status.FORBIDDEN.getStatusCode()
-                            || statusCode == ClientResponse.Status.NOT_FOUND.getStatusCode(),
+                    statusCode == Status.INTERNAL_SERVER_ERROR.getStatusCode()
+                            || statusCode == Status.FORBIDDEN.getStatusCode()
+                            || statusCode == Status.NOT_FOUND.getStatusCode(),
                     ErrorMessageKeys.UNEXPECTED_STATUS);
         }
     }
@@ -172,9 +173,9 @@ public class StoredQueryTests extends BaseFixture {
                            ErrorMessage.get( ErrorMessageKeys.FID_NOT_FOUND ) );
         WFSMessage.appendStoredQuery( this.reqEntity, this.queryId, Collections.singletonMap( "id", featureIdToRequest ) );
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint( this.wfsMetadata, WFS2.GET_FEATURE, binding );
-        ClientResponse rsp = wfsClient.submitRequest( new DOMSource( this.reqEntity ), binding, endpoint );
-        this.rspEntity = extractBodyAsDocument( rsp );
+        Response rsp = wfsClient.submitRequest( new DOMSource( this.reqEntity ), binding, endpoint );
         Assert.assertTrue( rsp.hasEntity(), ErrorMessage.get( ErrorMessageKeys.MISSING_XML_ENTITY ) );
+        this.rspEntity = extractBodyAsDocument( rsp );
         Element feature = this.rspEntity.getDocumentElement();
         Assert.assertEquals( feature.getAttributeNS( Namespaces.GML, "id" ), featureIdToRequest,
                              ErrorMessage.get( ErrorMessageKeys.UNEXPECTED_ID ) );

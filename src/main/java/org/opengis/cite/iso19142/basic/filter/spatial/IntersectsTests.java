@@ -44,7 +44,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.sun.jersey.api.client.ClientResponse;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 /**
  * Tests the response to a GetFeature request that includes the spatial
@@ -168,9 +169,9 @@ public class IntersectsTests extends QueryFilterFixture {
         }
         this.reqEntity = buildGetFeatureRequest(featureType, INTERSECTS_OP, geomProperty, gmlPolygonElem);
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.GET_FEATURE, binding);
-        ClientResponse rsp = wfsClient.submitRequest(new DOMSource(reqEntity), binding, endpoint);
+        Response rsp = wfsClient.submitRequest(new DOMSource(reqEntity), binding, endpoint);
         this.rspEntity = extractBodyAsDocument(rsp);
-        Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
+        Assert.assertEquals(rsp.getStatus(), Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
         NodeList geomNodes = findGeometryPropertyValues(featureType, geomProperty);
         if (geomNodes.getLength() == 0) {
@@ -239,9 +240,9 @@ public class IntersectsTests extends QueryFilterFixture {
 
         this.reqEntity = buildGetFeatureRequest(featureType, INTERSECTS_OP, geomProperty, gmlCurveElem);
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.GET_FEATURE, binding);
-        ClientResponse rsp = wfsClient.submitRequest(new DOMSource(this.reqEntity), binding, endpoint);
+        Response rsp = wfsClient.submitRequest(new DOMSource(this.reqEntity), binding, endpoint);
         this.rspEntity = extractBodyAsDocument(rsp);
-        Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
+        Assert.assertEquals(rsp.getStatus(), Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
         NodeList geomNodes = findGeometryPropertyValues(featureType, geomProperty);
         if (geomNodes.getLength() == 0) {
