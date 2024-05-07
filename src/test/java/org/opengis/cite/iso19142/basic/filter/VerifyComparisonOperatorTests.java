@@ -1,5 +1,16 @@
 package org.opengis.cite.iso19142.basic.filter;
 
+import static org.hamcrest.CoreMatchers.anyOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -8,8 +19,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
@@ -32,15 +43,6 @@ import org.opengis.cite.iso19142.util.VerifyAppSchemaUtils;
 import org.opengis.cite.iso19142.util.WFSMessage;
 import org.opengis.cite.validation.XSModelBuilder;
 import org.opengis.cite.validation.XmlSchemaCompiler;
-
-import static org.hamcrest.CoreMatchers.anyOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import org.testng.ISuite;
 import org.testng.ITestContext;
 import org.w3c.dom.Document;
@@ -90,11 +92,11 @@ public class VerifyComparisonOperatorTests {
 
         List<String> integerValueList = Arrays.asList( "600", "100", "200" );
         QName integerPropName = new QName( NS1, "intProperty2" );
-        when( dataSampler.getSimplePropertyValues( eq( featureType ), eq( integerPropName ), anyString() ) ).thenReturn( integerValueList );
+        when( dataSampler.getSimplePropertyValues( eq( featureType ), eq( integerPropName ), any() ) ).thenReturn( integerValueList );
 
         List<String> doubleValueList = Arrays.asList( "600.68", "100.47", "200.54" );
         QName doublePropName = new QName( NS1, "measurand" );
-        when( dataSampler.getSimplePropertyValues( eq( featureType ), eq( doublePropName ), anyString() ) ).thenReturn( doubleValueList );
+        when( dataSampler.getSimplePropertyValues( eq( featureType ), eq( doublePropName ), any() ) ).thenReturn( doubleValueList );
 
         ComparisonOperatorTests iut = new ComparisonOperatorTests();
         iut.initQueryFilterFixture( testContext );

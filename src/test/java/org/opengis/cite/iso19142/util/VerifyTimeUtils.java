@@ -37,7 +37,7 @@ public class VerifyTimeUtils {
         Instant startPeriod = tmFactory.createInstant(Date.from(t1.minusMonths(1).toInstant()));
         Instant endPeriod = tmFactory.createInstant(Date.from(t1.plusMonths(1).toInstant()));
         Period period = tmFactory.createPeriod(startPeriod, endPeriod);
-        Document doc = TimeUtils.periodAsGML(period);
+        Document doc = TimeUtils.periodAsGML(period, null);
         Node endPosition = doc.getElementsByTagNameNS(Namespaces.GML, "endPosition").item(0);
         assertTrue("Expected end date 2016-06-03", endPosition.getTextContent().startsWith("2016-06-03"));
     }
@@ -48,7 +48,7 @@ public class VerifyTimeUtils {
         Instant startPeriod = tmFactory.createInstant(Date.from(t1.minusMonths(1).toInstant()));
         Instant endPeriod = tmFactory.createInstant(Date.from(t1.plusMonths(1).toInstant()));
         Period period = tmFactory.createPeriod(startPeriod, endPeriod);
-        Document doc = TimeUtils.periodAsGML(period);
+        Document doc = TimeUtils.periodAsGML(period, ZoneOffset.of("-07:00"));
         Node beginPosition = doc.getElementsByTagNameNS(Namespaces.GML, "beginPosition").item(0);
         assertTrue("Expected begin time 17:15:30Z", beginPosition.getTextContent().endsWith("17:15:30Z"));
     }

@@ -1,5 +1,9 @@
 package org.opengis.cite.iso19142.basic.filter;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Arrays;
@@ -15,16 +19,11 @@ import org.apache.xerces.xs.XSModel;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import org.opengis.cite.iso19142.SuiteAttribute;
 import org.opengis.cite.iso19142.util.DataSampler;
 import org.opengis.cite.iso19142.util.VerifyAppSchemaUtils;
 import org.opengis.cite.validation.XSModelBuilder;
 import org.opengis.cite.validation.XmlSchemaCompiler;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import org.testng.ISuite;
 import org.testng.ITestContext;
 import org.xml.sax.SAXException;
@@ -73,7 +72,7 @@ public class VerifyPropertyIsLikeOperatorTests {
 						.getName())).thenReturn(model);
 		when(
 				dataSampler.getSimplePropertyValues(any(QName.class),
-						any(QName.class), anyString()))
+						any(QName.class), any()))
 				.thenReturn(valueList);
 		QName featureType = new QName(NS1, "SimpleFeature");
 		PropertyIsLikeOperatorTests iut = new PropertyIsLikeOperatorTests();
@@ -98,7 +97,7 @@ public class VerifyPropertyIsLikeOperatorTests {
 						.getName())).thenReturn(model);
 		when(
 				dataSampler.getSimplePropertyValues(any(QName.class),
-						any(QName.class), anyString()))
+						any(QName.class), any()))
 				.thenReturn(valueList);
 		QName featureType = new QName(NS1, "ComplexFeature");
 		PropertyIsLikeOperatorTests iut = new PropertyIsLikeOperatorTests();

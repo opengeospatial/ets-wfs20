@@ -72,10 +72,26 @@ public class TimeUtils {
      * @return A Document with gml:TimePeriod as the document element.
      */
     public static Document periodAsGML(Period period) {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXX");
-        String startOfPeriod = period.getBeginning().getDate().toInstant().toString();
+        return periodAsGML(period, null);
+    }
+
+    /**
+     * Builds a GML representation of the given time period.
+     *
+     * @param period
+     *            A Period representing a temporal interval (UTC).
+     * @param offset
+     *            A time-zone offset from UTC ('Z' if null).
+     * @return A Document with gml:TimePeriod as the document element.
+     */
+    public static Document periodAsGML(Period period, ZoneOffset offset) {
+        if (null == offset) {
+            offset = ZoneOffset.UTC;
+        }
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
+        String startOfPeriod = period.getBeginning().getDate().toInstant().atOffset(offset).toString();
         ZonedDateTime startDateTime = ZonedDateTime.parse(startOfPeriod, dateTimeFormatter);
-        String endOfPeriod = period.getEnding().getDate().toInstant().toString();
+        String endOfPeriod = period.getEnding().getDate().toInstant().atOffset(offset).toString();
         ZonedDateTime endDateTime = ZonedDateTime.parse(endOfPeriod, dateTimeFormatter);
         return intervalAsGML(startDateTime, endDateTime);
     }

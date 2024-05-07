@@ -78,8 +78,9 @@ public class VerifyTemporalQuery extends CommonTestFixture {
         assertTrue("Expected result: " + Period.class.getName(), Period.class.isInstance(result));
         Period period = Period.class.cast(result);
         DateTimeFormatter xsdDateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
-        ZonedDateTime actualStart = ZonedDateTime.parse(period.getBeginning().getDate().toInstant().toString(),
-                xsdDateTimeFormatter);
+        ZonedDateTime actualStart = ZonedDateTime
+                .parse(period.getBeginning().getDate().toInstant().atOffset(java.time.ZoneOffset.of("+02:00"))
+                        .format(xsdDateTimeFormatter));
         ZonedDateTime expectedStart = ZonedDateTime.parse("2016-05-15T00:00:00-04:00");
         assertTrue(actualStart.isEqual(expectedStart));
     }
