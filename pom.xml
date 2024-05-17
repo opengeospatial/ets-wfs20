@@ -54,7 +54,7 @@
     <soapui.tests.passed>120</soapui.tests.passed>
     <soapui.tests.skipped>53</soapui.tests.skipped>
     <soapui.tests.failed>0</soapui.tests.failed>
-    <docker.teamengine.version>5.6.1</docker.teamengine.version>
+    <docker.teamengine.version>5.7</docker.teamengine.version>
   </properties>
 
   <dependencies>
@@ -66,16 +66,34 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>ets-gml32</artifactId>
-      <version>1.31</version>
+      <version>1.32</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>teamengine-spi</artifactId>
+          <groupId>org.opengis.cite.teamengine</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.opengis.cite.teamengine</groupId>
       <artifactId>teamengine-spi</artifactId>
-      <version>5.6.1</version>
+      <version>5.7</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>xercesImpl</artifactId>
+          <groupId>xerces</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>schema-utils</artifactId>
+      <exclusions>
+        <exclusion>
+          <artifactId>xercesImpl</artifactId>
+          <groupId>xerces</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -88,7 +106,7 @@
     <dependency>
       <groupId>com.beust</groupId>
       <artifactId>jcommander</artifactId>
-      <version>1.48</version>
+      <version>1.82</version>
     </dependency>
     <dependency>
       <groupId>com.sun.jersey</groupId>
@@ -139,6 +157,12 @@
       <groupId>org.geotoolkit.pending</groupId>
       <artifactId>geotk-geometry</artifactId>
       <version>3.21</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>jts</artifactId>
+          <groupId>com.vividsolutions</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.geotoolkit.pending</groupId>
@@ -149,6 +173,12 @@
       <groupId>org.testng</groupId>
       <artifactId>testng</artifactId>
       <version>6.9.10</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>jcommander</artifactId>
+          <groupId>com.beust</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>xerces</groupId>
