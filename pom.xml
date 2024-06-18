@@ -7,7 +7,7 @@
     <version>10-SNAPSHOT</version>
   </parent>
   <artifactId>ets-wfs20</artifactId>
-  <version>1.41-SNAPSHOT</version>
+  <version>1.42-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>WFS 2.0 (ISO 19142:2010) Conformance Test Suite</name>
@@ -50,25 +50,29 @@
     <soapui.teamengine.endpoint>http://localhost:8081/teamengine</soapui.teamengine.endpoint>
     <soapui.teamengine.user>ogctest</soapui.teamengine.user>
     <soapui.teamengine.password>ogctest</soapui.teamengine.password>
-    <soapui.iut>https://cite.deegree.org/deegree-webservices-3.4.30/services/wfs200?service=WFS&amp;request=GetCapabilities</soapui.iut>
+    <soapui.iut>https://cite.deegree.org/deegree-webservices-3.5.6/services/wfs200?service=WFS&amp;request=GetCapabilities</soapui.iut>
     <soapui.tests.passed>120</soapui.tests.passed>
     <soapui.tests.skipped>53</soapui.tests.skipped>
     <soapui.tests.failed>0</soapui.tests.failed>
-    <docker.teamengine.version>6.0-SNAPSHOT</docker.teamengine.version>
-  </properties>
+    <docker.teamengine.version>6.0-SNAPSHOT</docker.teamengine.version>  </properties>
 
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>ets-gml32</artifactId>
-      <version>1.32-SNAPSHOT</version>
+      <version>1.33-SNAPSHOT</version>
       <exclusions>
-      	<exclusion>
-      		<groupId>xml-apis</groupId>
-      		<artifactId>xml-apis</artifactId>
-      	</exclusion>
-      </exclusions>
+        <exclusion>
+          <artifactId>teamengine-spi</artifactId>
+          <groupId>org.opengis.cite.teamengine</groupId>
+        </exclusion>
+      </exclusions>    
     </dependency>
+    <dependency>		
+      <artifactId>teamengine-spi</artifactId>
+      <groupId>org.opengis.cite.teamengine</groupId>
+      <version>6.0-SNAPSHOT</version>
+	</dependency>
     <dependency>
       <groupId>org.glassfish.jersey.media</groupId>
       <artifactId>jersey-media-jaxb</artifactId>

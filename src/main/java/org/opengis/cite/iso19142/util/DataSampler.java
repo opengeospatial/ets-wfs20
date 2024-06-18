@@ -25,6 +25,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.stream.StreamSource;
@@ -38,6 +39,7 @@ import org.apache.xerces.xs.XSElementDeclaration;
 import org.apache.xerces.xs.XSModel;
 import org.apache.xerces.xs.XSTypeDefinition;
 import org.opengis.cite.geomatics.Extents;
+import org.opengis.cite.geomatics.GeodesyUtils;
 import org.opengis.cite.geomatics.gml.GmlUtils;
 import org.opengis.cite.geomatics.time.TemporalComparator;
 import org.opengis.cite.geomatics.time.TemporalUtils;
@@ -52,6 +54,8 @@ import org.opengis.temporal.TemporalGeometricPrimitive;
 import org.testng.SkipException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -76,6 +80,7 @@ public class DataSampler {
     private Map<QName, Envelope> spatialExtents;
     private Map<FeatureProperty, Period> temporalPropertyExtents;
     private final Map<QName, List<QName>> nillableProperties = new HashMap<>();
+    private DocumentBuilder documentBuilder;
 
     /**
      * Constructs a new DataSampler for a particular WFS implementation.
@@ -96,6 +101,14 @@ public class DataSampler {
         }
         this.spatialExtents = new HashMap<>();
         this.temporalPropertyExtents = new HashMap<>();
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+
+        try {
+            documentBuilder = dbf.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+
         LOGR.config("Created DataSampler - GetCapabilities (GET) endpoint is " + ServiceMetadataUtils
                 .getOperationEndpoint(wfsCapabilities, WFS2.GET_CAPABILITIES, ProtocolBinding.GET));
     }
