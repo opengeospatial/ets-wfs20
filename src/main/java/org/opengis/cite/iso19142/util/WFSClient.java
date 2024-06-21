@@ -19,6 +19,7 @@ import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 
 import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.logging.LoggingFeature;
 import org.opengis.cite.iso19142.Namespaces;
 import org.opengis.cite.iso19142.ProtocolBinding;
 import org.opengis.cite.iso19142.WFS2;
@@ -62,9 +63,8 @@ public class WFSClient {
      */
     public WFSClient() {
         ClientConfig config = new ClientConfig();
-//        config.getClasses().add(SOAPMessageConsumer.class);
+        config.register(new LoggingFeature(LOGR, Level.ALL, LoggingFeature.Verbosity.PAYLOAD_ANY, 5000));
         this.client = ClientBuilder.newClient(config);
-        this.client.register(new LoggingFilter());
         this.client.register(new SOAPMessageConsumer());
     }
 
