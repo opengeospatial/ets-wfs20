@@ -131,9 +131,9 @@
       <version>4.0.1</version>
      </dependency>
      <dependency>
-     	<groupId>one.gfw</groupId>
-     	<artifactId>jakarta.xml.bind-api</artifactId>
-     	<version>4.0.0.1</version>
+       <groupId>one.gfw</groupId>
+       <artifactId>jakarta.xml.bind-api</artifactId>
+       <version>4.0.0.1</version>
      </dependency>
      <dependency>
      	<groupId>org.glassfish.jaxb</groupId>
