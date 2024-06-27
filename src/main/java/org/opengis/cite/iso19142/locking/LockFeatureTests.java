@@ -1,13 +1,10 @@
 package org.opengis.cite.iso19142.locking;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.logging.Level;
 
 import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMSource;
@@ -15,12 +12,10 @@ import javax.xml.transform.dom.DOMSource;
 import org.opengis.cite.iso19142.ETSAssert;
 import org.opengis.cite.iso19142.ErrorMessage;
 import org.opengis.cite.iso19142.ErrorMessageKeys;
-import org.opengis.cite.iso19142.FeatureTypeInfo;
 import org.opengis.cite.iso19142.Namespaces;
 import org.opengis.cite.iso19142.ProtocolBinding;
 import org.opengis.cite.iso19142.WFS2;
 import org.opengis.cite.iso19142.util.ServiceMetadataUtils;
-import org.opengis.cite.iso19142.util.TestSuiteLogger;
 import org.opengis.cite.iso19142.util.WFSMessage;
 import org.testng.Assert;
 import org.testng.SkipException;
@@ -29,8 +24,8 @@ import org.testng.annotations.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import com.sun.jersey.api.client.ClientResponse;
-import org.w3c.dom.NodeList;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 /**
  * Tests the response to a LockFeature request that attempts to lock feature
@@ -80,11 +75,11 @@ public class LockFeatureTests extends LockingFixture {
 		WFSMessage.appendStoredQuery(reqEntity, this.storedQueryId,
 				Collections.singletonMap("id", (Object) gmlId));
 		reqEntity.getDocumentElement().setAttribute("expiry", "60");
-		ClientResponse rsp = wfsClient.submitRequest(reqEntity,
+		Response rsp = wfsClient.submitRequest(reqEntity,
 				ProtocolBinding.ANY);
-		this.rspEntity = rsp.getEntity(Document.class);
+		this.rspEntity = rsp.readEntity(Document.class);
 		Assert.assertEquals(rsp.getStatus(),
-				ClientResponse.Status.OK.getStatusCode(),
+				Status.OK.getStatusCode(),
 				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
 		ETSAssert
 				.assertXPath("//wfs:LockFeatureResponse", this.rspEntity, null);
@@ -124,11 +119,11 @@ public class LockFeatureTests extends LockingFixture {
 		WFSMessage.appendStoredQuery(reqEntity, this.storedQueryId,
 				Collections.singletonMap("id", (Object) gmlId));
 		reqEntity.getDocumentElement().setAttribute("expiry", "60");
-		ClientResponse rsp = wfsClient.submitRequest(reqEntity,
+		Response rsp = wfsClient.submitRequest(reqEntity,
 				ProtocolBinding.ANY);
-		this.rspEntity = rsp.getEntity(Document.class);
+		this.rspEntity = rsp.readEntity(Document.class);
 		Assert.assertEquals(rsp.getStatus(),
-				ClientResponse.Status.OK.getStatusCode(),
+				Status.OK.getStatusCode(),
 				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
 		Element lockRsp = (Element) this.rspEntity.getElementsByTagNameNS(
 				Namespaces.WFS, WFS2.LOCK_FEATURE_RSP).item(0);
@@ -136,9 +131,9 @@ public class LockFeatureTests extends LockingFixture {
 		// try to lock it again (without specifying lockId)
 		reqEntity.getDocumentElement().setAttribute("expiry", "180");
 		rsp = wfsClient.submitRequest(reqEntity, ProtocolBinding.ANY);
-		this.rspEntity = rsp.getEntity(Document.class);
+		this.rspEntity = rsp.readEntity(Document.class);
 		Assert.assertEquals(rsp.getStatus(),
-				ClientResponse.Status.BAD_REQUEST.getStatusCode(),
+				Status.BAD_REQUEST.getStatusCode(),
 				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
 		String xpath = "//ows:Exception[@exceptionCode = 'CannotLockAllFeatures']";
 		ETSAssert.assertXPath(xpath, this.rspEntity.getDocumentElement(), null);
@@ -172,11 +167,11 @@ public class LockFeatureTests extends LockingFixture {
 		WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
 		URI endpoint = ServiceMetadataUtils.getOperationEndpoint(
 				this.wfsMetadata, WFS2.LOCK_FEATURE, binding);
-		ClientResponse rsp = wfsClient.submitRequest(new DOMSource(reqEntity),
+		Response rsp = wfsClient.submitRequest(new DOMSource(reqEntity),
 				binding, endpoint);
 		this.rspEntity = extractBodyAsDocument(rsp);
 		Assert.assertEquals(rsp.getStatus(),
-				ClientResponse.Status.OK.getStatusCode(),
+				Status.OK.getStatusCode(),
 				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
 		Element lockRsp = this.rspEntity.getDocumentElement();
 		Assert.assertEquals(lockRsp.getLocalName(), WFS2.LOCK_FEATURE_RSP,
@@ -219,11 +214,11 @@ public class LockFeatureTests extends LockingFixture {
 		QName featureType = this.dataSampler.selectFeatureType();
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
         this.reqEntity.getDocumentElement().setAttribute("expiry", "10");
-        ClientResponse rsp = wfsClient.submitRequest(this.reqEntity,
+        Response rsp = wfsClient.submitRequest(this.reqEntity,
                                                      ProtocolBinding.ANY);
-        this.rspEntity = rsp.getEntity(Document.class);
+        this.rspEntity = rsp.readEntity(Document.class);
         Assert.assertEquals(rsp.getStatus(),
-                            ClientResponse.Status.OK.getStatusCode(),
+                            Status.OK.getStatusCode(),
                             ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
         Element featureColl = (Element) this.rspEntity.getElementsByTagNameNS(
                                 Namespaces.WFS, WFS2.FEATURE_COLLECTION).item(0);
@@ -238,9 +233,9 @@ public class LockFeatureTests extends LockingFixture {
         reqEntity.getDocumentElement().setAttribute("lockId", lockId);
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
         rsp = wfsClient.submitRequest(reqEntity, ProtocolBinding.ANY);
-        this.rspEntity = rsp.getEntity(Document.class);
+        this.rspEntity = rsp.readEntity(Document.class);
         Assert.assertEquals(rsp.getStatus(),
-                            ClientResponse.Status.BAD_REQUEST.getStatusCode(),
+                            Status.BAD_REQUEST.getStatusCode(),
                             ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
         String xpath = "//ows:Exception[@exceptionCode = 'OperationParsingFailed']";
         ETSAssert.assertXPath(xpath, this.rspEntity.getDocumentElement(), null);

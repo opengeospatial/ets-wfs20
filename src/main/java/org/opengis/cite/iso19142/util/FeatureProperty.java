@@ -1,13 +1,13 @@
 package org.opengis.cite.iso19142.util;
 
+import java.util.List;
+
 import javax.xml.namespace.QName;
 
 import org.apache.xerces.xs.XSComplexTypeDefinition;
 import org.apache.xerces.xs.XSElementDeclaration;
 import org.apache.xerces.xs.XSTypeDefinition;
 import org.opengis.cite.iso19136.util.XMLSchemaModelUtils;
-
-import java.util.List;
 
 /**
  * An immutable description of a feature property. The property type may be

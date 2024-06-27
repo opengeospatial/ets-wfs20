@@ -1,17 +1,18 @@
 package org.opengis.cite.iso19142.basic.filter.spatial;
 
-import com.sun.jersey.api.client.ClientResponse;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPathExpressionException;
+
+import org.apache.sis.geometry.GeneralEnvelope;
 import org.apache.xerces.xs.XSElementDeclaration;
 import org.apache.xerces.xs.XSTypeDefinition;
-import org.geotoolkit.geometry.GeneralEnvelope;
 import org.opengis.cite.geomatics.Extents;
 import org.opengis.cite.geomatics.SpatialOperator;
 import org.opengis.cite.geomatics.TopologicalRelationships;
@@ -35,11 +36,14 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
+
 /**
  * Tests the response to a GetFeature request that includes a BBOX predicate.
  * All conforming "Basic WFS" implementations must support this spatial
  * operator.
- * 
+ *
  * <p style="margin-bottom: 0.5em">
  * <strong>Sources</strong>
  * </p>
@@ -70,12 +74,12 @@ public class BBOXTests extends QueryFilterFixture {
      * all spatial properties. The response entity (wfs:FeatureCollection) must
      * be schema-valid and contain only instances of the requested type that
      * satisfy the spatial predicate.
-     * 
+     *
      * @param binding
      *            The ProtocolBinding to use for this request.
      * @param featureType
      *            A QName representing the qualified name of some feature type.
-     * 
+     *
      * @see "ISO 19143:2010, 7.8.3.2: BBOX operator"
      */
     @Test(description = "See ISO 19143: 7.8.3.2", dataProvider = "protocol-featureType")
@@ -95,9 +99,9 @@ public class BBOXTests extends QueryFilterFixture {
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
         addBBOXPredicate(this.reqEntity, gmlEnv.getDocumentElement(), null);
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.GET_FEATURE, binding);
-        ClientResponse rsp = wfsClient.submitRequest(new DOMSource(reqEntity), binding, endpoint);
+        Response rsp = wfsClient.submitRequest(new DOMSource(reqEntity), binding, endpoint);
         this.rspEntity = extractBodyAsDocument(rsp);
-        Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
+        Assert.assertEquals(rsp.getStatus(), Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
         Map<String, String> nsBindings = new HashMap<String, String>();
         nsBindings.put(Namespaces.WFS, "wfs");
@@ -120,7 +124,7 @@ public class BBOXTests extends QueryFilterFixture {
      * referring to a valid geometry property. The response shall contain only
      * features possessing a geometry value that spatially interacts (i.e. is
      * not disjoint) with the given envelope.
-     * 
+     *
      * <p style="margin-bottom: 0.5em">
      * <strong>Sources</strong>
      * </p>
@@ -128,12 +132,12 @@ public class BBOXTests extends QueryFilterFixture {
      * <li>ISO 19143:2010, cl. A.7: Test cases for minimum spatial filter</li>
      * <li>ISO 19143:2010, 7.8.3.2: BBOX operator</li>
      * </ul>
-     * 
+     *
      * @param binding
      *            The ProtocolBinding to use for this request.
      * @param featureType
      *            A QName representing the qualified name of some feature type.
-     * 
+     *
      */
     @Test(description = "See ISO 19143: 7.8.3.2, A.7", dataProvider = "protocol-featureType")
     public void bboxWithDefaultExtent(ProtocolBinding binding, QName featureType) {
@@ -153,9 +157,9 @@ public class BBOXTests extends QueryFilterFixture {
             throw new RuntimeException("Could not create envelope for feature type: " + featureType);
 		}
         addBBOXPredicate(this.reqEntity, gmlEnv.getDocumentElement(), valueRef);
-        ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
+        Response rsp = wfsClient.submitRequest(reqEntity, binding);
         this.rspEntity = extractBodyAsDocument(rsp);
-        Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
+        Assert.assertEquals(rsp.getStatus(), Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
         Map<String, String> nsBindings = new HashMap<String, String>();
         nsBindings.put(featureType.getNamespaceURI(), "ns1");
@@ -212,11 +216,11 @@ public class BBOXTests extends QueryFilterFixture {
      * refers to a feature property (gml:description) that is not
      * geometry-valued. An exception is expected in response with status code
      * 400 and exception code {@code InvalidParameterValue}.
-     * 
+     *
      * @param featureType
      *            A QName representing the qualified name of a feature type for
      *            which instances exist.
-     * 
+     *
      * @see "ISO 19142:2010, 11.4: GetFeature - Exceptions"
      * @see "ISO 19143:2010, 8.3: Exceptions"
      */
@@ -233,15 +237,15 @@ public class BBOXTests extends QueryFilterFixture {
             throw new RuntimeException("Could not create envelope for feature type: " + featureType);
 		}
         addBBOXPredicate(this.reqEntity, gmlEnv.getDocumentElement(), valueRef);
-        ClientResponse rsp = wfsClient.submitRequest(reqEntity, ProtocolBinding.ANY);
-        this.rspEntity = rsp.getEntity(Document.class);
+        Response rsp = wfsClient.submitRequest(reqEntity, ProtocolBinding.ANY);
+        this.rspEntity = rsp.readEntity(Document.class);
         //https://github.com/opengeospatial/ets-wfs20/issues/147
         //Agreed solution to this issue is to also allow OperationProcessingFailed (Status Code 403) as valid exception type.
         int statusCode = rsp.getStatus();
-        if(statusCode == ClientResponse.Status.BAD_REQUEST.getStatusCode()) {
+        if(statusCode == Status.BAD_REQUEST.getStatusCode()) {
             String xpath = "//ows:Exception[@exceptionCode='InvalidParameterValue']";
             ETSAssert.assertXPath(xpath, this.rspEntity, null);
-        } else if(statusCode == ClientResponse.Status.FORBIDDEN.getStatusCode()) {
+        } else if(statusCode == Status.FORBIDDEN.getStatusCode()) {
             String xpath = "//ows:Exception[@exceptionCode='OperationProcessingFailed']";
             ETSAssert.assertXPath(xpath, this.rspEntity, null);
         } else {
@@ -256,12 +260,12 @@ public class BBOXTests extends QueryFilterFixture {
      * Replaces gml:Surface elements having a single gml:PolygonPatch with a
      * gml:Polygon element. Such a simplification facilitates a binding to JTS
      * geometry objects.
-     * 
+     *
      * @param geometry
      *            A GML geometry collection.
      * @return A new DOM Element containing a simplified representation of the
      *         original geometry collection.
-     * 
+     *
      * @see "ISO 19125-1: Geographic information -- Simple feature access --
      *      Part 1: Common architecture"
      */
@@ -275,7 +279,7 @@ public class BBOXTests extends QueryFilterFixture {
      * Adds a BBOX spatial predicate to a GetFeature request entity. If the
      * envelope has no spatial reference (srsName) it is assumed to be the
      * default CRS specified in the capabilities document.
-     * 
+     *
      * @param request
      *            The request entity (/wfs:GetFeature).
      * @param envelope

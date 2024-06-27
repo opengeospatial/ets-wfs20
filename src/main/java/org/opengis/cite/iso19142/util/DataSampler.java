@@ -15,16 +15,15 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -35,16 +34,11 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import net.sf.saxon.s9api.SaxonApiException;
-import net.sf.saxon.s9api.XdmItem;
-import net.sf.saxon.s9api.XdmValue;
-
 import org.apache.xerces.xs.XSComplexTypeDefinition;
 import org.apache.xerces.xs.XSElementDeclaration;
 import org.apache.xerces.xs.XSModel;
 import org.apache.xerces.xs.XSTypeDefinition;
 import org.opengis.cite.geomatics.Extents;
-import org.opengis.cite.geomatics.GeodesyUtils;
 import org.opengis.cite.geomatics.gml.GmlUtils;
 import org.opengis.cite.geomatics.time.TemporalComparator;
 import org.opengis.cite.geomatics.time.TemporalUtils;
@@ -59,11 +53,14 @@ import org.opengis.temporal.TemporalGeometricPrimitive;
 import org.testng.SkipException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+
+import jakarta.xml.bind.JAXBException;
+import net.sf.saxon.s9api.SaxonApiException;
+import net.sf.saxon.s9api.XdmItem;
+import net.sf.saxon.s9api.XdmValue;
 
 /**
  * Obtains samples of the feature data available from the WFS under test.

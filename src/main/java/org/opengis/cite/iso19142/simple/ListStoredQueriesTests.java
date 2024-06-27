@@ -1,20 +1,21 @@
 package org.opengis.cite.iso19142.simple;
 
-import com.sun.jersey.api.client.ClientResponse;
 import java.net.URI;
 import java.util.logging.Level;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.Validator;
+
+import org.opengis.cite.iso19142.BaseFixture;
+import org.opengis.cite.iso19142.ETSAssert;
 import org.opengis.cite.iso19142.ErrorMessage;
 import org.opengis.cite.iso19142.ErrorMessageKeys;
-import org.opengis.cite.iso19142.BaseFixture;
 import org.opengis.cite.iso19142.ProtocolBinding;
 import org.opengis.cite.iso19142.SuiteAttribute;
 import org.opengis.cite.iso19142.WFS2;
-import org.opengis.cite.iso19142.ETSAssert;
 import org.opengis.cite.iso19142.util.ServiceMetadataUtils;
 import org.opengis.cite.iso19142.util.TestSuiteLogger;
 import org.opengis.cite.validation.ValidationErrorHandler;
@@ -22,6 +23,8 @@ import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import jakarta.ws.rs.core.Response;
 
 /**
  * Tests the service response to a ListStoredQueries request. A conforming
@@ -75,7 +78,7 @@ public class ListStoredQueriesTests extends BaseFixture {
 	public void listStoredQueries(ProtocolBinding binding) {
 		URI endpoint = ServiceMetadataUtils.getOperationEndpoint(
 				this.wfsMetadata, WFS2.LIST_STORED_QUERIES, binding);
-		ClientResponse rsp = wfsClient.submitRequest(new DOMSource(
+		Response rsp = wfsClient.submitRequest(new DOMSource(
 				this.reqEntity), binding, endpoint);
 		Assert.assertTrue(rsp.hasEntity(),
 				ErrorMessage.get(ErrorMessageKeys.MISSING_XML_ENTITY));

@@ -18,8 +18,8 @@ import javax.xml.xpath.XPathExpressionException;
 
 import org.opengis.cite.iso19142.util.DataSampler;
 import org.opengis.cite.iso19142.util.ServiceMetadataUtils;
-import org.opengis.cite.iso19142.util.WFSClient;
 import org.opengis.cite.iso19142.util.TestSuiteLogger;
+import org.opengis.cite.iso19142.util.WFSClient;
 import org.opengis.cite.iso19142.util.WFSMessage;
 import org.opengis.cite.iso19142.util.XMLUtils;
 import org.testng.ISuite;
@@ -31,7 +31,8 @@ import org.testng.annotations.DataProvider;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import com.sun.jersey.api.client.ClientResponse;
+import jakarta.ws.rs.core.Response;
+
 
 /**
  * A supporting base class that provides common configuration methods and data
@@ -286,12 +287,12 @@ public class BaseFixture {
      * SOAP response this will contain the content of the SOAP body element.
      * 
      * @param rsp
-     *            A ClientResponse representing an HTTP response message.
+     *            A Response representing an HTTP response message.
      * @return A Document representing the response entity, or {@code null} if
      *         it could not be parsed.
      */
-    protected Document extractBodyAsDocument(ClientResponse rsp) {
-        Document entity = rsp.getEntity(Document.class);
+    protected Document extractBodyAsDocument(Response rsp) {
+        Document entity = rsp.readEntity(Document.class);
         try {
             Element soapBody = (Element) XMLUtils.evaluateXPath(entity, "//soap11:Body/*[1] | //soap:Body/*[1]", null,
                     XPathConstants.NODE);

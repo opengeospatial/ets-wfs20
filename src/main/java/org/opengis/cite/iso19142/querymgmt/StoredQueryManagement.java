@@ -1,6 +1,6 @@
 package org.opengis.cite.iso19142.querymgmt;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertTrue;
 
 import javax.xml.xpath.XPathExpressionException;
 
@@ -9,7 +9,6 @@ import org.opengis.cite.iso19142.ErrorMessageKeys;
 import org.opengis.cite.iso19142.SuiteAttribute;
 import org.opengis.cite.iso19142.util.ServiceMetadataUtils;
 import org.opengis.cite.iso19142.util.XMLUtils;
-
 import org.testng.ITestContext;
 import org.testng.SkipException;
 import org.testng.annotations.BeforeTest;

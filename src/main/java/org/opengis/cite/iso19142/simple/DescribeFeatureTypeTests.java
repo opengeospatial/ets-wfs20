@@ -33,7 +33,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import com.sun.jersey.api.client.ClientResponse;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 /**
  * Tests the service response to a DescribeFeatureType request. No particular
@@ -118,11 +119,11 @@ public class DescribeFeatureTypeTests extends BaseFixture {
     @Test(description = "See ISO 19142: 9.2.4.1", dataProvider = "protocol-binding")
     public void describeAllFeatureTypes(ProtocolBinding binding) {
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.DESCRIBE_FEATURE_TYPE, binding);
-        ClientResponse rsp = wfsClient.submitRequest(new DOMSource(reqEntity), binding, endpoint);
-        this.rspEntity = extractBodyAsDocument(rsp);
-        Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
-                ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
+        Response rsp = wfsClient.submitRequest(new DOMSource(reqEntity), binding, endpoint);
         Assert.assertTrue(rsp.hasEntity(), ErrorMessage.get(ErrorMessageKeys.MISSING_XML_ENTITY));
+        this.rspEntity = extractBodyAsDocument(rsp);
+        Assert.assertEquals(rsp.getStatus(), Status.OK.getStatusCode(),
+                ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
         Element docElem = this.rspEntity.getDocumentElement();
         if (docElem.getLocalName().equals("DescribeFeatureTypeResponse")) {
             // special case for SOAP response
@@ -151,11 +152,11 @@ public class DescribeFeatureTypeTests extends BaseFixture {
     public void describeUnknownFeatureType(ProtocolBinding binding) {
         addFeatureType(this.reqEntity, new QName("http://example.org", "Unknown1.Type"));
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.DESCRIBE_FEATURE_TYPE, binding);
-        ClientResponse rsp = wfsClient.submitRequest(new DOMSource(this.reqEntity), binding, endpoint);
-        this.rspEntity = extractBodyAsDocument(rsp);
-        Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.BAD_REQUEST.getStatusCode(),
-                ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
+        Response rsp = wfsClient.submitRequest(new DOMSource(this.reqEntity), binding, endpoint);
         Assert.assertTrue(rsp.hasEntity(), ErrorMessage.get(ErrorMessageKeys.MISSING_XML_ENTITY));
+        this.rspEntity = extractBodyAsDocument(rsp);
+        Assert.assertEquals(rsp.getStatus(), Status.BAD_REQUEST.getStatusCode(),
+                ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
         SchematronValidator validator = ValidationUtils.buildSchematronValidator("ExceptionReport.sch",
                 "InvalidParameterValuePhase");
         Result result = validator.validate(new DOMSource(this.rspEntity), false);

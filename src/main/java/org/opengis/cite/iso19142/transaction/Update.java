@@ -44,7 +44,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import com.sun.jersey.api.client.ClientResponse;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
+
 
 /**
  * Tests the response to a Transaction request that includes one or more update
@@ -71,8 +73,8 @@ public class Update extends TransactionFixture {
         }
         Document req = WFSMessage.createRequestEntity(WFS2.TRANSACTION, this.wfsVersion);
         WFSMessage.addReplaceStatements(req, modifiedFeatures);
-        ClientResponse rsp = wfsClient.submitRequest(req, ProtocolBinding.ANY);
-        Document rspEntity = rsp.getEntity(Document.class);
+        Response rsp = wfsClient.submitRequest(req, ProtocolBinding.ANY);
+        Document rspEntity = rsp.readEntity(Document.class);
         String expr = String.format("//wfs:totalReplaced = '%d'", modifiedFeatures.size());
         Boolean result;
         try {
@@ -153,9 +155,9 @@ public class Update extends TransactionFixture {
         WFSMessage.setTypeName(update, featureTypes.get(0));
         ProtocolBinding binding = wfsClient.getAnyTransactionBinding();
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.TRANSACTION, binding);
-        ClientResponse rsp = wfsClient.submitRequest(new DOMSource(this.reqEntity), binding, endpoint);
-        this.rspEntity = rsp.getEntity(Document.class);
-        Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.BAD_REQUEST.getStatusCode(),
+        Response rsp = wfsClient.submitRequest(new DOMSource(this.reqEntity), binding, endpoint);
+        this.rspEntity = rsp.readEntity(Document.class);
+        Assert.assertEquals(rsp.getStatus(), Status.BAD_REQUEST.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
         String xpath = "//ows:Exception[@exceptionCode = 'InvalidValue']";
         ETSAssert.assertXPath(xpath, this.rspEntity.getDocumentElement(), null);
@@ -283,7 +285,7 @@ public class Update extends TransactionFixture {
         case XSConstants.BOOLEAN_DT:
             String boolVal = propValues.get(0);
             boolean oldValue = (boolVal.equals("true") || boolVal.equals("1")) ? true : false;
-            newValue = new Boolean(!oldValue).toString();
+            newValue = Boolean.valueOf(!oldValue).toString();
             break;
         default:
             newValue = "UNSUPPORTED_DATATYPE";
