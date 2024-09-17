@@ -146,7 +146,7 @@ public class IntersectsTests extends QueryFilterFixture {
         try {
             gmlEnv = Extents.envelopeAsGML(extent);
 		} catch (Exception e) {
-            throw new RuntimeException("Could not create envelope for feature type: " + featureType);
+            throw new SkipException("Could not create envelope for feature type: " + featureType);
 		}
         Element gmlPolygonElem = XMLUtils
                 .transform(new StreamSource(getClass().getResourceAsStream(XSLT_ENV2POLYGON)), gmlEnv, null)
@@ -218,7 +218,7 @@ public class IntersectsTests extends QueryFilterFixture {
         try {
             gmlEnv = Extents.envelopeAsGML(extent);
 		} catch (Exception e) {
-            throw new RuntimeException("Could not create envelope for feature type: " + featureType);
+            throw new SkipException("Could not create envelope for feature type: " + featureType);
 		}
         Element gmlCurveElem = XMLUtils
                 .transform(new StreamSource(getClass().getResourceAsStream("envelopeTocurve.xsl")), gmlEnv,

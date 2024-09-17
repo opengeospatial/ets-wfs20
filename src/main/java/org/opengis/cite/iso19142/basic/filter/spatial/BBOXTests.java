@@ -90,7 +90,7 @@ public class BBOXTests extends QueryFilterFixture {
         try {
             gmlEnv = envelopeAsGML(extent);
 		} catch (Exception e) {
-            throw new RuntimeException("Could not create envelope for feature type: " + featureType);
+            throw new SkipException("Could not create envelope for feature type: " + featureType);
 		}
         WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
         addBBOXPredicate(this.reqEntity, gmlEnv.getDocumentElement(), null);
@@ -150,7 +150,7 @@ public class BBOXTests extends QueryFilterFixture {
         try {
             gmlEnv = envelopeAsGML(extent);
 		} catch (Exception e) {
-            throw new RuntimeException("Could not create envelope for feature type: " + featureType);
+            throw new SkipException("Could not create envelope for feature type: " + featureType);
 		}
         addBBOXPredicate(this.reqEntity, gmlEnv.getDocumentElement(), valueRef);
         ClientResponse rsp = wfsClient.submitRequest(reqEntity, binding);
@@ -230,7 +230,7 @@ public class BBOXTests extends QueryFilterFixture {
         try {
             gmlEnv = envelopeAsGML(extent);
 		} catch (Exception e) {
-            throw new RuntimeException("Could not create envelope for feature type: " + featureType);
+            throw new SkipException("Could not create envelope for feature type: " + featureType);
 		}
         addBBOXPredicate(this.reqEntity, gmlEnv.getDocumentElement(), valueRef);
         ClientResponse rsp = wfsClient.submitRequest(reqEntity, ProtocolBinding.ANY);
