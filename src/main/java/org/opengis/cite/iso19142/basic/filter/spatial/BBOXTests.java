@@ -245,7 +245,10 @@ public class BBOXTests extends QueryFilterFixture {
             String xpath = "//ows:Exception[@exceptionCode='OperationProcessingFailed']";
             ETSAssert.assertXPath(xpath, this.rspEntity, null);
         } else {
-        	Assert.fail(ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
+            Assert.fail(String.format(
+                    ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS) + " Expected '%d' or '%d', was '%d'.",
+                    ClientResponse.Status.BAD_REQUEST.getStatusCode(), ClientResponse.Status.FORBIDDEN.getStatusCode(),
+                    statusCode));
         }
     }
 
