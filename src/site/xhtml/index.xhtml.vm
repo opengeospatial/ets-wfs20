@@ -81,6 +81,7 @@ dt {
       the GetPropertyValue operation.</dd>
       <dt><strong>Spatial filter</strong></dt>
       <dd>Implements the BBOX spatial operator and one or more of the other spatial operators.</dd>
+      <dd>At least one feature needs to have spatial attributes, so that an envelope can be calculated for the tests.</dd>
       <dt><strong>Temporal filter</strong></dt>
       <dd>Implements the During temporal operator and one or more of the other temporal operators.</dd>  
       <dt><strong>Transactional WFS</strong></dt>
