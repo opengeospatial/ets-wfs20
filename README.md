@@ -144,3 +144,4 @@ enhancement request
 * Fix a bug: Fork the repository, apply the fix, and create a pull request
 * Add new tests: Fork the repository, implement (and verify) the tests on a new topic branch, 
 and create a pull request
+* PR template
