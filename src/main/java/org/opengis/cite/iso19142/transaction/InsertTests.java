@@ -1,6 +1,5 @@
 package org.opengis.cite.iso19142.transaction;
 
-import com.sun.jersey.api.client.ClientResponse;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,10 +7,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
+
 import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
+
 import org.opengis.cite.iso19142.ETSAssert;
 import org.opengis.cite.iso19142.ErrorMessage;
 import org.opengis.cite.iso19142.ErrorMessageKeys;
@@ -19,10 +20,10 @@ import org.opengis.cite.iso19142.Namespaces;
 import org.opengis.cite.iso19142.ProtocolBinding;
 import org.opengis.cite.iso19142.WFS2;
 import org.opengis.cite.iso19142.basic.filter.ResourceId;
-import org.opengis.cite.iso19142.util.XMLUtils;
 import org.opengis.cite.iso19142.util.ServiceMetadataUtils;
 import org.opengis.cite.iso19142.util.TestSuiteLogger;
 import org.opengis.cite.iso19142.util.WFSMessage;
+import org.opengis.cite.iso19142.util.XMLUtils;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
@@ -30,6 +31,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 /**
  * Tests the response to a Transaction request that includes one or more insert
@@ -86,9 +90,9 @@ public class InsertTests extends TransactionFixture {
         Node feature = createFeatureInstance(featureType);
         WFSMessage.addInsertStatement(this.reqEntity, feature);
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.TRANSACTION, binding);
-        ClientResponse rsp = this.wfsClient.submitRequest(new DOMSource(this.reqEntity), binding, endpoint);
-        this.rspEntity = rsp.getEntity(Document.class);
-        Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
+        Response rsp = this.wfsClient.submitRequest(new DOMSource(this.reqEntity), binding, endpoint);
+        this.rspEntity = rsp.readEntity(Document.class);
+        Assert.assertEquals(rsp.getStatus(), Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
         ETSAssert.assertXPath("//wfs:TransactionResponse/wfs:InsertResults", this.rspEntity, null);
         List<ResourceId> newFeatureIDs = extractFeatureIdentifiers(this.rspEntity, WFS2.Transaction.INSERT);
@@ -114,10 +118,10 @@ public class InsertTests extends TransactionFixture {
         }
         ProtocolBinding binding = wfsClient.getAnyTransactionBinding();
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.TRANSACTION, binding);
-        ClientResponse rsp = wfsClient.submitRequest(new DOMSource(this.reqEntity), binding, endpoint);
-        Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.BAD_REQUEST.getStatusCode(),
+        Response rsp = wfsClient.submitRequest(new DOMSource(this.reqEntity), binding, endpoint);
+        Assert.assertEquals(rsp.getStatus(), Status.BAD_REQUEST.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
-        this.rspEntity = rsp.getEntity(Document.class);
+        this.rspEntity = rsp.readEntity(Document.class);
         String xpath = "//ows:Exception[@exceptionCode = 'InvalidValue']";
         ETSAssert.assertXPath(xpath, this.rspEntity.getDocumentElement(), null);
     }

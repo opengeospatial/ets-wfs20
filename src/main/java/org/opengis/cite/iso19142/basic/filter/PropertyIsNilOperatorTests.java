@@ -23,7 +23,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.sun.jersey.api.client.ClientResponse;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 /**
  * Tests the response to a GetFeature request that includes a {@code PropertyIsNil} filter predicate that tests the
@@ -76,9 +77,9 @@ public class PropertyIsNilOperatorTests extends QueryFilterFixture {
         // get last nillable property for this feature type
         QName propName = nillables.get( nillables.size() - 1 );
         addPropertyIsNilPredicate( this.reqEntity, propName, null, false );
-        ClientResponse rsp = wfsClient.submitRequest( reqEntity, binding );
+        Response rsp = wfsClient.submitRequest( reqEntity, binding );
         this.rspEntity = extractBodyAsDocument( rsp );
-        Assert.assertEquals( rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
+        Assert.assertEquals( rsp.getStatus(), Status.OK.getStatusCode(),
                              ErrorMessage.get( ErrorMessageKeys.UNEXPECTED_STATUS ) );
         NodeList features = this.rspEntity.getElementsByTagNameNS(Namespaces.WFS, WFS2.MEMBER);
         

@@ -1,6 +1,9 @@
 package org.opengis.cite.iso19142.versioning;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertNull;
 
 import java.net.URI;
 import java.util.Collections;
@@ -37,7 +40,9 @@ import org.testng.annotations.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import com.sun.jersey.api.client.ClientResponse;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
+
 
 /**
  * Provides test methods that verify the behavior of the IUT with respect to
@@ -88,10 +93,10 @@ public class VersioningTests extends BaseFixture {
         WFSMessage.addInsertStatement(this.reqEntity, feature);
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.TRANSACTION,
                 ProtocolBinding.POST);
-        ClientResponse rsp = this.wfsClient.submitRequest(new DOMSource(this.reqEntity), ProtocolBinding.POST,
+        Response rsp = this.wfsClient.submitRequest(new DOMSource(this.reqEntity), ProtocolBinding.POST,
                 endpoint);
-        this.rspEntity = rsp.getEntity(Document.class);
-        Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
+        this.rspEntity = rsp.readEntity(Document.class);
+        Assert.assertEquals(rsp.getStatus(), Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
         List<ResourceId> newFeatureIDs = InsertTests.extractFeatureIdentifiers(this.rspEntity, WFS2.Transaction.INSERT);
         assertEquals(newFeatureIDs.size(), 1,
@@ -105,7 +110,7 @@ public class VersioningTests extends BaseFixture {
         // get LAST version and check that state attribute is "valid"
         qryId.setVersion(FES2.VersionAction.LAST.name());
         rsp = this.wfsClient.GetFeatureVersion(qryId, typeName);
-        this.rspEntity = rsp.getEntity(Document.class);
+        this.rspEntity = rsp.readEntity(Document.class);
         int numReturned = Integer.parseInt(this.rspEntity.getDocumentElement().getAttribute("numberReturned"));
         assertEquals(numReturned, 1, ErrorMessage.get(ErrorMessageKeys.NUM_RETURNED));
         feature = (Element) this.rspEntity.getElementsByTagNameNS(typeName.getNamespaceURI(), typeName.getLocalPart())
@@ -141,8 +146,8 @@ public class VersioningTests extends BaseFixture {
                 String.format("Updated feature is missing previousRid (rid=%s)", id.getRid()));
         // get PREVIOUS version and check that state attribute is "superseded"
         ResourceId qryId = new ResourceId(id.getPreviousRid());
-        ClientResponse rsp = this.wfsClient.GetFeatureVersion(qryId, typeName);
-        this.rspEntity = rsp.getEntity(Document.class);
+        Response rsp = this.wfsClient.GetFeatureVersion(qryId, typeName);
+        this.rspEntity = rsp.readEntity(Document.class);
         int numReturned = Integer.parseInt(this.rspEntity.getDocumentElement().getAttribute("numberReturned"));
         assertEquals(numReturned, 1, ErrorMessage.get(ErrorMessageKeys.NUM_RETURNED));
         feature = (Element) this.rspEntity.getElementsByTagNameNS(typeName.getNamespaceURI(), typeName.getLocalPart())
@@ -200,10 +205,10 @@ public class VersioningTests extends BaseFixture {
         WFSMessage.addReplaceStatements(this.reqEntity, Collections.singletonList(feature));
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.TRANSACTION,
                 ProtocolBinding.POST);
-        ClientResponse rsp = this.wfsClient.submitRequest(new DOMSource(this.reqEntity), ProtocolBinding.POST,
+        Response rsp = this.wfsClient.submitRequest(new DOMSource(this.reqEntity), ProtocolBinding.POST,
                 endpoint);
-        this.rspEntity = rsp.getEntity(Document.class);
-        Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
+        this.rspEntity = rsp.readEntity(Document.class);
+        Assert.assertEquals(rsp.getStatus(), Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
         List<ResourceId> newFeatureIDs = InsertTests.extractFeatureIdentifiers(this.rspEntity,
                 WFS2.Transaction.REPLACE);
@@ -217,7 +222,7 @@ public class VersioningTests extends BaseFixture {
         ResourceId qryId = new ResourceId(id.getRid());
         qryId.setVersion(FES2.VersionAction.NEXT.name());
         rsp = this.wfsClient.GetFeatureVersion(qryId, typeName);
-        this.rspEntity = rsp.getEntity(Document.class);
+        this.rspEntity = rsp.readEntity(Document.class);
         int numMatched = Integer.parseInt(this.rspEntity.getDocumentElement().getAttribute("numberMatched"));
         assertEquals(numMatched, 0, ErrorMessage.get(ErrorMessageKeys.NUM_MATCHED));
     }
@@ -233,9 +238,9 @@ public class VersioningTests extends BaseFixture {
         Element feature = this.dataSampler.randomlySelectFeatureInstance();
         String gmlId = feature.getAttributeNS(Namespaces.GML, "id");
         QName typeName = new QName(feature.getNamespaceURI(), feature.getLocalName());
-        ClientResponse rsp = wfsClient.deleteFeature(this.reqEntity, gmlId, typeName);
-        this.rspEntity = rsp.getEntity(Document.class);
-        assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
+        Response rsp = wfsClient.deleteFeature(this.reqEntity, gmlId, typeName);
+        this.rspEntity = rsp.readEntity(Document.class);
+        assertEquals(rsp.getStatus(), Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
         int totalDeleted = Integer.parseInt(
                 this.rspEntity.getElementsByTagNameNS(Namespaces.WFS, WFS2.TOTAL_DEL).item(0).getTextContent());
@@ -244,7 +249,7 @@ public class VersioningTests extends BaseFixture {
         ResourceId qryId = new ResourceId(gmlId);
         qryId.setVersion(FES2.VersionAction.LAST.name());
         rsp = this.wfsClient.GetFeatureVersion(qryId, typeName);
-        this.rspEntity = rsp.getEntity(Document.class);
+        this.rspEntity = rsp.readEntity(Document.class);
         int numReturned = Integer.parseInt(this.rspEntity.getDocumentElement().getAttribute("numberReturned"));
         assertEquals(numReturned, 1, ErrorMessage.get(ErrorMessageKeys.NUM_RETURNED));
         feature = (Element) this.rspEntity.getElementsByTagNameNS(typeName.getNamespaceURI(), typeName.getLocalPart())

@@ -21,7 +21,9 @@ import org.testng.annotations.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import com.sun.jersey.api.client.ClientResponse;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
+
 
 /**
  * Tests the response to a GetFeatureWithLock request that attempts to lock
@@ -80,11 +82,11 @@ public class GetFeatureWithLockTests extends LockingFixture {
 		QName featureType = this.dataSampler.selectFeatureType();
 		WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
 		this.reqEntity.getDocumentElement().setAttribute("resultType", "hits");
-		ClientResponse rsp = wfsClient.submitRequest(this.reqEntity,
+		Response rsp = wfsClient.submitRequest(this.reqEntity,
 				ProtocolBinding.ANY);
-		this.rspEntity = rsp.getEntity(Document.class);
+		this.rspEntity = rsp.readEntity(Document.class);
 		Assert.assertEquals(rsp.getStatus(),
-				ClientResponse.Status.BAD_REQUEST.getStatusCode(),
+				Status.BAD_REQUEST.getStatusCode(),
 				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
 		String xpath = "//ows:Exception[@exceptionCode = 'InvalidParameterValue']";
 		ETSAssert.assertXPath(xpath, this.rspEntity.getDocumentElement(), null);
@@ -109,11 +111,11 @@ public class GetFeatureWithLockTests extends LockingFixture {
 		QName featureType = this.dataSampler.selectFeatureType();
 		WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
 		this.reqEntity.getDocumentElement().setAttribute("expiry", "20");
-		ClientResponse rsp = wfsClient.submitRequest(this.reqEntity,
+		Response rsp = wfsClient.submitRequest(this.reqEntity,
 				ProtocolBinding.ANY);
-		this.rspEntity = rsp.getEntity(Document.class);
+		this.rspEntity = rsp.readEntity(Document.class);
 		Assert.assertEquals(rsp.getStatus(),
-				ClientResponse.Status.OK.getStatusCode(),
+				Status.OK.getStatusCode(),
 				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
 		Element featureColl = (Element) this.rspEntity.getElementsByTagNameNS(
 				Namespaces.WFS, WFS2.FEATURE_COLLECTION).item(0);
@@ -131,9 +133,9 @@ public class GetFeatureWithLockTests extends LockingFixture {
 				this.wfsVersion);
 		reqEntity.getDocumentElement().setAttribute("lockId", lockId);
 		rsp = wfsClient.submitRequest(reqEntity, ProtocolBinding.ANY);
-		this.rspEntity = rsp.getEntity(Document.class);
+		this.rspEntity = rsp.readEntity(Document.class);
 		Assert.assertEquals(rsp.getStatus(),
-				ClientResponse.Status.FORBIDDEN.getStatusCode(),
+				Status.FORBIDDEN.getStatusCode(),
 				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
 		String xpath = "//ows:Exception[@exceptionCode = 'LockHasExpired']";
 		ETSAssert.assertXPath(xpath, this.rspEntity.getDocumentElement(), null);
@@ -167,11 +169,11 @@ public class GetFeatureWithLockTests extends LockingFixture {
 		WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
 		WFSMessage.addResourceIdPredicate(this.reqEntity, singleton);
 		this.reqEntity.getDocumentElement().setAttribute("expiry", "60");
-		ClientResponse rsp = wfsClient.submitRequest(this.reqEntity,
+		Response rsp = wfsClient.submitRequest(this.reqEntity,
 				ProtocolBinding.ANY);
-		this.rspEntity = rsp.getEntity(Document.class);
+		this.rspEntity = rsp.readEntity(Document.class);
 		Assert.assertEquals(rsp.getStatus(),
-				ClientResponse.Status.OK.getStatusCode(),
+				Status.OK.getStatusCode(),
 				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
 		Element featureColl = (Element) this.rspEntity.getElementsByTagNameNS(
 				Namespaces.WFS, WFS2.FEATURE_COLLECTION).item(0);
@@ -186,9 +188,9 @@ public class GetFeatureWithLockTests extends LockingFixture {
 		WFSMessage.addResourceIdPredicate(this.reqEntity, featureIdSet);
 		this.reqEntity.getDocumentElement().setAttribute("lockAction", "SOME");
 		rsp = wfsClient.submitRequest(this.reqEntity, ProtocolBinding.ANY);
-		this.rspEntity = rsp.getEntity(Document.class);
+		this.rspEntity = rsp.readEntity(Document.class);
 		Assert.assertEquals(rsp.getStatus(),
-				ClientResponse.Status.OK.getStatusCode(),
+				Status.OK.getStatusCode(),
 				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
 		featureColl = (Element) this.rspEntity.getElementsByTagNameNS(
 				Namespaces.WFS, WFS2.FEATURE_COLLECTION).item(0);

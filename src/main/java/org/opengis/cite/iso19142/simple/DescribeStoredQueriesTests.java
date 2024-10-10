@@ -1,21 +1,22 @@
 package org.opengis.cite.iso19142.simple;
 
-import com.sun.jersey.api.client.ClientResponse;
 import java.net.URI;
 import java.util.logging.Level;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.Validator;
+
+import org.opengis.cite.iso19142.BaseFixture;
+import org.opengis.cite.iso19142.ETSAssert;
 import org.opengis.cite.iso19142.ErrorMessage;
 import org.opengis.cite.iso19142.ErrorMessageKeys;
-import org.opengis.cite.iso19142.BaseFixture;
 import org.opengis.cite.iso19142.Namespaces;
 import org.opengis.cite.iso19142.ProtocolBinding;
 import org.opengis.cite.iso19142.SuiteAttribute;
 import org.opengis.cite.iso19142.WFS2;
-import org.opengis.cite.iso19142.ETSAssert;
 import org.opengis.cite.iso19142.util.ServiceMetadataUtils;
 import org.opengis.cite.iso19142.util.TestSuiteLogger;
 import org.opengis.cite.iso19142.util.WFSMessage;
@@ -28,6 +29,8 @@ import org.testng.annotations.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import jakarta.ws.rs.core.Response;
 
 /**
  * Tests the service response to a DescribeStoredQueries request. This operation
@@ -85,7 +88,7 @@ public class DescribeStoredQueriesTests extends BaseFixture {
 	public void describeAllStoredQueries(ProtocolBinding binding) {
 		URI endpoint = ServiceMetadataUtils.getOperationEndpoint(
 				this.wfsMetadata, WFS2.DESC_STORED_QUERIES, binding);
-		ClientResponse rsp = wfsClient.submitRequest(new DOMSource(reqEntity),
+		Response rsp = wfsClient.submitRequest(new DOMSource(reqEntity),
 				binding, endpoint);
 		Assert.assertTrue(rsp.hasEntity(),
 				ErrorMessage.get(ErrorMessageKeys.MISSING_XML_ENTITY));
@@ -130,7 +133,7 @@ public class DescribeStoredQueriesTests extends BaseFixture {
 		addQueryIdentifier(this.reqEntity, queryId);
 		URI endpoint = ServiceMetadataUtils.getOperationEndpoint(
 				this.wfsMetadata, WFS2.DESC_STORED_QUERIES, binding);
-		ClientResponse rsp = wfsClient.submitRequest(new DOMSource(reqEntity),
+		Response rsp = wfsClient.submitRequest(new DOMSource(reqEntity),
 				binding, endpoint);
 		Assert.assertTrue(rsp.hasEntity(),
 				ErrorMessage.get(ErrorMessageKeys.MISSING_XML_ENTITY));

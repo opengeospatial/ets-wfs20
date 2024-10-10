@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.opengis.cite</groupId>
     <artifactId>ets-common</artifactId>
-    <version>9</version>
+    <version>10-SNAPSHOT</version>
   </parent>
   <artifactId>ets-wfs20</artifactId>
   <version>1.43-SNAPSHOT</version>
@@ -54,54 +54,50 @@
     <soapui.tests.passed>120</soapui.tests.passed>
     <soapui.tests.skipped>53</soapui.tests.skipped>
     <soapui.tests.failed>0</soapui.tests.failed>
-    <docker.teamengine.version>5.7</docker.teamengine.version>
-  </properties>
+    <docker.teamengine.version>6.0.0-RC1</docker.teamengine.version>  </properties>
 
   <dependencies>
     <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-      <version>2.7</version>
-    </dependency>
-    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>ets-gml32</artifactId>
-      <version>1.32</version>
+      <version>1.33-SNAPSHOT</version>
       <exclusions>
         <exclusion>
           <artifactId>teamengine-spi</artifactId>
           <groupId>org.opengis.cite.teamengine</groupId>
         </exclusion>
-      </exclusions>
+      </exclusions>    
+    </dependency>
+    <dependency>		
+      <artifactId>teamengine-spi</artifactId>
+      <groupId>org.opengis.cite.teamengine</groupId>
+      <version>6.0.0-RC1</version>
+	</dependency>
+    <dependency>
+      <groupId>org.glassfish.jersey.media</groupId>
+      <artifactId>jersey-media-jaxb</artifactId>
+      <version>3.1.6</version>
     </dependency>
     <dependency>
-      <groupId>org.opengis.cite.teamengine</groupId>
-      <artifactId>teamengine-spi</artifactId>
-      <version>5.7</version>
-      <exclusions>
-        <exclusion>
-          <artifactId>xercesImpl</artifactId>
-          <groupId>xerces</groupId>
-        </exclusion>
-      </exclusions>
+       <groupId>org.glassfish.jersey.inject</groupId>
+       <artifactId>jersey-hk2</artifactId>
+      <version>3.1.6</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>schema-utils</artifactId>
+      <version>1.8</version>
       <exclusions>
-        <exclusion>
-          <artifactId>xercesImpl</artifactId>
-          <groupId>xerces</groupId>
-        </exclusion>
+      	<exclusion>
+      		<groupId>xml-apis</groupId>
+      		<artifactId>xml-apis</artifactId>
+      	</exclusion>
       </exclusions>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-core</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.beust</groupId>
@@ -109,13 +105,14 @@
       <version>1.82</version>
     </dependency>
     <dependency>
-      <groupId>com.sun.jersey</groupId>
+      <groupId>org.glassfish.jersey.core</groupId>
       <artifactId>jersey-client</artifactId>
+      <version>3.1.6</version>
     </dependency>
     <dependency>
-      <groupId>com.sun.jersey</groupId>
-      <artifactId>jersey-core</artifactId>
-      <version>1.19</version>
+      <groupId>org.glassfish.jersey.core</groupId>
+      <artifactId>jersey-server</artifactId>
+      <version>3.1.6</version>
     </dependency>
     <dependency>
       <groupId>javax.ws.rs</groupId>
@@ -129,92 +126,23 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.opengis</groupId>
-      <artifactId>geoapi-pending</artifactId>
-      <version>3.1-M04</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opengis.cite</groupId>
-      <artifactId>geomatics-geotk</artifactId>
-      <version>1.17</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opengis.cite.saxon</groupId>
-      <artifactId>saxon9</artifactId>
-      <version>9.0.0.8</version>
-    </dependency>
-    <dependency>
-      <groupId>org.geotoolkit</groupId>
-      <artifactId>geotk-utility</artifactId>
-      <version>3.21</version>
-    </dependency>
-    <dependency>
-      <groupId>org.geotoolkit</groupId>
-      <artifactId>geotk-referencing</artifactId>
-      <version>3.21</version>
-    </dependency>
-    <dependency>
-      <groupId>org.geotoolkit.pending</groupId>
-      <artifactId>geotk-geometry</artifactId>
-      <version>3.21</version>
-      <exclusions>
-        <exclusion>
-          <artifactId>jts</artifactId>
-          <groupId>com.vividsolutions</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.geotoolkit.pending</groupId>
-      <artifactId>geotk-temporal</artifactId>
-      <version>3.21</version>
-    </dependency>
-    <dependency>
-      <groupId>org.testng</groupId>
-      <artifactId>testng</artifactId>
-      <version>6.9.10</version>
-      <exclusions>
-        <exclusion>
-          <artifactId>jcommander</artifactId>
-          <groupId>com.beust</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>xerces</groupId>
-      <artifactId>xercesImpl</artifactId>
-      <version>2.12.2</version>
-    </dependency>
-    <dependency>
-      <groupId>xml-apis</groupId>
-      <artifactId>xml-apis</artifactId>
-      <version>1.4.01</version>
-    </dependency>
-  </dependencies>
-
+      <groupId>jakarta.xml.ws</groupId>
+      <artifactId>jakarta.xml.ws-api</artifactId>
+      <version>4.0.1</version>
+     </dependency>
+     <dependency>
+       <groupId>one.gfw</groupId>
+       <artifactId>jakarta.xml.bind-api</artifactId>
+       <version>4.0.0.1</version>
+     </dependency>
+     <dependency>
+     	<groupId>org.glassfish.jaxb</groupId>
+     	<artifactId>jaxb-runtime</artifactId>
+     	<version>4.0.5</version>
+     </dependency>
+	</dependencies>
   <build>
     <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.10.4</version>
-        <configuration>
-          <docfilessubdirs>true</docfilessubdirs>
-          <show>package</show>
-          <links>
-            <link>http://www.joda.org/joda-time/apidocs/</link>
-            <link>http://testng.org/javadocs/</link>
-          </links>
-        </configuration>
-        <executions>
-          <execution>
-            <id>attach-javadocs</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <configuration>
@@ -243,21 +171,13 @@
       </plugin>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <artifactId>maven-jar-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <artifactId>maven-release-plugin</artifactId>
-        <version>2.5.3</version>
         <configuration>
-          <autoVersionSubmodules>true</autoVersionSubmodules>
-          <tagNameFormat>@{project.version}</tagNameFormat>
-          <releaseProfiles>release</releaseProfiles>
+          <source>17</source>
+          <target>17</target>
         </configuration>
       </plugin>
       <plugin>
-        <artifactId>maven-site-plugin</artifactId>
+        <artifactId>maven-jar-plugin</artifactId>
       </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
@@ -265,7 +185,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-scm-publish-plugin</artifactId>
-        <version>1.1</version>
+        <version>3.2.1</version>
         <configuration>
           <scmBranch>gh-pages</scmBranch>
         </configuration>
@@ -287,12 +207,12 @@
         <plugin>
           <groupId>com.smartbear.soapui</groupId>
           <artifactId>soapui-maven-plugin</artifactId>
-          <version>5.5.0</version>
+          <version>5.7.0</version>
           <dependencies>
             <dependency>
               <groupId>com.jgoodies</groupId>
               <artifactId>forms</artifactId>
-              <version>1.0.7</version>
+              <version>1.2.1</version>
             </dependency>
           </dependencies>
           <configuration>
@@ -315,7 +235,7 @@
         <plugin>
           <groupId>io.fabric8</groupId>
           <artifactId>docker-maven-plugin</artifactId>
-          <version>0.28.0</version>
+          <version>0.43.4</version>
           <configuration>
             <images>
               <image>
@@ -358,7 +278,7 @@
         </plugin>
         <plugin>
           <artifactId>maven-dependency-plugin</artifactId>
-          <version>3.0.0</version>
+          <version>3.6.1</version>
           <configuration>
             <artifactItems>
               <artifactItem>
@@ -388,27 +308,6 @@
     </pluginManagement>
   </build>
 
-  <reporting>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-project-info-reports-plugin</artifactId>
-        <version>2.9</version>
-        <reportSets>
-          <reportSet>
-            <reports>
-              <report>license</report>
-              <report>issue-tracking</report>
-            </reports>
-          </reportSet>
-        </reportSets>
-        <configuration>
-          <linkOnly>true</linkOnly>
-        </configuration>
-      </plugin>
-    </plugins>
-  </reporting>
-
   <profiles>
     <profile>
       <id>release</id>
@@ -416,7 +315,7 @@
         <plugins>
           <plugin>
             <artifactId>maven-gpg-plugin</artifactId>
-            <version>1.6</version>
+            <version>3.1.0</version>
             <executions>
               <execution>
                 <id>sign-artifacts</id>
@@ -539,11 +438,11 @@
   </distributionManagement>
 
   <repositories>
-    <!-- Geotk 3.21 not available in Central repository -->
+		<!-- Geotk is not deployed in Central repository. -->
     <repository>
       <id>geotoolkit</id>
       <name>Geotk Modules</name>
-      <url>http://maven.geotoolkit.org/</url>
+      <url>https://nexus.geomatys.com/repository/maven-public</url>
       <layout>default</layout>
     </repository>
   </repositories>

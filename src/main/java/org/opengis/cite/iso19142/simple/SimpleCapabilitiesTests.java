@@ -1,10 +1,9 @@
 package org.opengis.cite.iso19142.simple;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.transform.Result;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
@@ -26,12 +25,13 @@ import org.testng.SkipException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
-import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 /**
  * Tests the service response to a GetCapabilities request for "Simple WFS"
@@ -61,7 +61,7 @@ public class SimpleCapabilitiesTests extends BaseFixture {
      */
     @BeforeClass
     public void extractEndpoint(ITestContext testContext) {
-        this.client = Client.create();
+        this.client = ClientBuilder.newClient();
         this.reqEndpointUsingGET = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.GET_CAPABILITIES,
                 ProtocolBinding.GET);
     }
@@ -77,14 +77,20 @@ public class SimpleCapabilitiesTests extends BaseFixture {
      */
     @Test(description = "See ISO 19142: 7.5")
     public void getCapabilities_missingServiceParam() {
-        WebResource resource = client.resource(reqEndpointUsingGET).queryParam(WFS2.REQUEST_PARAM,
-                WFS2.GET_CAPABILITIES);
-        resource.accept(MediaType.APPLICATION_XML);
-        ClientResponse rsp = resource.get(ClientResponse.class);
-        Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.BAD_REQUEST.getStatusCode(),
+        WebTarget target = client.target(reqEndpointUsingGET);
+        target = target.queryParam(WFS2.REQUEST_PARAM, WFS2.GET_CAPABILITIES);
+        Response rsp = target.request(MediaType.APPLICATION_XML).get();
+        Assert.assertEquals(rsp.getStatus(), Response.Status.BAD_REQUEST.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
         Assert.assertTrue(rsp.hasEntity(), ErrorMessage.get(ErrorMessageKeys.MISSING_XML_ENTITY));
-        this.rspEntity = rsp.getEntity(Document.class);
+        Object entity = rsp.getEntity();
+        if (entity instanceof InputStream) {
+            try {
+                this.rspEntity = docBuilder.parse((InputStream) entity);
+            } catch (SAXException | IOException e) {
+                throw new AssertionError(e.getMessage());
+            }
+        }
         SchematronValidator validator = ValidationUtils.buildSchematronValidator("ExceptionReport.sch",
                 "MissingParameterValuePhase");
         Result result = validator.validate(new DOMSource(this.rspEntity));
@@ -101,15 +107,20 @@ public class SimpleCapabilitiesTests extends BaseFixture {
      */
     @Test(description = "See ISO 19142: 7.2")
     public void getFullCapabilities() {
-        MultivaluedMap<String, String> params = new MultivaluedMapImpl();
-        params.putSingle(WFS2.REQUEST_PARAM, WFS2.GET_CAPABILITIES);
-        params.putSingle(WFS2.SERVICE_PARAM, WFS2.SERVICE_TYPE_CODE);
-        WebResource resource = client.resource(reqEndpointUsingGET).queryParams(params);
-        resource.accept(MediaType.APPLICATION_XML);
-        ClientResponse rsp = resource.get(ClientResponse.class);
-        Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
+        WebTarget target = client.target(reqEndpointUsingGET);
+        target = target.queryParam(WFS2.REQUEST_PARAM, WFS2.GET_CAPABILITIES);
+        target = target.queryParam(WFS2.SERVICE_PARAM, WFS2.SERVICE_TYPE_CODE);
+        Response rsp = target.request(MediaType.APPLICATION_XML).get();
+        Assert.assertEquals(rsp.getStatus(), Response.Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
-        this.rspEntity = rsp.getEntity(Document.class);
+    	Object entity = rsp.getEntity();
+        if (entity instanceof InputStream) {
+            try {
+                this.rspEntity = docBuilder.parse((InputStream) entity);
+            } catch (SAXException | IOException e) {
+                throw new AssertionError(e.getMessage());
+            }
+        }
         Assert.assertNotNull(this.rspEntity, ErrorMessage.get(ErrorMessageKeys.MISSING_XML_ENTITY));
         SchematronValidator validator = ValidationUtils.buildSchematronValidator("wfs-capabilities-2.0.sch",
                 "SimpleWFSPhase");
@@ -135,7 +146,7 @@ public class SimpleCapabilitiesTests extends BaseFixture {
     public void getCapabilities_acceptVersions(ProtocolBinding binding) {
         InputStream entityStream = getClass().getResourceAsStream("getCapabilities_acceptVersions.xml");
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.GET_CAPABILITIES, binding);
-        ClientResponse rsp = wfsClient.submitRequest(new StreamSource(entityStream), binding, endpoint);
+        Response rsp = wfsClient.submitRequest(new StreamSource(entityStream), binding, endpoint);
         Assert.assertTrue(rsp.hasEntity(), ErrorMessage.get(ErrorMessageKeys.MISSING_XML_ENTITY));
         this.rspEntity = extractBodyAsDocument(rsp);
         String xpath = "/wfs:WFS_Capabilities/@version = '2.0.0'";

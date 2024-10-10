@@ -26,7 +26,8 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
 
-import com.sun.jersey.api.client.ClientResponse;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 /**
  * Provides test methods that verify the deletion of stored queries.
@@ -55,17 +56,17 @@ public class DropStoredQueryTests extends BaseFixture {
         this.reqEntity = WFSMessage.createRequestEntity(ETS_PKG + "/querymgmt/CreateStoredQuery-GetFeatureByName",
                 this.wfsVersion);
         WFSMessage.setReturnTypesAndTypeNamesAttribute( this.reqEntity, this.dataSampler.selectFeatureType() );
-        ClientResponse rsp = this.wfsClient.submitRequest(new DOMSource(this.reqEntity), ProtocolBinding.POST,
+        Response rsp = this.wfsClient.submitRequest(new DOMSource(this.reqEntity), ProtocolBinding.POST,
                 endpoint);
-        assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(rsp.getStatus(), Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
         this.reqEntity = WFSMessage.createRequestEntity("DropStoredQuery", this.wfsVersion);
         this.reqEntity.getDocumentElement().setAttribute("id", CreateStoredQueryTests.QRY_GET_FEATURE_BY_NAME);
         endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.DROP_STORED_QRY,
                 ProtocolBinding.POST);
         rsp = this.wfsClient.submitRequest(new DOMSource(this.reqEntity), ProtocolBinding.POST, endpoint);
-        this.rspEntity = rsp.getEntity(Document.class);
-        assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
+        this.rspEntity = rsp.readEntity(Document.class);
+        assertEquals(rsp.getStatus(), Status.OK.getStatusCode(),
                 ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
         ETSAssert.assertQualifiedName(this.rspEntity.getDocumentElement(),
                 new QName(WFS2.NS_URI, "DropStoredQueryResponse"));
@@ -85,9 +86,9 @@ public class DropStoredQueryTests extends BaseFixture {
         this.reqEntity.getDocumentElement().setAttribute("id", "urn:uuid:" + UUID.randomUUID().toString());
         URI endpoint = ServiceMetadataUtils.getOperationEndpoint(this.wfsMetadata, WFS2.DROP_STORED_QRY,
                 ProtocolBinding.POST);
-        ClientResponse rsp = this.wfsClient.submitRequest(new DOMSource(this.reqEntity), ProtocolBinding.POST,
+        Response rsp = this.wfsClient.submitRequest(new DOMSource(this.reqEntity), ProtocolBinding.POST,
                 endpoint);
-        this.rspEntity = rsp.getEntity(Document.class);
+        this.rspEntity = rsp.readEntity(Document.class);
         ETSAssert.assertExceptionReport(this.rspEntity, "InvalidParameterValue", "id");
     }
 

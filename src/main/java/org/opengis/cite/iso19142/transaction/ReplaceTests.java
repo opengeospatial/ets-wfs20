@@ -21,9 +21,9 @@ import org.opengis.cite.iso19142.FES2;
 import org.opengis.cite.iso19142.Namespaces;
 import org.opengis.cite.iso19142.ProtocolBinding;
 import org.opengis.cite.iso19142.WFS2;
-import org.opengis.cite.iso19142.util.XMLUtils;
 import org.opengis.cite.iso19142.util.TestSuiteLogger;
 import org.opengis.cite.iso19142.util.WFSMessage;
+import org.opengis.cite.iso19142.util.XMLUtils;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
@@ -31,7 +31,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import com.sun.jersey.api.client.ClientResponse;
+import jakarta.ws.rs.core.Response;
+
 
 /**
  * Tests the response to a Transaction request that includes one or more replace
@@ -59,8 +60,8 @@ public class ReplaceTests extends TransactionFixture {
         }
         Document req = WFSMessage.createRequestEntity(WFS2.TRANSACTION, this.wfsVersion);
         WFSMessage.addReplaceStatements(req, originalFeatures);
-        ClientResponse rsp = wfsClient.submitRequest(req, ProtocolBinding.ANY);
-        Document rspEntity = rsp.getEntity(Document.class);
+        Response rsp = wfsClient.submitRequest(req, ProtocolBinding.ANY);
+        Document rspEntity = rsp.readEntity(Document.class);
         String expr = String.format("//wfs:totalReplaced = '%d'", originalFeatures.size());
         Boolean result;
         try {
@@ -98,8 +99,8 @@ public class ReplaceTests extends TransactionFixture {
         Element replacement = createReplacementFeature(originalFeature);
         List<Element> replacements = Arrays.asList(replacement);
         WFSMessage.addReplaceStatements(this.reqEntity, replacements);
-        ClientResponse rsp = wfsClient.submitRequest(this.reqEntity, binding);
-        this.rspEntity = rsp.getEntity(Document.class);
+        Response rsp = wfsClient.submitRequest(this.reqEntity, binding);
+        this.rspEntity = rsp.readEntity(Document.class);
         String xpath = String.format("//wfs:totalReplaced = '%d'", replacements.size());
         ETSAssert.assertXPath(xpath, this.rspEntity, null);
         originalFeatures.add(originalFeature);
