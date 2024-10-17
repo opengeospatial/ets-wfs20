@@ -30,7 +30,9 @@ import org.xml.sax.SAXException;
 public class VerifyBBOXTests extends CommonTestFixture {
 
 	private static final String NS1 = "http://example.org/ns1";
+
 	private static ITestContext testContext;
+
 	private static ISuite suite;
 
 	public VerifyBBOXTests() {
@@ -45,36 +47,26 @@ public class VerifyBBOXTests extends CommonTestFixture {
 
 	@Test
 	public void addBBOX() throws SAXException, IOException {
-		Document req = BUILDER.parse(this.getClass().getResourceAsStream(
-				"/GetFeature/GetFeature-Minimal.xml"));
+		Document req = BUILDER.parse(this.getClass().getResourceAsStream("/GetFeature/GetFeature-Minimal.xml"));
 		WFSMessage.appendSimpleQuery(req, new QName(NS1, "Type1"));
-		Document env = BUILDER.parse(this.getClass().getResourceAsStream(
-				"/Envelope.xml"));
+		Document env = BUILDER.parse(this.getClass().getResourceAsStream("/Envelope.xml"));
 		BBOXTests iut = new BBOXTests();
 		iut.addBBOXPredicate(req, env.getDocumentElement(), null);
-		NodeList envElems = req.getElementsByTagNameNS(Namespaces.GML,
-				"Envelope");
-		Assert.assertEquals("Unexpected number of gml:Envelope elements.", 1,
-				envElems.getLength());
+		NodeList envElems = req.getElementsByTagNameNS(Namespaces.GML, "Envelope");
+		Assert.assertEquals("Unexpected number of gml:Envelope elements.", 1, envElems.getLength());
 	}
 
 	@Test
 	public void addBBOXWithValueReference() throws SAXException, IOException {
-		Document req = BUILDER.parse(this.getClass().getResourceAsStream(
-				"/GetFeature/GetFeature-Minimal.xml"));
+		Document req = BUILDER.parse(this.getClass().getResourceAsStream("/GetFeature/GetFeature-Minimal.xml"));
 		WFSMessage.appendSimpleQuery(req, new QName(NS1, "Type1"));
-		Document env = BUILDER.parse(this.getClass().getResourceAsStream(
-				"/Envelope.xml"));
+		Document env = BUILDER.parse(this.getClass().getResourceAsStream("/Envelope.xml"));
 		BBOXTests iut = new BBOXTests();
-		Element valueRef = XMLUtils.createElement(new QName(Namespaces.FES,
-				"ValueReference", "fes"));
+		Element valueRef = XMLUtils.createElement(new QName(Namespaces.FES, "ValueReference", "fes"));
 		valueRef.setTextContent("tns:geom");
 		iut.addBBOXPredicate(req, env.getDocumentElement(), valueRef);
-		Node node = req
-				.getElementsByTagNameNS(Namespaces.FES, "ValueReference").item(
-						0);
-		Assert.assertEquals("Unexpected fes:ValueReference.", "tns:geom",
-				node.getTextContent());
+		Node node = req.getElementsByTagNameNS(Namespaces.FES, "ValueReference").item(0);
+		Assert.assertEquals("Unexpected fes:ValueReference.", "tns:geom", node.getTextContent());
 	}
 
 	@Test
@@ -83,8 +75,9 @@ public class VerifyBBOXTests extends CommonTestFixture {
 		BBOXTests iut = new BBOXTests();
 		Document document = iut.envelopeAsGML(envelope);
 		Node nodeLower = document.getElementsByTagNameNS(Namespaces.GML, "lowerCorner").item(0);
-		Assert.assertEquals("Unexpected LowerCorner", "-0.01 -0.01",nodeLower.getTextContent());
+		Assert.assertEquals("Unexpected LowerCorner", "-0.01 -0.01", nodeLower.getTextContent());
 		Node nodeUpper = document.getElementsByTagNameNS(Namespaces.GML, "upperCorner").item(0);
 		Assert.assertEquals("Unexpected LowerCorner", "1.01 1.01", nodeUpper.getTextContent());
 	}
+
 }

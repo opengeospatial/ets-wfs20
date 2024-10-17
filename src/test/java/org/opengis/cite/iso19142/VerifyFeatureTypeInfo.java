@@ -44,10 +44,8 @@ public class VerifyFeatureTypeInfo {
 		Envelope envelope = iut.getSpatialExtent();
 		Assert.assertNotNull("Default extent is null.", envelope);
 		String lowerCoordAsWKT = envelope.getLowerCorner().toString();
-		String lowerCoord = lowerCoordAsWKT.substring(
-				lowerCoordAsWKT.indexOf('(') + 1, lowerCoordAsWKT.indexOf(')'));
-		Assert.assertEquals("Unexpected coordinates of lower corner.",
-				"-90 -180", lowerCoord);
+		String lowerCoord = lowerCoordAsWKT.substring(lowerCoordAsWKT.indexOf('(') + 1, lowerCoordAsWKT.indexOf(')'));
+		Assert.assertEquals("Unexpected coordinates of lower corner.", "-90 -180", lowerCoord);
 	}
 
 	@Test
@@ -58,7 +56,7 @@ public class VerifyFeatureTypeInfo {
 		Envelope envelope = iut.getSpatialExtent();
 		Assert.assertNotNull("Default extent is null.", envelope);
 		DirectPosition pos = envelope.getLowerCorner();
-		Assert.assertTrue("Expected easting of lower corner > 200000 ",
-				pos.getOrdinate(0) > 200000);
+		Assert.assertTrue("Expected easting of lower corner > 200000 ", pos.getOrdinate(0) > 200000);
 	}
+
 }

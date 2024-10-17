@@ -9,25 +9,24 @@ import org.opengis.cite.iso19142.util.DataSampler;
 import org.w3c.dom.Document;
 
 /**
- * An enumerated type defining ISuite attributes that may be set to constitute a
- * shared test fixture.
+ * An enumerated type defining ISuite attributes that may be set to constitute a shared
+ * test fixture.
  */
 @SuppressWarnings("rawtypes")
 public enum SuiteAttribute {
 
 	/**
-	 * A DOM Document describing the WFS under test. This is typically a WFS
-	 * capabilities document.
+	 * A DOM Document describing the WFS under test. This is typically a WFS capabilities
+	 * document.
 	 */
 	TEST_SUBJECT("testSubject", Document.class),
 	/**
-	 * An immutable Schema object representing the complete WFS 2.0 schema
-	 * (wfs.xsd).
+	 * An immutable Schema object representing the complete WFS 2.0 schema (wfs.xsd).
 	 */
 	WFS_SCHEMA("wfsSchema", Schema.class),
 	/**
-	 * A {@literal Map<QName, {@link FeatureTypeInfo}>} containing one or more
-	 * entries providing information about managed feature types.
+	 * A {@literal Map<QName, {@link FeatureTypeInfo}>} containing one or more entries
+	 * providing information about managed feature types.
 	 */
 	FEATURE_INFO("featureInfo", Map.class),
 	/**
@@ -35,15 +34,16 @@ public enum SuiteAttribute {
 	 */
 	SAMPLER("sampler", DataSampler.class),
 	/**
-	 * A {@literal List<String>} of test suite preconditions that were not
-	 * satisfied.
+	 * A {@literal List<String>} of test suite preconditions that were not satisfied.
 	 */
 	FAILED_PRECONDITIONS("failedPreconditions", List.class),
 	/**
 	 * The highest specification version supported by the IUT.
 	 */
 	WFS_VERSION("wfsVersion", String.class);
+
 	private final Class attrType;
+
 	private final String attrName;
 
 	private SuiteAttribute(String attrName, Class attrType) {
@@ -65,4 +65,5 @@ public enum SuiteAttribute {
 		sb.append('(').append(attrType.getName()).append(')');
 		return sb.toString();
 	}
+
 }

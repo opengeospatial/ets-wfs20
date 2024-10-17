@@ -27,26 +27,26 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 
 /**
- * Tests the response to a GetFeature request that includes the temporal
- * predicate <em>During</em>. The relation can be expressed as follows when
- * comparing a temporal instant to a temporal period:
- * 
+ * Tests the response to a GetFeature request that includes the temporal predicate
+ * <em>During</em>. The relation can be expressed as follows when comparing a temporal
+ * instant to a temporal period:
+ *
  * <pre>
  * self.position &gt; other.begin.position AND self.position &lt; other.end.position
  * </pre>
- * 
+ *
  * <p>
  * If both operands are periods then the following must hold:
  * </p>
- * 
+ *
  * <pre>
  * self.begin.position &gt; other.begin.position AND self.end.position &lt; other.end.position
  * </pre>
- * 
+ *
  * <p>
- * The following figure illustrates the relationship. A solid line denotes a
- * temporal property; a dashed line denotes a literal time value that specifies
- * the temporal extent of interest.
+ * The following figure illustrates the relationship. A solid line denotes a temporal
+ * property; a dashed line denotes a literal time value that specifies the temporal extent
+ * of interest.
  * </p>
  *
  * <img src="doc-files/during.png" alt="During relationship">
@@ -60,61 +60,55 @@ import jakarta.ws.rs.core.Response.Status;
  */
 public class DuringTests extends AbstractTemporalTest {
 
-    private static final String DURING_OP = "During";
+	private static final String DURING_OP = "During";
 
-    /**
-     * [{@code Test}] Submits a GetFeature request containing a During temporal
-     * predicate with a gml:TimePeriod operand spanning some time interval. The
-     * response entity must contain only instances of the requested type that
-     * satisfy the temporal relation.
-     * 
-     * @param binding
-     *            The ProtocolBinding to use for this request.
-     * @param featureType
-     *            A QName representing the qualified name of some feature type.
-     */
-    @Test(description = "See ISO 19143: 7.14.6, A.9", dataProvider = "protocol-featureType")
-    public void duringPeriod(ProtocolBinding binding, QName featureType) {
-        TemporalProperty temporalProperty = findTemporalProperty( featureType );
+	/**
+	 * [{@code Test}] Submits a GetFeature request containing a During temporal predicate
+	 * with a gml:TimePeriod operand spanning some time interval. The response entity must
+	 * contain only instances of the requested type that satisfy the temporal relation.
+	 * @param binding The ProtocolBinding to use for this request.
+	 * @param featureType A QName representing the qualified name of some feature type.
+	 */
+	@Test(description = "See ISO 19143: 7.14.6, A.9", dataProvider = "protocol-featureType")
+	public void duringPeriod(ProtocolBinding binding, QName featureType) {
+		TemporalProperty temporalProperty = findTemporalProperty(featureType);
 
-        Document gmlTimeLiteral = TimeUtils.periodAsGML(temporalProperty.getExtent());
-        WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
-        Element valueRef = WFSMessage.createValueReference(temporalProperty.getProperty());
-        WFSMessage.addTemporalPredicate(this.reqEntity, DURING_OP, gmlTimeLiteral, valueRef);
-        Response rsp = wfsClient.getFeature(new DOMSource(reqEntity), binding);
-        this.rspEntity = extractBodyAsDocument(rsp);
-        Assert.assertEquals(rsp.getStatus(), Status.OK.getStatusCode(),
-                ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
-        List<Node> temporalNodes = TemporalQuery.extractTemporalNodes(this.rspEntity, temporalProperty.getProperty(), getModel());
-        assertDuring(temporalNodes, temporalProperty.getProperty(), gmlTimeLiteral);
-    }
+		Document gmlTimeLiteral = TimeUtils.periodAsGML(temporalProperty.getExtent());
+		WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
+		Element valueRef = WFSMessage.createValueReference(temporalProperty.getProperty());
+		WFSMessage.addTemporalPredicate(this.reqEntity, DURING_OP, gmlTimeLiteral, valueRef);
+		Response rsp = wfsClient.getFeature(new DOMSource(reqEntity), binding);
+		this.rspEntity = extractBodyAsDocument(rsp);
+		Assert.assertEquals(rsp.getStatus(), Status.OK.getStatusCode(),
+				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
+		List<Node> temporalNodes = TemporalQuery.extractTemporalNodes(this.rspEntity, temporalProperty.getProperty(),
+				getModel());
+		assertDuring(temporalNodes, temporalProperty.getProperty(), gmlTimeLiteral);
+	}
 
-    /**
-     * Asserts that all temporal values in the given list occur during the
-     * specified GML temporal value (gml:TimePeriod).
-     * 
-     * @param temporalNodes
-     *            A list of simple or complex temporal values.
-     * @param propertyDecl
-     *            An element declaration for a temporal property.
-     * @param gmlTimeLiteral
-     *            A document that contains a GML representation of a period.
-     */
-    void assertDuring(List<Node> temporalNodes, XSElementDeclaration propertyDecl, Document gmlTimeLiteral) {
-        Assert.assertFalse(temporalNodes.isEmpty(),
-                String.format("No temporal values found in results: property is %s.", propertyDecl));
-        TemporalGeometricPrimitive t2 = GmlUtils.gmlToTemporalGeometricPrimitive(gmlTimeLiteral.getDocumentElement());
-        XSTypeDefinition typeDef = propertyDecl.getTypeDefinition();
-        for (Node timeNode : temporalNodes) {
-            TemporalGeometricPrimitive t1 = null;
-            if (typeDef.getTypeCategory() == XSTypeDefinition.SIMPLE_TYPE
-                || ( (XSComplexTypeDefinition) typeDef ).getContentType() == XSComplexTypeDefinition.CONTENTTYPE_SIMPLE) {
-                t1 = TemporalQuery.parseTemporalValue(timeNode.getTextContent(), typeDef);
-            } else {
-                t1 = GmlUtils.gmlToTemporalGeometricPrimitive((Element) timeNode);
-            }
-            TemporalUtils.assertTemporalRelation(RelativePosition.DURING, t1, t2);
-        }
-    }
+	/**
+	 * Asserts that all temporal values in the given list occur during the specified GML
+	 * temporal value (gml:TimePeriod).
+	 * @param temporalNodes A list of simple or complex temporal values.
+	 * @param propertyDecl An element declaration for a temporal property.
+	 * @param gmlTimeLiteral A document that contains a GML representation of a period.
+	 */
+	void assertDuring(List<Node> temporalNodes, XSElementDeclaration propertyDecl, Document gmlTimeLiteral) {
+		Assert.assertFalse(temporalNodes.isEmpty(),
+				String.format("No temporal values found in results: property is %s.", propertyDecl));
+		TemporalGeometricPrimitive t2 = GmlUtils.gmlToTemporalGeometricPrimitive(gmlTimeLiteral.getDocumentElement());
+		XSTypeDefinition typeDef = propertyDecl.getTypeDefinition();
+		for (Node timeNode : temporalNodes) {
+			TemporalGeometricPrimitive t1 = null;
+			if (typeDef.getTypeCategory() == XSTypeDefinition.SIMPLE_TYPE || ((XSComplexTypeDefinition) typeDef)
+				.getContentType() == XSComplexTypeDefinition.CONTENTTYPE_SIMPLE) {
+				t1 = TemporalQuery.parseTemporalValue(timeNode.getTextContent(), typeDef);
+			}
+			else {
+				t1 = GmlUtils.gmlToTemporalGeometricPrimitive((Element) timeNode);
+			}
+			TemporalUtils.assertTemporalRelation(RelativePosition.DURING, t1, t2);
+		}
+	}
 
 }

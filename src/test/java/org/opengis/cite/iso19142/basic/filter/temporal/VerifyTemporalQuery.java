@@ -33,64 +33,69 @@ import org.xml.sax.SAXException;
 
 public class VerifyTemporalQuery extends CommonTestFixture {
 
-    private static final String EX_NS = "http://example.org/ns1";
-    private static XSModel model;
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
+	private static final String EX_NS = "http://example.org/ns1";
 
-    @BeforeClass
-    public static void initFixture() throws Exception {
-        URL entityCatalog = VerifyTemporalQuery.class.getResource("/schema-catalog.xml");
-        XmlSchemaCompiler xsdCompiler = new XmlSchemaCompiler(entityCatalog);
-        InputStream xis = VerifyTemporalQuery.class.getResourceAsStream("/xsd/simple.xsd");
-        Schema schema = xsdCompiler.compileXmlSchema(new StreamSource(xis));
-        model = XSModelBuilder.buildXMLSchemaModel(schema, EX_NS);
-    }
+	private static XSModel model;
 
-    @Test
-    public void parseDateTime() {
-        XSTypeDefinition typeDef = model.getTypeDefinition("dateTime", XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        TemporalGeometricPrimitive result = TemporalQuery.parseTemporalValue("2016-05-15T12:00:00Z", typeDef);
-        assertTrue("Expected result: " + Instant.class.getName(), Instant.class.isInstance(result));
-        Instant instant = Instant.class.cast(result);
-        assertTrue(instant.getDate().toInstant().toString().startsWith("2016-05"));
-    }
+	@Rule
+	public ExpectedException thrown = ExpectedException.none();
 
-    @Test
-    public void parseDate() {
-        XSTypeDefinition typeDef = model.getTypeDefinition("date", XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        TemporalGeometricPrimitive result = TemporalQuery.parseTemporalValue("2016-05-15Z", typeDef);
-        assertTrue("Expected result: " + Period.class.getName(), Period.class.isInstance(result));
-        Period period = Period.class.cast(result);
-        assertTrue("Expected duration: PT23H59M59S", period.length().toString().equals("PT23H59M59S"));
-    }
+	@BeforeClass
+	public static void initFixture() throws Exception {
+		URL entityCatalog = VerifyTemporalQuery.class.getResource("/schema-catalog.xml");
+		XmlSchemaCompiler xsdCompiler = new XmlSchemaCompiler(entityCatalog);
+		InputStream xis = VerifyTemporalQuery.class.getResourceAsStream("/xsd/simple.xsd");
+		Schema schema = xsdCompiler.compileXmlSchema(new StreamSource(xis));
+		model = XSModelBuilder.buildXMLSchemaModel(schema, EX_NS);
+	}
 
-    @Test(expected = SkipException.class)
-    public void parseDateWithoutTimezone() {
-        XSTypeDefinition typeDef = model.getTypeDefinition("date", XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        TemporalQuery.parseTemporalValue("2016-05-15", typeDef);
-    }
+	@Test
+	public void parseDateTime() {
+		XSTypeDefinition typeDef = model.getTypeDefinition("dateTime", XMLConstants.W3C_XML_SCHEMA_NS_URI);
+		TemporalGeometricPrimitive result = TemporalQuery.parseTemporalValue("2016-05-15T12:00:00Z", typeDef);
+		assertTrue("Expected result: " + Instant.class.getName(), Instant.class.isInstance(result));
+		Instant instant = Instant.class.cast(result);
+		assertTrue(instant.getDate().toInstant().toString().startsWith("2016-05"));
+	}
 
-    @Test
-    public void parseDateWithOffset() {
-        XSTypeDefinition typeDef = model.getTypeDefinition("date", XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        TemporalGeometricPrimitive result = TemporalQuery.parseTemporalValue("2016-05-15-04:00", typeDef);
-        assertTrue("Expected result: " + Period.class.getName(), Period.class.isInstance(result));
-        Period period = Period.class.cast(result);
-        DateTimeFormatter xsdDateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
-        ZonedDateTime actualStart = ZonedDateTime
-                .parse(period.getBeginning().getDate().toInstant().atOffset(java.time.ZoneOffset.of("+02:00"))
-                        .format(xsdDateTimeFormatter));
-        ZonedDateTime expectedStart = ZonedDateTime.parse("2016-05-15T00:00:00-04:00");
-        assertTrue(actualStart.isEqual(expectedStart));
-    }
+	@Test
+	public void parseDate() {
+		XSTypeDefinition typeDef = model.getTypeDefinition("date", XMLConstants.W3C_XML_SCHEMA_NS_URI);
+		TemporalGeometricPrimitive result = TemporalQuery.parseTemporalValue("2016-05-15Z", typeDef);
+		assertTrue("Expected result: " + Period.class.getName(), Period.class.isInstance(result));
+		Period period = Period.class.cast(result);
+		assertTrue("Expected duration: PT23H59M59S", period.length().toString().equals("PT23H59M59S"));
+	}
 
-    @Test
-    public void extractValidTimeValues() throws SAXException, IOException {
-        Document rspEntity = BUILDER.parse(getClass().getResourceAsStream("/wfs/FeatureCollection-ComplexFeature.xml"));
-        XSElementDeclaration validTimeProp = model.getElementDeclaration("validTime", EX_NS);
-        List<Node> tmValues = TemporalQuery.extractTemporalNodes(rspEntity, validTimeProp, model);
-        assertEquals("Unexpected number of temporal values.", 2, tmValues.size());
-        assertEquals("First node has unexpected name.", "TimePeriod", tmValues.get(0).getLocalName());
-    }
+	@Test(expected = SkipException.class)
+	public void parseDateWithoutTimezone() {
+		XSTypeDefinition typeDef = model.getTypeDefinition("date", XMLConstants.W3C_XML_SCHEMA_NS_URI);
+		TemporalQuery.parseTemporalValue("2016-05-15", typeDef);
+	}
+
+	@Test
+	public void parseDateWithOffset() {
+		XSTypeDefinition typeDef = model.getTypeDefinition("date", XMLConstants.W3C_XML_SCHEMA_NS_URI);
+		TemporalGeometricPrimitive result = TemporalQuery.parseTemporalValue("2016-05-15-04:00", typeDef);
+		assertTrue("Expected result: " + Period.class.getName(), Period.class.isInstance(result));
+		Period period = Period.class.cast(result);
+		DateTimeFormatter xsdDateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
+		ZonedDateTime actualStart = ZonedDateTime.parse(period.getBeginning()
+			.getDate()
+			.toInstant()
+			.atOffset(java.time.ZoneOffset.of("+02:00"))
+			.format(xsdDateTimeFormatter));
+		ZonedDateTime expectedStart = ZonedDateTime.parse("2016-05-15T00:00:00-04:00");
+		assertTrue(actualStart.isEqual(expectedStart));
+	}
+
+	@Test
+	public void extractValidTimeValues() throws SAXException, IOException {
+		Document rspEntity = BUILDER.parse(getClass().getResourceAsStream("/wfs/FeatureCollection-ComplexFeature.xml"));
+		XSElementDeclaration validTimeProp = model.getElementDeclaration("validTime", EX_NS);
+		List<Node> tmValues = TemporalQuery.extractTemporalNodes(rspEntity, validTimeProp, model);
+		assertEquals("Unexpected number of temporal values.", 2, tmValues.size());
+		assertEquals("First node has unexpected name.", "TimePeriod", tmValues.get(0).getLocalName());
+	}
+
 }

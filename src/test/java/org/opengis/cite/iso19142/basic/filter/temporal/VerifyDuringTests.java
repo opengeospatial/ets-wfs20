@@ -15,16 +15,17 @@ import org.xml.sax.SAXException;
 
 public class VerifyDuringTests {
 
-    private static final String NS1 = "http://example.org/ns1";
-    private static XSModel model;
+	private static final String NS1 = "http://example.org/ns1";
 
-    @BeforeClass
-    public static void buildSchemaModel() throws SAXException {
-        URL entityCatalog = VerifyAppSchemaUtils.class.getResource("/schema-catalog.xml");
-        XmlSchemaCompiler xsdCompiler = new XmlSchemaCompiler(entityCatalog);
-        InputStream xis = VerifyAppSchemaUtils.class.getResourceAsStream("/xsd/simple.xsd");
-        Schema schema = xsdCompiler.compileXmlSchema(new StreamSource(xis));
-        model = XSModelBuilder.buildXMLSchemaModel(schema, NS1);
-    }
+	private static XSModel model;
+
+	@BeforeClass
+	public static void buildSchemaModel() throws SAXException {
+		URL entityCatalog = VerifyAppSchemaUtils.class.getResource("/schema-catalog.xml");
+		XmlSchemaCompiler xsdCompiler = new XmlSchemaCompiler(entityCatalog);
+		InputStream xis = VerifyAppSchemaUtils.class.getResourceAsStream("/xsd/simple.xsd");
+		Schema schema = xsdCompiler.compileXmlSchema(new StreamSource(xis));
+		model = XSModelBuilder.buildXMLSchemaModel(schema, NS1);
+	}
 
 }

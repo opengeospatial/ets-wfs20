@@ -24,13 +24,11 @@ import org.w3c.dom.Element;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 
-
 /**
- * Tests the response to a GetFeatureWithLock request that attempts to lock
- * feature instances that belong to a set of query results. The lock is active
- * until it either expires (default duration is 300 s) or it is released by a
- * subsequent transaction.
- * 
+ * Tests the response to a GetFeatureWithLock request that attempts to lock feature
+ * instances that belong to a set of query results. The lock is active until it either
+ * expires (default duration is 300 s) or it is released by a subsequent transaction.
+ *
  * <p style="margin-bottom: 0.5em">
  * <strong>Sources</strong>
  * </p>
@@ -43,38 +41,34 @@ import jakarta.ws.rs.core.Response.Status;
 public class GetFeatureWithLockTests extends LockingFixture {
 
 	/**
-	 * Checks that the GetFeatureWithLock operation is implemented by the SUT.
-	 * If not, all test methods defined in this class are skipped.
-	 * 
-	 * @param testContext
-	 *            Supplies details about the test run.
+	 * Checks that the GetFeatureWithLock operation is implemented by the SUT. If not, all
+	 * test methods defined in this class are skipped.
+	 * @param testContext Supplies details about the test run.
 	 */
 	@BeforeClass(alwaysRun = true)
 	public void sutImplementsGetFeatureWithLock(ITestContext testContext) {
-		String xpath = String.format("//ows:Operation[@name='%s']",
-				WFS2.GET_FEATURE_WITH_LOCK);
-        boolean xpathResult = ETSAssert.evaluateXPathToBoolean( xpath, this.wfsMetadata, null );
-        if ( !xpathResult ) {
-            throw new SkipException( "The service does not support " + WFS2.GET_FEATURE_WITH_LOCK
-                                     + " operation so tests are skipped." );
+		String xpath = String.format("//ows:Operation[@name='%s']", WFS2.GET_FEATURE_WITH_LOCK);
+		boolean xpathResult = ETSAssert.evaluateXPathToBoolean(xpath, this.wfsMetadata, null);
+		if (!xpathResult) {
+			throw new SkipException(
+					"The service does not support " + WFS2.GET_FEATURE_WITH_LOCK + " operation so tests are skipped.");
 		}
 	}
 
 	/**
-	 * Builds a DOM Document representing a GetFeatureWithLock request entity.
-	 * It contains default values for all lock-related attributes.
+	 * Builds a DOM Document representing a GetFeatureWithLock request entity. It contains
+	 * default values for all lock-related attributes.
 	 */
 	@BeforeMethod
 	public void buildGetFeatureWithLockRequest() {
-		this.reqEntity = WFSMessage.createRequestEntity("GetFeatureWithLock",
-				this.wfsVersion);
+		this.reqEntity = WFSMessage.createRequestEntity("GetFeatureWithLock", this.wfsVersion);
 	}
 
 	/**
 	 * [{@code Test}] The only valid value for the resultType attribute in a
-	 * GetFeatureWithLock request is "results". Any other value ("hits") shall
-	 * produce an exception report with error code "InvalidParameterValue".
-	 * 
+	 * GetFeatureWithLock request is "results". Any other value ("hits") shall produce an
+	 * exception report with error code "InvalidParameterValue".
+	 *
 	 * @see "ISO 19142:2010, cl. 13.2.4.3: resultType parameter"
 	 */
 	@Test(description = "See ISO 19142: 13.2.4.3")
@@ -82,22 +76,20 @@ public class GetFeatureWithLockTests extends LockingFixture {
 		QName featureType = this.dataSampler.selectFeatureType();
 		WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
 		this.reqEntity.getDocumentElement().setAttribute("resultType", "hits");
-		Response rsp = wfsClient.submitRequest(this.reqEntity,
-				ProtocolBinding.ANY);
+		Response rsp = wfsClient.submitRequest(this.reqEntity, ProtocolBinding.ANY);
 		this.rspEntity = rsp.readEntity(Document.class);
-		Assert.assertEquals(rsp.getStatus(),
-				Status.BAD_REQUEST.getStatusCode(),
+		Assert.assertEquals(rsp.getStatus(), Status.BAD_REQUEST.getStatusCode(),
 				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
 		String xpath = "//ows:Exception[@exceptionCode = 'InvalidParameterValue']";
 		ETSAssert.assertXPath(xpath, this.rspEntity.getDocumentElement(), null);
 	}
 
 	/**
-	 * [{@code Test}] Submits a request to lock all instances of a randomly
-	 * selected feature type for 20 seconds. After this time has elapsed, an
-	 * attempt is made to reset the lock; this LockFeature request should fail
-	 * with a 'LockHasExpired' exception and HTTP status code 403 (Forbidden).
-	 * 
+	 * [{@code Test}] Submits a request to lock all instances of a randomly selected
+	 * feature type for 20 seconds. After this time has elapsed, an attempt is made to
+	 * reset the lock; this LockFeature request should fail with a 'LockHasExpired'
+	 * exception and HTTP status code 403 (Forbidden).
+	 *
 	 * <p style="margin-bottom: 0.5em">
 	 * <strong>Sources</strong>
 	 * </p>
@@ -111,75 +103,66 @@ public class GetFeatureWithLockTests extends LockingFixture {
 		QName featureType = this.dataSampler.selectFeatureType();
 		WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
 		this.reqEntity.getDocumentElement().setAttribute("expiry", "20");
-		Response rsp = wfsClient.submitRequest(this.reqEntity,
-				ProtocolBinding.ANY);
+		Response rsp = wfsClient.submitRequest(this.reqEntity, ProtocolBinding.ANY);
 		this.rspEntity = rsp.readEntity(Document.class);
-		Assert.assertEquals(rsp.getStatus(),
-				Status.OK.getStatusCode(),
+		Assert.assertEquals(rsp.getStatus(), Status.OK.getStatusCode(),
 				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
-		Element featureColl = (Element) this.rspEntity.getElementsByTagNameNS(
-				Namespaces.WFS, WFS2.FEATURE_COLLECTION).item(0);
+		Element featureColl = (Element) this.rspEntity.getElementsByTagNameNS(Namespaces.WFS, WFS2.FEATURE_COLLECTION)
+			.item(0);
 		String lockId = featureColl.getAttribute("lockId");
-		Assert.assertFalse(lockId.isEmpty(), ErrorMessage.format(
-				ErrorMessageKeys.MISSING_INFOSET_ITEM, "@lockId"));
+		Assert.assertFalse(lockId.isEmpty(), ErrorMessage.format(ErrorMessageKeys.MISSING_INFOSET_ITEM, "@lockId"));
 		locks.add(lockId);
 		try {
 			Thread.sleep(34 * 1000);
-		} catch (InterruptedException e) {
+		}
+		catch (InterruptedException e) {
 			// ignore interrupt should one occur
 		}
 		// try to reset expired lock with LockFeature request
-		this.reqEntity = WFSMessage.createRequestEntity("LockFeature",
-				this.wfsVersion);
+		this.reqEntity = WFSMessage.createRequestEntity("LockFeature", this.wfsVersion);
 		reqEntity.getDocumentElement().setAttribute("lockId", lockId);
 		rsp = wfsClient.submitRequest(reqEntity, ProtocolBinding.ANY);
 		this.rspEntity = rsp.readEntity(Document.class);
-		Assert.assertEquals(rsp.getStatus(),
-				Status.FORBIDDEN.getStatusCode(),
+		Assert.assertEquals(rsp.getStatus(), Status.FORBIDDEN.getStatusCode(),
 				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
 		String xpath = "//ows:Exception[@exceptionCode = 'LockHasExpired']";
 		ETSAssert.assertXPath(xpath, this.rspEntity.getDocumentElement(), null);
 	}
 
 	/**
-	 * [{@code Test}] Verifies that a feature can be protected by only one lock
-	 * at a time (i.e. a mutual exclusion lock). Two
-	 * <code>GetFeatureWithLock</code> requests are submitted:
+	 * [{@code Test}] Verifies that a feature can be protected by only one lock at a time
+	 * (i.e. a mutual exclusion lock). Two <code>GetFeatureWithLock</code> requests are
+	 * submitted:
 	 * <ol>
 	 * <li>A request to lock a single feature instance for 60 seconds (Q1)</li>
-	 * <li>A request to lock SOME of Q1 plus other feature instances (a proper
-	 * superset of the Q1).</li>
+	 * <li>A request to lock SOME of Q1 plus other feature instances (a proper superset of
+	 * the Q1).</li>
 	 * </ol>
-	 * 
+	 *
 	 * <p>
-	 * The last request should succeed. However, the response entity shall not
-	 * contain the feature that was previously locked in Q1.
+	 * The last request should succeed. However, the response entity shall not contain the
+	 * feature that was previously locked in Q1.
 	 * </p>
-	 * 
+	 *
 	 * @see "ISO 19142:2010, cl. 13.2.4.2: lockAction parameter"
 	 */
 	@Test(description = "See ISO 19142: 13.2.4.2")
 	public void lockSomeFeatures() {
 		QName featureType = this.dataSampler.selectFeatureType();
-		Set<String> featureIdSet = this.dataSampler
-				.selectRandomFeatureIdentifiers(featureType, 10);
+		Set<String> featureIdSet = this.dataSampler.selectRandomFeatureIdentifiers(featureType, 10);
 		// Submit Q1 to lock one feature
-		Set<String> singleton = Collections.singleton(featureIdSet.iterator()
-				.next());
+		Set<String> singleton = Collections.singleton(featureIdSet.iterator().next());
 		WFSMessage.appendSimpleQuery(this.reqEntity, featureType);
 		WFSMessage.addResourceIdPredicate(this.reqEntity, singleton);
 		this.reqEntity.getDocumentElement().setAttribute("expiry", "60");
-		Response rsp = wfsClient.submitRequest(this.reqEntity,
-				ProtocolBinding.ANY);
+		Response rsp = wfsClient.submitRequest(this.reqEntity, ProtocolBinding.ANY);
 		this.rspEntity = rsp.readEntity(Document.class);
-		Assert.assertEquals(rsp.getStatus(),
-				Status.OK.getStatusCode(),
+		Assert.assertEquals(rsp.getStatus(), Status.OK.getStatusCode(),
 				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
-		Element featureColl = (Element) this.rspEntity.getElementsByTagNameNS(
-				Namespaces.WFS, WFS2.FEATURE_COLLECTION).item(0);
+		Element featureColl = (Element) this.rspEntity.getElementsByTagNameNS(Namespaces.WFS, WFS2.FEATURE_COLLECTION)
+			.item(0);
 		String lockId = featureColl.getAttribute("lockId");
-		Assert.assertFalse(lockId.isEmpty(), ErrorMessage.format(
-				ErrorMessageKeys.MISSING_INFOSET_ITEM,
+		Assert.assertFalse(lockId.isEmpty(), ErrorMessage.format(ErrorMessageKeys.MISSING_INFOSET_ITEM,
 				"@lockId in response to GetFeatureWithLock"));
 		locks.add(lockId);
 		// Submit Q2 to lock all features in set
@@ -189,23 +172,18 @@ public class GetFeatureWithLockTests extends LockingFixture {
 		this.reqEntity.getDocumentElement().setAttribute("lockAction", "SOME");
 		rsp = wfsClient.submitRequest(this.reqEntity, ProtocolBinding.ANY);
 		this.rspEntity = rsp.readEntity(Document.class);
-		Assert.assertEquals(rsp.getStatus(),
-				Status.OK.getStatusCode(),
+		Assert.assertEquals(rsp.getStatus(), Status.OK.getStatusCode(),
 				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
-		featureColl = (Element) this.rspEntity.getElementsByTagNameNS(
-				Namespaces.WFS, WFS2.FEATURE_COLLECTION).item(0);
+		featureColl = (Element) this.rspEntity.getElementsByTagNameNS(Namespaces.WFS, WFS2.FEATURE_COLLECTION).item(0);
 		lockId = featureColl.getAttribute("lockId");
-		Assert.assertFalse(lockId.isEmpty(), ErrorMessage.format(
-				ErrorMessageKeys.MISSING_INFOSET_ITEM,
+		Assert.assertFalse(lockId.isEmpty(), ErrorMessage.format(ErrorMessageKeys.MISSING_INFOSET_ITEM,
 				"@lockId in response to GetFeatureWithLock"));
 		locks.add(lockId);
 		String xpath1 = "/wfs:FeatureCollection/@numberReturned > 1";
-		ETSAssert
-				.assertXPath(xpath1, this.rspEntity.getDocumentElement(), null);
+		ETSAssert.assertXPath(xpath1, this.rspEntity.getDocumentElement(), null);
 		// response must exclude feature that was previously locked
-		xpath1 = String.format("not(//*[@gml:id = '%s'])", singleton.iterator()
-				.next());
-		ETSAssert
-				.assertXPath(xpath1, this.rspEntity.getDocumentElement(), null);
+		xpath1 = String.format("not(//*[@gml:id = '%s'])", singleton.iterator().next());
+		ETSAssert.assertXPath(xpath1, this.rspEntity.getDocumentElement(), null);
 	}
+
 }

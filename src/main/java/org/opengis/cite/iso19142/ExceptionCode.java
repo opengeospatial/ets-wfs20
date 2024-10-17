@@ -1,9 +1,9 @@
 package org.opengis.cite.iso19142;
 
 /**
- * An enumerated type defining OGC exception codes that appear in an exception
- * report. Each error code has an associated HTTP status code.
- * 
+ * An enumerated type defining OGC exception codes that appear in an exception report.
+ * Each error code has an associated HTTP status code.
+ *
  * @see "OGC 09-025r2, Table D.2"
  */
 public enum ExceptionCode {
@@ -12,6 +12,7 @@ public enum ExceptionCode {
 	INVALID_PARAM_VALUE("InvalidParameterValue", 400);
 
 	private final String ogcCode;
+
 	private final int httpStatus;
 
 	private ExceptionCode(String ogcCode, int httpStatus) {

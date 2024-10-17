@@ -23,7 +23,7 @@
 
   <organization>
     <name>Open Geospatial Consortium</name>
-    <url>http://www.opengeospatial.org/</url>
+    <url>https://www.ogc.org/</url>
   </organization>
   <scm>
     <connection>scm:git:https://github.com/opengeospatial/ets-wfs20.git</connection>
@@ -40,6 +40,11 @@
       <name>R. Martell</name>
       <url>https://github.com/rjmartell</url>
       <timezone>Canada/Pacific</timezone>
+    </developer>
+    <developer>
+      <name>D. Stenger</name>
+      <url>https://github.com/dstenger</url>
+      <timezone>Europe/Berlin</timezone>
     </developer>
   </developers>
 
@@ -130,6 +135,7 @@
      	<artifactId>jaxb-runtime</artifactId>
      </dependency>
 	</dependencies>
+
   <build>
     <plugins>
       <plugin>
@@ -140,64 +146,21 @@
               <mainClass>org.opengis.cite.iso19142.TestNGController</mainClass>
             </manifest>
           </archive>
-          <descriptors>
-            <descriptor>${basedir}/src/assembly/deps.xml</descriptor>
-            <descriptor>${basedir}/src/assembly/ctl-scripts.xml</descriptor>
-            <descriptor>${basedir}/src/assembly/aio.xml</descriptor>
-          </descriptors>
         </configuration>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <artifactId>maven-surefire-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>17</source>
-          <target>17</target>
-        </configuration>
-      </plugin>
-      <plugin>
-        <artifactId>maven-jar-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>buildnumber-maven-plugin</artifactId>
       </plugin>
       <plugin>
         <artifactId>maven-scm-publish-plugin</artifactId>
-        <version>3.2.1</version>
-        <configuration>
-          <scmBranch>gh-pages</scmBranch>
-        </configuration>
       </plugin>
     </plugins>
+
     <pluginManagement>
       <plugins>
         <plugin>
           <groupId>com.smartbear.soapui</groupId>
           <artifactId>soapui-maven-plugin</artifactId>
-          <version>5.7.2</version>
-          <dependencies>
-            <dependency>
-              <groupId>com.jgoodies</groupId>
-              <artifactId>forms</artifactId>
-              <version>1.2.1</version>
-            </dependency>
-          </dependencies>
           <configuration>
             <projectFile>src/test/resources/soapui/ets-wfs20-soapui-project.xml</projectFile>
             <settingsFile>src/test/resources/soapui/ets-wfs20-soapui-settings.xml</settingsFile>
-            <outputFolder>${project.build.directory}/soapui</outputFolder>
-            <junitReport>true</junitReport>
             <testFailIgnore>${soapui.test.fail.ignore}</testFailIgnore>
             <projectProperties>
               <value>teamengine.endpoint=${soapui.teamengine.endpoint}</value>
@@ -213,31 +176,13 @@
         <plugin>
           <groupId>io.fabric8</groupId>
           <artifactId>docker-maven-plugin</artifactId>
-          <version>0.43.4</version>
           <configuration>
             <images>
               <image>
-                <name>ogccite/${project.artifactId}</name>
                 <build>
-                  <dockerFileDir>${project.basedir}/src/docker</dockerFileDir>
                   <tags>
                     <tag>${project.version}-teamengine-${docker.teamengine.version}</tag>
                   </tags>
-                  <assembly>
-                    <inline>
-                      <fileSets>
-                        <fileSet>
-                          <directory>${project.build.directory}</directory>
-                          <outputDirectory>.</outputDirectory>
-                          <includes>
-                            <include>dependency/*teamengine-*.war</include>
-                            <include>dependency/*teamengine-*.zip</include>
-                            <include>*ets-*.zip</include>
-                          </includes>
-                        </fileSet>
-                      </fileSets>
-                    </inline>
-                  </assembly>
                 </build>
                 <run>
                   <ports>
@@ -256,7 +201,6 @@
         </plugin>
         <plugin>
           <artifactId>maven-dependency-plugin</artifactId>
-          <version>3.6.1</version>
           <configuration>
             <artifactItems>
               <artifactItem>
@@ -287,32 +231,6 @@
   </build>
 
   <profiles>
-    <profile>
-      <id>release</id>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-gpg-plugin</artifactId>
-            <version>3.1.0</version>
-            <executions>
-              <execution>
-                <id>sign-artifacts</id>
-                <phase>verify</phase>
-                <goals>
-                  <goal>sign</goal>
-                </goals>
-                <configuration>
-                  <gpgArguments>
-                    <arg>--pinentry-mode</arg>
-                    <arg>loopback</arg>
-                  </gpgArguments>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
     <profile>
       <id>integration-tests</id>
       <build>
@@ -408,17 +326,6 @@
     </pluginRepository>
   </pluginRepositories>
 
-  <distributionManagement>
-    <repository>
-      <id>sonatype-nexus-staging</id>
-      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-    </repository>
-    <site>
-      <id>site</id>
-      <url>scm:git:git@github.com:opengeospatial/ets-wfs20.git</url>
-    </site>
-  </distributionManagement>
-
   <repositories>
 		<!-- Geotk is not deployed in Central repository. -->
     <repository>
@@ -428,4 +335,11 @@
       <layout>default</layout>
     </repository>
   </repositories>
+
+  <distributionManagement>
+    <site>
+      <id>site</id>
+      <url>scm:git:git@github.com:opengeospatial/ets-wfs20.git</url>
+    </site>
+  </distributionManagement>
 </project>

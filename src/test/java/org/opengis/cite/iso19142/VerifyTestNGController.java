@@ -26,37 +26,39 @@ import org.xml.sax.SAXException;
  */
 public class VerifyTestNGController {
 
-    private static DocumentBuilder docBuilder;
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
+	private static DocumentBuilder docBuilder;
 
-    @BeforeClass
-    public static void initParser() throws ParserConfigurationException {
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-        dbf.setValidating(false);
-        dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-        docBuilder = dbf.newDocumentBuilder();
-    }
+	@Rule
+	public ExpectedException thrown = ExpectedException.none();
 
-    @Test
-    public void etsCode() throws Exception {
-        TestNGController controller = new TestNGController();
-        String etsCode = controller.getCode();
-        assertEquals("Unexpected ETS code.", "wfs20", etsCode);
-    }
+	@BeforeClass
+	public static void initParser() throws ParserConfigurationException {
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		dbf.setNamespaceAware(true);
+		dbf.setValidating(false);
+		dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+		docBuilder = dbf.newDocumentBuilder();
+	}
 
-    @Test
-    public void missingArgument() throws URISyntaxException, IOException, SAXException {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("'iut' or 'wfs' must be present");
-        Properties testRunProps = new Properties();
-        URL sut = getClass().getResource("/wfs/capabilities-acme.xml");
-        testRunProps.setProperty("sut", sut.toURI().toString());
-        ByteArrayOutputStream outStream = new ByteArrayOutputStream(1024);
-        testRunProps.storeToXML(outStream, "Integration test");
-        Document testRunArgs = docBuilder.parse(new ByteArrayInputStream(outStream.toByteArray()));
-        TestNGController controller = new TestNGController();
-        controller.validateTestRunArgs(testRunArgs);
-    }
+	@Test
+	public void etsCode() throws Exception {
+		TestNGController controller = new TestNGController();
+		String etsCode = controller.getCode();
+		assertEquals("Unexpected ETS code.", "wfs20", etsCode);
+	}
+
+	@Test
+	public void missingArgument() throws URISyntaxException, IOException, SAXException {
+		thrown.expect(IllegalArgumentException.class);
+		thrown.expectMessage("'iut' or 'wfs' must be present");
+		Properties testRunProps = new Properties();
+		URL sut = getClass().getResource("/wfs/capabilities-acme.xml");
+		testRunProps.setProperty("sut", sut.toURI().toString());
+		ByteArrayOutputStream outStream = new ByteArrayOutputStream(1024);
+		testRunProps.storeToXML(outStream, "Integration test");
+		Document testRunArgs = docBuilder.parse(new ByteArrayInputStream(outStream.toByteArray()));
+		TestNGController controller = new TestNGController();
+		controller.validateTestRunArgs(testRunArgs);
+	}
+
 }
