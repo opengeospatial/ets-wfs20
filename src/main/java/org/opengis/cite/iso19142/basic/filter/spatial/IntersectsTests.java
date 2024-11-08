@@ -141,12 +141,16 @@ public class IntersectsTests extends QueryFilterFixture {
 			throw new SkipException("Unsupported geometry operand: " + gmlPolygon);
 		}
 		Envelope extent = this.dataSampler.getSpatialExtent(getModel(), featureType);
+		if (extent == null) {
+			throw new SkipException(
+					"Could not create envelope out of sampled features for feature type: " + featureType);
+		}
 		Document gmlEnv = null;
 		try {
 			gmlEnv = Extents.envelopeAsGML(extent);
 		}
 		catch (Exception e) {
-			throw new RuntimeException("Could not create envelope for feature type: " + featureType);
+			throw new RuntimeException("Could not create envelope for feature type: " + featureType, e);
 		}
 		Element gmlPolygonElem = XMLUtils
 			.transform(new StreamSource(getClass().getResourceAsStream(XSLT_ENV2POLYGON)), gmlEnv, null)
@@ -212,12 +216,16 @@ public class IntersectsTests extends QueryFilterFixture {
 			}
 		}
 		Envelope extent = this.dataSampler.getSpatialExtent(getModel(), featureType);
+		if (extent == null) {
+			throw new SkipException(
+					"Could not create envelope out of sampled features for feature type: " + featureType);
+		}
 		Document gmlEnv = null;
 		try {
 			gmlEnv = Extents.envelopeAsGML(extent);
 		}
 		catch (Exception e) {
-			throw new RuntimeException("Could not create envelope for feature type: " + featureType);
+			throw new RuntimeException("Could not create envelope for feature type: " + featureType, e);
 		}
 		Element gmlCurveElem = XMLUtils
 			.transform(new StreamSource(getClass().getResourceAsStream("envelopeTocurve.xsl")), gmlEnv,
