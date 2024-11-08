@@ -35,11 +35,12 @@ import org.testng.annotations.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
-import com.sun.jersey.api.client.ClientResponse;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 /**
- * A spatial join includes a spatial predicate. One or more of the following
- * spatial predicates must be supported:
+ * A spatial join includes a spatial predicate. One or more of the following spatial
+ * predicates must be supported:
  * <ul>
  * <li>Equals</li>
  * <li>Disjoint</li>
@@ -52,15 +53,15 @@ import com.sun.jersey.api.client.ClientResponse;
  * <li>Beyond</li>
  * <li>DWithin</li>
  * </ul>
- * 
+ *
  * <p>
- * A sample GetFeature request entity is shown below, where the "Intersects"
- * predicate refers to the geometry properties of two different feature types.
+ * A sample GetFeature request entity is shown below, where the "Intersects" predicate
+ * refers to the geometry properties of two different feature types.
  * </p>
- * 
+ *
  * <pre>
- * &lt;wfs:GetFeature version="2.0.0" service="WFS" 
- *   xmlns:tns="http://example.org/ns1" 
+ * &lt;wfs:GetFeature version="2.0.0" service="WFS"
+ *   xmlns:tns="http://example.org/ns1"
  *   xmlns:wfs="http://www.opengis.net/wfs/2.0"
  *   xmlns:fes="http://www.opengis.net/fes/2.0"&gt;
  *   &lt;wfs:Query typeNames="tns:Parks tns:Lakes"&gt;
@@ -85,163 +86,173 @@ import com.sun.jersey.api.client.ClientResponse;
  */
 public class SpatialJoinTests extends QueryFilterFixture {
 
-    public final static String IMPL_SPATIAL_JOINS = "ImplementsSpatialJoins";
-    private static final Logger LOGR = Logger.getLogger(SpatialJoinTests.class.getPackage().getName());
-    private Map<QName, List<XSElementDeclaration>> surfaceProps;
-    private Map<QName, List<XSElementDeclaration>> curveProps;
-    private Map<QName, List<XSElementDeclaration>> pointProps;
-    private Map<SpatialOperator, Set<QName>> spatialCapabilities;
+	public final static String IMPL_SPATIAL_JOINS = "ImplementsSpatialJoins";
 
-    /**
-     * Searches the application schema for geometry properties where the value
-     * is an instance of the given type.
-     * 
-     * @param gmlTypeName
-     *            The name of a GML geometry type (may be abstract).
-     * @return A Map containing, for each feature type name (key), a list of
-     *         matching geometry properties (value).
-     */
-    Map<QName, List<XSElementDeclaration>> findGeometryProperties(String gmlTypeName) {
-        Map<QName, List<XSElementDeclaration>> geomProps = new HashMap<QName, List<XSElementDeclaration>>();
-        XSTypeDefinition gmlGeomBaseType = getModel().getTypeDefinition(gmlTypeName, Namespaces.GML);
-        for (QName featureType : this.featureTypes) {
-            List<XSElementDeclaration> geomPropsList = AppSchemaUtils.getFeaturePropertiesByType(getModel(), featureType,
-                    gmlGeomBaseType);
-            if (!geomPropsList.isEmpty()) {
-                geomProps.put(featureType, geomPropsList);
-            }
-        }
-        return geomProps;
-    }
+	private static final Logger LOGR = Logger.getLogger(SpatialJoinTests.class.getPackage().getName());
 
-    /**
-     * Checks the value of the service constraint {@value #IMPL_SPATIAL_JOINS}
-     * in the capabilities document. All tests are skipped if this is not
-     * "TRUE".
-     * 
-     * @param testContext
-     *            Information about the test run environment.
-     */
-    @BeforeTest
-    public void implementsSpatialJoins(ITestContext testContext) {
-        this.wfsMetadata = (Document) testContext.getSuite().getAttribute(SuiteAttribute.TEST_SUBJECT.getName());
-        String xpath = String.format("//ows:Constraint[@name='%s' and (ows:DefaultValue = 'TRUE')]",
-                IMPL_SPATIAL_JOINS);
-        NodeList result;
-        try {
-            result = XMLUtils.evaluateXPath(this.wfsMetadata, xpath, null);
-        } catch (XPathExpressionException e) {
-            throw new AssertionError(e.getMessage());
-        }
-        if (result.getLength() == 0) {
-            throw new SkipException(ErrorMessage.format(ErrorMessageKeys.NOT_IMPLEMENTED,
-                    ConformanceClass.SPATIAL_JOINS.getConstraintName()));
-        }
-    }
+	private Map<QName, List<XSElementDeclaration>> surfaceProps;
 
-    /**
-     * Initializes the test class fixture. Finds surface, curve, and point
-     * properties defined in the application schema. Properties that use
-     * primitive types are preferred, but if none are defined then aggregate
-     * geometry types (Multi*) will be used instead.
-     */
-    @BeforeClass
-    public void initFixture() {
-        this.spatialCapabilities = ServiceMetadataUtils.getSpatialCapabilities(this.wfsMetadata);
-        this.surfaceProps = findGeometryProperties("AbstractSurfaceType");
-        if (this.surfaceProps.isEmpty()) {
-            this.surfaceProps = findGeometryProperties("MultiSurfaceType");
-        }
-        LOGR.info(this.surfaceProps.toString());
-        this.curveProps = findGeometryProperties("AbstractCurveType");
-        if (this.curveProps.isEmpty()) {
-            this.curveProps = findGeometryProperties("MultiCurveType");
-        }
-        LOGR.info(this.curveProps.toString());
-        this.pointProps = findGeometryProperties("PointType");
-        if (this.pointProps.isEmpty()) {
-            this.pointProps = findGeometryProperties("MultiPointType");
-        }
-        LOGR.info(this.pointProps.toString());
-    }
+	private Map<QName, List<XSElementDeclaration>> curveProps;
 
-    /**
-     * [{@code Test}] Submits a basic join query that includes the
-     * <code>Intersects</code> operator. A projection clause (wfs:PropertyName)
-     * is omitted, so the response entity is expected to contain instances of
-     * both feature types.
-     */
-    @Test(description = "See OGC 09-025r2: 7.9.2.5.3, A.1.12")
-    public void joinWithIntersects() {
-        if (!this.spatialCapabilities.keySet().contains(SpatialOperator.INTERSECTS)) {
-            throw new SkipException(ErrorMessage.format(ErrorMessageKeys.NOT_IMPLEMENTED, SpatialOperator.INTERSECTS));
-        }
-        List<FeatureProperty> joinProperties = new ArrayList<FeatureProperty>();
-        if (this.surfaceProps.size() > 1) {
-            Iterator<Map.Entry<QName, List<XSElementDeclaration>>> itr = this.surfaceProps.entrySet().iterator();
-            Entry<QName, List<XSElementDeclaration>> entry = itr.next();
-            joinProperties.add(new FeatureProperty(entry.getKey(), entry.getValue().get(0)));
-            entry = itr.next();
-            joinProperties.add(new FeatureProperty(entry.getKey(), entry.getValue().get(0)));
-        } else if (!this.surfaceProps.isEmpty() && !this.curveProps.isEmpty()) {
-            // surface property
-            Iterator<Map.Entry<QName, List<XSElementDeclaration>>> itrSurfaceProps = this.surfaceProps.entrySet().iterator();
-            Entry<QName, List<XSElementDeclaration>> entrySurfaceProps = itrSurfaceProps.next();
-            joinProperties.add(new FeatureProperty(entrySurfaceProps.getKey(), entrySurfaceProps.getValue().get(0)));
+	private Map<QName, List<XSElementDeclaration>> pointProps;
 
-            // curve property
-            Iterator<Map.Entry<QName, List<XSElementDeclaration>>> itrCurveProps = this.curveProps.entrySet().iterator();
-            Entry<QName, List<XSElementDeclaration>> entryCurveProps = itrCurveProps.next();
-            joinProperties.add(new FeatureProperty(entryCurveProps.getKey(), entryCurveProps.getValue().get(0)));
-        } else if (!this.surfaceProps.isEmpty() && !this.pointProps.isEmpty()) {
-            // surface property
-            Iterator<Map.Entry<QName, List<XSElementDeclaration>>> itrSurfaceProps = this.surfaceProps.entrySet().iterator();
-            Entry<QName, List<XSElementDeclaration>> entrySurfaceProps = itrSurfaceProps.next();
-            joinProperties.add(new FeatureProperty(entrySurfaceProps.getKey(), entrySurfaceProps.getValue().get(0)));
+	private Map<SpatialOperator, Set<QName>> spatialCapabilities;
 
-            // point property
-            Iterator<Map.Entry<QName, List<XSElementDeclaration>>> itrPointProps = this.pointProps.entrySet().iterator();
-            Entry<QName, List<XSElementDeclaration>> entryPointProps = itrPointProps.next();
-            joinProperties.add(new FeatureProperty(entryPointProps.getKey(), entryPointProps.getValue().get(0)));
-        } else if (!this.curveProps.isEmpty() && !this.pointProps.isEmpty()) {
-            // curve property
-            Iterator<Map.Entry<QName, List<XSElementDeclaration>>> itrCurveProps = this.curveProps.entrySet().iterator();
-            Entry<QName, List<XSElementDeclaration>> entryCurveProps = itrCurveProps.next();
-            joinProperties.add(new FeatureProperty(entryCurveProps.getKey(), entryCurveProps.getValue().get(0)));
-            
-            // point property
-            Iterator<Map.Entry<QName, List<XSElementDeclaration>>> itrPointProps = this.pointProps.entrySet().iterator();
-            Entry<QName, List<XSElementDeclaration>> entryPointProps = itrPointProps.next();
-            joinProperties.add(new FeatureProperty(entryPointProps.getKey(), entryPointProps.getValue().get(0)));         
-        }
-        else{
-           throw new SkipException("This test has triggered an unexpected Spatial Join condition. The Spatial Join test will need to be applied manually.");       
-        } 
-        JoinQueryUtils.appendSpatialJoinQuery(this.reqEntity, "Intersects", joinProperties);
-        ClientResponse rsp = wfsClient.submitRequest(this.reqEntity, ProtocolBinding.ANY);
-        this.rspEntity = extractBodyAsDocument(rsp);
-        Assert.assertEquals(rsp.getStatus(), ClientResponse.Status.OK.getStatusCode(),
-                ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
-        // TODO check entity body: F1 intersects F2
-    }
+	/**
+	 * Searches the application schema for geometry properties where the value is an
+	 * instance of the given type.
+	 * @param gmlTypeName The name of a GML geometry type (may be abstract).
+	 * @return A Map containing, for each feature type name (key), a list of matching
+	 * geometry properties (value).
+	 */
+	Map<QName, List<XSElementDeclaration>> findGeometryProperties(String gmlTypeName) {
+		Map<QName, List<XSElementDeclaration>> geomProps = new HashMap<QName, List<XSElementDeclaration>>();
+		XSTypeDefinition gmlGeomBaseType = getModel().getTypeDefinition(gmlTypeName, Namespaces.GML);
+		for (QName featureType : this.featureTypes) {
+			List<XSElementDeclaration> geomPropsList = AppSchemaUtils.getFeaturePropertiesByType(getModel(),
+					featureType, gmlGeomBaseType);
+			if (!geomPropsList.isEmpty()) {
+				geomProps.put(featureType, geomPropsList);
+			}
+		}
+		return geomProps;
+	}
 
-    // self-join T1 BBOX T1 (gml:boundedBy)??
-    // self-join T1 INTERSECTS T1
-    // self-join T1 BEFORE T1
-    // join T1 BBOX T2 (gml;boundedBy) ??
-    // join T1 AFTER T2
-    // join T1 BEFORE T2
+	/**
+	 * Checks the value of the service constraint {@value #IMPL_SPATIAL_JOINS} in the
+	 * capabilities document. All tests are skipped if this is not "TRUE".
+	 * @param testContext Information about the test run environment.
+	 */
+	@BeforeTest
+	public void implementsSpatialJoins(ITestContext testContext) {
+		this.wfsMetadata = (Document) testContext.getSuite().getAttribute(SuiteAttribute.TEST_SUBJECT.getName());
+		String xpath = String.format("//ows:Constraint[@name='%s' and (ows:DefaultValue = 'TRUE')]",
+				IMPL_SPATIAL_JOINS);
+		NodeList result;
+		try {
+			result = XMLUtils.evaluateXPath(this.wfsMetadata, xpath, null);
+		}
+		catch (XPathExpressionException e) {
+			throw new AssertionError(e.getMessage());
+		}
+		if (result.getLength() == 0) {
+			throw new SkipException(ErrorMessage.format(ErrorMessageKeys.NOT_IMPLEMENTED,
+					ConformanceClass.SPATIAL_JOINS.getConstraintName()));
+		}
+	}
 
-    public void selfJoinWithIntersects() {
-        if (!ServiceMetadataUtils.implementsSpatialOperator(this.wfsMetadata, "Intersects")) {
-            throw new SkipException(ErrorMessage.format(ErrorMessageKeys.NOT_IMPLEMENTED, "Intersects operator"));
-        }
-        if (!this.surfaceProps.isEmpty()) {
-            // TODO
-        }
-        if (!this.curveProps.isEmpty()) {
-            // TODO
-        }
-    }
+	/**
+	 * Initializes the test class fixture. Finds surface, curve, and point properties
+	 * defined in the application schema. Properties that use primitive types are
+	 * preferred, but if none are defined then aggregate geometry types (Multi*) will be
+	 * used instead.
+	 */
+	@BeforeClass
+	public void initFixture() {
+		this.spatialCapabilities = ServiceMetadataUtils.getSpatialCapabilities(this.wfsMetadata);
+		this.surfaceProps = findGeometryProperties("AbstractSurfaceType");
+		if (this.surfaceProps.isEmpty()) {
+			this.surfaceProps = findGeometryProperties("MultiSurfaceType");
+		}
+		LOGR.info(this.surfaceProps.toString());
+		this.curveProps = findGeometryProperties("AbstractCurveType");
+		if (this.curveProps.isEmpty()) {
+			this.curveProps = findGeometryProperties("MultiCurveType");
+		}
+		LOGR.info(this.curveProps.toString());
+		this.pointProps = findGeometryProperties("PointType");
+		if (this.pointProps.isEmpty()) {
+			this.pointProps = findGeometryProperties("MultiPointType");
+		}
+		LOGR.info(this.pointProps.toString());
+	}
+
+	/**
+	 * [{@code Test}] Submits a basic join query that includes the <code>Intersects</code>
+	 * operator. A projection clause (wfs:PropertyName) is omitted, so the response entity
+	 * is expected to contain instances of both feature types.
+	 */
+	@Test(description = "See OGC 09-025r2: 7.9.2.5.3, A.1.12")
+	public void joinWithIntersects() {
+		if (!this.spatialCapabilities.keySet().contains(SpatialOperator.INTERSECTS)) {
+			throw new SkipException(ErrorMessage.format(ErrorMessageKeys.NOT_IMPLEMENTED, SpatialOperator.INTERSECTS));
+		}
+		List<FeatureProperty> joinProperties = new ArrayList<FeatureProperty>();
+		if (this.surfaceProps.size() > 1) {
+			Iterator<Map.Entry<QName, List<XSElementDeclaration>>> itr = this.surfaceProps.entrySet().iterator();
+			Entry<QName, List<XSElementDeclaration>> entry = itr.next();
+			joinProperties.add(new FeatureProperty(entry.getKey(), entry.getValue().get(0)));
+			entry = itr.next();
+			joinProperties.add(new FeatureProperty(entry.getKey(), entry.getValue().get(0)));
+		}
+		else if (!this.surfaceProps.isEmpty() && !this.curveProps.isEmpty()) {
+			// surface property
+			Iterator<Map.Entry<QName, List<XSElementDeclaration>>> itrSurfaceProps = this.surfaceProps.entrySet()
+				.iterator();
+			Entry<QName, List<XSElementDeclaration>> entrySurfaceProps = itrSurfaceProps.next();
+			joinProperties.add(new FeatureProperty(entrySurfaceProps.getKey(), entrySurfaceProps.getValue().get(0)));
+
+			// curve property
+			Iterator<Map.Entry<QName, List<XSElementDeclaration>>> itrCurveProps = this.curveProps.entrySet()
+				.iterator();
+			Entry<QName, List<XSElementDeclaration>> entryCurveProps = itrCurveProps.next();
+			joinProperties.add(new FeatureProperty(entryCurveProps.getKey(), entryCurveProps.getValue().get(0)));
+		}
+		else if (!this.surfaceProps.isEmpty() && !this.pointProps.isEmpty()) {
+			// surface property
+			Iterator<Map.Entry<QName, List<XSElementDeclaration>>> itrSurfaceProps = this.surfaceProps.entrySet()
+				.iterator();
+			Entry<QName, List<XSElementDeclaration>> entrySurfaceProps = itrSurfaceProps.next();
+			joinProperties.add(new FeatureProperty(entrySurfaceProps.getKey(), entrySurfaceProps.getValue().get(0)));
+
+			// point property
+			Iterator<Map.Entry<QName, List<XSElementDeclaration>>> itrPointProps = this.pointProps.entrySet()
+				.iterator();
+			Entry<QName, List<XSElementDeclaration>> entryPointProps = itrPointProps.next();
+			joinProperties.add(new FeatureProperty(entryPointProps.getKey(), entryPointProps.getValue().get(0)));
+		}
+		else if (!this.curveProps.isEmpty() && !this.pointProps.isEmpty()) {
+			// curve property
+			Iterator<Map.Entry<QName, List<XSElementDeclaration>>> itrCurveProps = this.curveProps.entrySet()
+				.iterator();
+			Entry<QName, List<XSElementDeclaration>> entryCurveProps = itrCurveProps.next();
+			joinProperties.add(new FeatureProperty(entryCurveProps.getKey(), entryCurveProps.getValue().get(0)));
+
+			// point property
+			Iterator<Map.Entry<QName, List<XSElementDeclaration>>> itrPointProps = this.pointProps.entrySet()
+				.iterator();
+			Entry<QName, List<XSElementDeclaration>> entryPointProps = itrPointProps.next();
+			joinProperties.add(new FeatureProperty(entryPointProps.getKey(), entryPointProps.getValue().get(0)));
+		}
+		else {
+			throw new SkipException(
+					"This test has triggered an unexpected Spatial Join condition. The Spatial Join test will need to be applied manually.");
+		}
+		JoinQueryUtils.appendSpatialJoinQuery(this.reqEntity, "Intersects", joinProperties);
+		Response rsp = wfsClient.submitRequest(this.reqEntity, ProtocolBinding.ANY);
+		this.rspEntity = extractBodyAsDocument(rsp);
+		Assert.assertEquals(rsp.getStatus(), Status.OK.getStatusCode(),
+				ErrorMessage.get(ErrorMessageKeys.UNEXPECTED_STATUS));
+		// TODO check entity body: F1 intersects F2
+	}
+
+	// self-join T1 BBOX T1 (gml:boundedBy)??
+	// self-join T1 INTERSECTS T1
+	// self-join T1 BEFORE T1
+	// join T1 BBOX T2 (gml;boundedBy) ??
+	// join T1 AFTER T2
+	// join T1 BEFORE T2
+
+	public void selfJoinWithIntersects() {
+		if (!ServiceMetadataUtils.implementsSpatialOperator(this.wfsMetadata, "Intersects")) {
+			throw new SkipException(ErrorMessage.format(ErrorMessageKeys.NOT_IMPLEMENTED, "Intersects operator"));
+		}
+		if (!this.surfaceProps.isEmpty()) {
+			// TODO
+		}
+		if (!this.curveProps.isEmpty()) {
+			// TODO
+		}
+	}
 
 }

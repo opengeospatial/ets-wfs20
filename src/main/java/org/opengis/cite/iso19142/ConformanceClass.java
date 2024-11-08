@@ -8,7 +8,7 @@ package org.opengis.cite.iso19142;
  * <li>Transactional WFS</li>
  * <li>Locking WFS</li>
  * </ol>
- * 
+ *
  * <p style="margin-bottom: 0.5em">
  * <strong>Sources</strong>
  * </p>
@@ -45,4 +45,5 @@ public enum ConformanceClass {
 	public String getConstraintName() {
 		return constraintName;
 	}
+
 }

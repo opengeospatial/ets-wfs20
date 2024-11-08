@@ -22,27 +22,30 @@ import org.xml.sax.SAXException;
 
 public class VerifyInsertTests {
 
-    private static ITestContext testContext;
-    private static ISuite suite;
-    private static DocumentBuilder docBuilder;
+	private static ITestContext testContext;
 
-    @BeforeClass
-    public static void initFixture() throws ParserConfigurationException {
-        testContext = mock(ITestContext.class);
-        suite = mock(ISuite.class);
-        when(testContext.getSuite()).thenReturn(suite);
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-        docBuilder = dbf.newDocumentBuilder();
-    }
+	private static ISuite suite;
 
-    @Test
-    public void replaceFirstName() throws SAXException, IOException {
-        Document doc = docBuilder.parse(getClass().getResourceAsStream("/Alpha-1.xml"));
-        String name = InsertTests.addRandomName(doc.getDocumentElement());
-        assertFalse("No name value", name.isEmpty());
-        NodeList nameList = doc.getElementsByTagNameNS(Namespaces.GML, "name");
-        assertEquals("Unexpected number of names", 2, nameList.getLength());
-        assertEquals("Unexpected name", name, nameList.item(0).getTextContent());
-    }
+	private static DocumentBuilder docBuilder;
+
+	@BeforeClass
+	public static void initFixture() throws ParserConfigurationException {
+		testContext = mock(ITestContext.class);
+		suite = mock(ISuite.class);
+		when(testContext.getSuite()).thenReturn(suite);
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		dbf.setNamespaceAware(true);
+		docBuilder = dbf.newDocumentBuilder();
+	}
+
+	@Test
+	public void replaceFirstName() throws SAXException, IOException {
+		Document doc = docBuilder.parse(getClass().getResourceAsStream("/Alpha-1.xml"));
+		String name = InsertTests.addRandomName(doc.getDocumentElement());
+		assertFalse("No name value", name.isEmpty());
+		NodeList nameList = doc.getElementsByTagNameNS(Namespaces.GML, "name");
+		assertEquals("Unexpected number of names", 2, nameList.getLength());
+		assertEquals("Unexpected name", name, nameList.item(0).getTextContent());
+	}
+
 }

@@ -27,9 +27,13 @@ public class VerifyServiceMetadataTests {
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
+
 	private static ITestContext testContext;
+
 	private static ISuite suite;
+
 	private static DocumentBuilder docBuilder;
+
 	private static Schema wfsSchema;
 
 	public VerifyServiceMetadataTests() {
@@ -41,20 +45,16 @@ public class VerifyServiceMetadataTests {
 		suite = mock(ISuite.class);
 		when(testContext.getSuite()).thenReturn(suite);
 		wfsSchema = ValidationUtils.createWFSSchema();
-		when(suite.getAttribute(SuiteAttribute.WFS_SCHEMA.getName()))
-				.thenReturn(wfsSchema);
+		when(suite.getAttribute(SuiteAttribute.WFS_SCHEMA.getName())).thenReturn(wfsSchema);
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		dbf.setNamespaceAware(true);
 		docBuilder = dbf.newDocumentBuilder();
 	}
 
 	@Test
-	public void validateEmptyCapabilitiesDoc_valid() throws SAXException,
-			IOException {
-		Document doc = docBuilder.parse(this.getClass().getResourceAsStream(
-				"/empty-wfs-capabilities.xml"));
-		when(suite.getAttribute(SuiteAttribute.TEST_SUBJECT.getName()))
-				.thenReturn(doc);
+	public void validateEmptyCapabilitiesDoc_valid() throws SAXException, IOException {
+		Document doc = docBuilder.parse(this.getClass().getResourceAsStream("/empty-wfs-capabilities.xml"));
+		when(suite.getAttribute(SuiteAttribute.TEST_SUBJECT.getName())).thenReturn(doc);
 		ServiceMetadataTests iut = new ServiceMetadataTests();
 		iut.initBaseFixture(testContext);
 		iut.obtainWFSSchema(testContext);
@@ -65,11 +65,10 @@ public class VerifyServiceMetadataTests {
 	public void atomFeed() throws SAXException, IOException {
 		thrown.expect(IllegalArgumentException.class);
 		thrown.expectMessage("Not a WFS service description");
-		Document doc = docBuilder.parse(this.getClass().getResourceAsStream(
-				"/atom-feed.xml"));
-		when(suite.getAttribute(SuiteAttribute.TEST_SUBJECT.getName()))
-				.thenReturn(doc);
+		Document doc = docBuilder.parse(this.getClass().getResourceAsStream("/atom-feed.xml"));
+		when(suite.getAttribute(SuiteAttribute.TEST_SUBJECT.getName())).thenReturn(doc);
 		ServiceMetadataTests iut = new ServiceMetadataTests();
 		iut.initBaseFixture(testContext);
 	}
+
 }

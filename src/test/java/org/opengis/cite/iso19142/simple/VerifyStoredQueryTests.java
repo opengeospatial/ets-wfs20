@@ -15,28 +15,29 @@ import org.testng.ITestContext;
  */
 public class VerifyStoredQueryTests {
 
-    private static ITestContext testContext;
-    private static ISuite suite;
+	private static ITestContext testContext;
 
-    public VerifyStoredQueryTests() {
-    }
+	private static ISuite suite;
 
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-        testContext = mock(ITestContext.class);
-        suite = mock(ISuite.class);
-        when(testContext.getSuite()).thenReturn(suite);
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-        dbf.newDocumentBuilder();
-    }
+	public VerifyStoredQueryTests() {
+	}
 
-    @Before
-    public void setUp() {
-    }
+	@BeforeClass
+	public static void setUpClass() throws Exception {
+		testContext = mock(ITestContext.class);
+		suite = mock(ISuite.class);
+		when(testContext.getSuite()).thenReturn(suite);
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		dbf.setNamespaceAware(true);
+		dbf.newDocumentBuilder();
+	}
 
-    @After
-    public void tearDown() {
-    }
+	@Before
+	public void setUp() {
+	}
+
+	@After
+	public void tearDown() {
+	}
 
 }

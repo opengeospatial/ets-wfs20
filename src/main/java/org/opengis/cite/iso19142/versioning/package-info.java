@@ -1,18 +1,16 @@
 /**
- * This package contains tests to verify that the IUT satisfies the requirements
- * of the <strong>Feature versions</strong> conformance class. If the WFS
- * service constraint <em>ImplementsFeatureVersioning</em> is set to "TRUE" in
- * the capabilities document, a client may choose to navigate versions of
- * feature instances.
- * 
+ * This package contains tests to verify that the IUT satisfies the requirements of the
+ * <strong>Feature versions</strong> conformance class. If the WFS service constraint
+ * <em>ImplementsFeatureVersioning</em> is set to "TRUE" in the capabilities document, a
+ * client may choose to navigate versions of feature instances.
+ *
  * <p>
- * A server implementation that supports versioning shall maintain version
- * information about each feature instance, but exactly how this is accomplished
- * is not specified. The ResourceId operator may be used to query feature
- * versions; the filter constraint <em>ImplementsVersionNav</em> must be set to
- * "TRUE" in the capabilities document.
+ * A server implementation that supports versioning shall maintain version information
+ * about each feature instance, but exactly how this is accomplished is not specified. The
+ * ResourceId operator may be used to query feature versions; the filter constraint
+ * <em>ImplementsVersionNav</em> must be set to "TRUE" in the capabilities document.
  * </p>
- * 
+ *
  * <p style="margin-bottom: 0.5em">
  * <strong>Sources</strong>
  * </p>

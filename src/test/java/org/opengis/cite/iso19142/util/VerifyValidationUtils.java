@@ -22,41 +22,37 @@ import org.w3c.dom.ls.LSResourceResolver;
  */
 public class VerifyValidationUtils {
 
-    public VerifyValidationUtils() {
-    }
+	public VerifyValidationUtils() {
+	}
 
-    @Test
-    public void testBuildSchematronValidator() {
-        String schemaRef = "http://schemas.opengis.net/gml/3.2.1/SchematronConstraints.xml";
-        String phase = "";
-        SchematronValidator result = ValidationUtils.buildSchematronValidator(
-                schemaRef, phase);
-        assertNotNull(result);
-    }
+	@Test
+	public void testBuildSchematronValidator() {
+		String schemaRef = "http://schemas.opengis.net/gml/3.2.1/SchematronConstraints.xml";
+		String phase = "";
+		SchematronValidator result = ValidationUtils.buildSchematronValidator(schemaRef, phase);
+		assertNotNull(result);
+	}
 
-    @Test
-    public void extractRelativeSchemaReference() throws FileNotFoundException,
-            XMLStreamException {
-        File xmlFile = new File("src/test/resources/Alpha-1.xml");
-        URI xsdRef = ValidationUtils.extractSchemaReference(new StreamSource(
-                xmlFile), null);
-        assertTrue("Expected schema reference */xsd/alpha.xsd", xsdRef
-                .toString().endsWith("/xsd/alpha.xsd"));
-    }
+	@Test
+	public void extractRelativeSchemaReference() throws FileNotFoundException, XMLStreamException {
+		File xmlFile = new File("src/test/resources/Alpha-1.xml");
+		URI xsdRef = ValidationUtils.extractSchemaReference(new StreamSource(xmlFile), null);
+		assertTrue("Expected schema reference */xsd/alpha.xsd", xsdRef.toString().endsWith("/xsd/alpha.xsd"));
+	}
 
-    @Test
-    public void compileWFSSchema() {
-        Schema schema = ValidationUtils.createWFSSchema();
-        assertNotNull(schema);
-    }
+	@Test
+	public void compileWFSSchema() {
+		Schema schema = ValidationUtils.createWFSSchema();
+		assertNotNull(schema);
+	}
 
-    @Test
-    public void createXMLSchemaResolver() {
-        LSResourceResolver resolver = ValidationUtils
-                .createSchemaResolver(Namespaces.XSD);
-        assertNotNull(resolver);
-        LSInput resource = resolver.resolveResource(Namespaces.XSD.toString(),
-                Namespaces.WFS, null, WFS2.SCHEMA_URI, null);
-        assertNotNull("Failed to resolve WFS2 schema resource.", resource);
-    }
+	@Test
+	public void createXMLSchemaResolver() {
+		LSResourceResolver resolver = ValidationUtils.createSchemaResolver(Namespaces.XSD);
+		assertNotNull(resolver);
+		LSInput resource = resolver.resolveResource(Namespaces.XSD.toString(), Namespaces.WFS, null, WFS2.SCHEMA_URI,
+				null);
+		assertNotNull("Failed to resolve WFS2 schema resource.", resource);
+	}
+
 }

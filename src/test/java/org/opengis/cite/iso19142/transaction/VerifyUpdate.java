@@ -36,71 +36,76 @@ import org.xml.sax.SAXException;
  */
 public class VerifyUpdate {
 
-    private static final String NS1 = "http://example.org/ns1";
-    private static ITestContext testContext;
-    private static ISuite suite;
-    private static XSModel model;
-    private static DataSampler dataSampler;
+	private static final String NS1 = "http://example.org/ns1";
 
-    @BeforeClass
-    public static void mockTestContext() throws ParserConfigurationException {
-        testContext = mock(ITestContext.class);
-        suite = mock(ISuite.class);
-        when(testContext.getSuite()).thenReturn(suite);
-        dataSampler = mock(DataSampler.class);
-        when(suite.getAttribute(SuiteAttribute.SAMPLER.getName())).thenReturn(dataSampler);
-    }
+	private static ITestContext testContext;
 
-    @BeforeClass
-    public static void buildSchemaModel() throws SAXException {
-        URL entityCatalog = VerifyUpdate.class.getResource("/schema-catalog.xml");
-        XmlSchemaCompiler xsdCompiler = new XmlSchemaCompiler(entityCatalog);
-        InputStream xis = VerifyUpdate.class.getResourceAsStream("/xsd/simple.xsd");
-        Schema schema = xsdCompiler.compileXmlSchema(new StreamSource(xis));
-        model = XSModelBuilder.buildXMLSchemaModel(schema, NS1);
-    }
+	private static ISuite suite;
 
-    @Test
-    public void createNewStringEnumValue() throws SAXException, IOException {
-        QName featureType = new QName(NS1, "ComplexFeature");
-        List<XSElementDeclaration> simpleProps = AppSchemaUtils.getSimpleFeatureProperties(model, featureType);
-        List<String> propValues = new ArrayList<String>();
-        propValues.add("CA-AB");
-        Update iut = new Update();
-        String newVal = iut.newPropertyValue(simpleProps.get(simpleProps.size() - 1), propValues);
-        assertEquals("CA-BC", newVal);
-    }
+	private static XSModel model;
 
-    @Test
-    public void createNewDoubleValue() throws SAXException, IOException {
-        QName featureType = new QName(NS1, "ComplexFeature");
-        List<XSElementDeclaration> simpleProps = AppSchemaUtils.getSimpleFeatureProperties(model, featureType);
-        List<String> propValues = new ArrayList<String>();
-        propValues.add("48.2");
-        Update iut = new Update();
-        String newVal = iut.newPropertyValue(simpleProps.get(0), propValues);
-        assertEquals(24.1, Double.parseDouble(newVal), 0.00001);
-    }
+	private static DataSampler dataSampler;
 
-    @Test
-    public void createNewDecimalValue() throws SAXException, IOException {
-        QName featureType = new QName(NS1, "SimpleFeature");
-        List<XSElementDeclaration> simpleProps = AppSchemaUtils.getSimpleFeatureProperties(model, featureType);
-        List<String> propValues = new ArrayList<String>();
-        propValues.add("49.25");
-        Update iut = new Update();
-        String newVal = iut.newPropertyValue(simpleProps.get(5), propValues);
-        assertEquals(4.925, Double.parseDouble(newVal), 0.0001);
-    }
+	@BeforeClass
+	public static void mockTestContext() throws ParserConfigurationException {
+		testContext = mock(ITestContext.class);
+		suite = mock(ISuite.class);
+		when(testContext.getSuite()).thenReturn(suite);
+		dataSampler = mock(DataSampler.class);
+		when(suite.getAttribute(SuiteAttribute.SAMPLER.getName())).thenReturn(dataSampler);
+	}
 
-    @Test
-    public void createNewDateValue() throws SAXException, IOException {
-        QName featureType = new QName(NS1, "SimpleFeature");
-        List<XSElementDeclaration> simpleProps = AppSchemaUtils.getSimpleFeatureProperties(model, featureType);
-        List<String> propValues = new ArrayList<String>();
-        propValues.add("2010-01-01");
-        Update iut = new Update();
-        String newVal = iut.newPropertyValue(simpleProps.get(4), propValues);
-        assertEquals(LocalDate.now(ZoneId.of("Z")), LocalDate.parse(newVal));
-    }
+	@BeforeClass
+	public static void buildSchemaModel() throws SAXException {
+		URL entityCatalog = VerifyUpdate.class.getResource("/schema-catalog.xml");
+		XmlSchemaCompiler xsdCompiler = new XmlSchemaCompiler(entityCatalog);
+		InputStream xis = VerifyUpdate.class.getResourceAsStream("/xsd/simple.xsd");
+		Schema schema = xsdCompiler.compileXmlSchema(new StreamSource(xis));
+		model = XSModelBuilder.buildXMLSchemaModel(schema, NS1);
+	}
+
+	@Test
+	public void createNewStringEnumValue() throws SAXException, IOException {
+		QName featureType = new QName(NS1, "ComplexFeature");
+		List<XSElementDeclaration> simpleProps = AppSchemaUtils.getSimpleFeatureProperties(model, featureType);
+		List<String> propValues = new ArrayList<String>();
+		propValues.add("CA-AB");
+		Update iut = new Update();
+		String newVal = iut.newPropertyValue(simpleProps.get(simpleProps.size() - 1), propValues);
+		assertEquals("CA-BC", newVal);
+	}
+
+	@Test
+	public void createNewDoubleValue() throws SAXException, IOException {
+		QName featureType = new QName(NS1, "ComplexFeature");
+		List<XSElementDeclaration> simpleProps = AppSchemaUtils.getSimpleFeatureProperties(model, featureType);
+		List<String> propValues = new ArrayList<String>();
+		propValues.add("48.2");
+		Update iut = new Update();
+		String newVal = iut.newPropertyValue(simpleProps.get(0), propValues);
+		assertEquals(24.1, Double.parseDouble(newVal), 0.00001);
+	}
+
+	@Test
+	public void createNewDecimalValue() throws SAXException, IOException {
+		QName featureType = new QName(NS1, "SimpleFeature");
+		List<XSElementDeclaration> simpleProps = AppSchemaUtils.getSimpleFeatureProperties(model, featureType);
+		List<String> propValues = new ArrayList<String>();
+		propValues.add("49.25");
+		Update iut = new Update();
+		String newVal = iut.newPropertyValue(simpleProps.get(5), propValues);
+		assertEquals(4.925, Double.parseDouble(newVal), 0.0001);
+	}
+
+	@Test
+	public void createNewDateValue() throws SAXException, IOException {
+		QName featureType = new QName(NS1, "SimpleFeature");
+		List<XSElementDeclaration> simpleProps = AppSchemaUtils.getSimpleFeatureProperties(model, featureType);
+		List<String> propValues = new ArrayList<String>();
+		propValues.add("2010-01-01");
+		Update iut = new Update();
+		String newVal = iut.newPropertyValue(simpleProps.get(4), propValues);
+		assertEquals(LocalDate.now(ZoneId.of("Z")), LocalDate.parse(newVal));
+	}
+
 }

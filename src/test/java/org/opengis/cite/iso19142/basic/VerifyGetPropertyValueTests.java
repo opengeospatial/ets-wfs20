@@ -27,7 +27,9 @@ import org.xml.sax.SAXException;
 public class VerifyGetPropertyValueTests {
 
 	private static ITestContext testContext;
+
 	private static ISuite suite;
+
 	private static DocumentBuilder docBuilder;
 
 	public VerifyGetPropertyValueTests() {
@@ -53,16 +55,12 @@ public class VerifyGetPropertyValueTests {
 
 	@Test
 	public void addTwoQueries() throws SAXException, IOException {
-		Document doc = docBuilder.parse(this.getClass().getResourceAsStream(
-				"/GetPropertyValue.xml"));
+		Document doc = docBuilder.parse(this.getClass().getResourceAsStream("/GetPropertyValue.xml"));
 		GetPropertyValueTests iut = new GetPropertyValueTests();
-		iut.addQuery(doc, new QName("http://cite.opengeospatial.org/gmlsf",
-				"PrimitiveGeoFeature"));
-		iut.addQuery(doc, new QName(
-				"http://www.opengis.net/citygml/building/2.0", "Building"));
-		NodeList qryElems = doc.getElementsByTagNameNS(Namespaces.WFS,
-				WFS2.QUERY_ELEM);
-		Assert.assertEquals("Unexpected number of wfs:Query elements.", 3,
-				qryElems.getLength());
+		iut.addQuery(doc, new QName("http://cite.opengeospatial.org/gmlsf", "PrimitiveGeoFeature"));
+		iut.addQuery(doc, new QName("http://www.opengis.net/citygml/building/2.0", "Building"));
+		NodeList qryElems = doc.getElementsByTagNameNS(Namespaces.WFS, WFS2.QUERY_ELEM);
+		Assert.assertEquals("Unexpected number of wfs:Query elements.", 3, qryElems.getLength());
 	}
+
 }

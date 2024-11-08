@@ -28,38 +28,41 @@ import org.xml.sax.SAXException;
 
 public class VerifyIntersectsTests {
 
-    private static final String NS1 = "http://example.org/ns1";
-    private static DocumentBuilder docBuilder;
-    private static XSModel model;
+	private static final String NS1 = "http://example.org/ns1";
 
-    @BeforeClass
-    public static void initParser() throws ParserConfigurationException {
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-        dbf.setValidating(false);
-        dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-        docBuilder = dbf.newDocumentBuilder();
-    }
+	private static DocumentBuilder docBuilder;
 
-    @BeforeClass
-    public static void buildSchemaModel() throws SAXException {
-        URL entityCatalog = VerifyAppSchemaUtils.class.getResource("/schema-catalog.xml");
-        XmlSchemaCompiler xsdCompiler = new XmlSchemaCompiler(entityCatalog);
-        InputStream xis = VerifyAppSchemaUtils.class.getResourceAsStream("/xsd/simple.xsd");
-        Schema schema = xsdCompiler.compileXmlSchema(new StreamSource(xis));
-        model = XSModelBuilder.buildXMLSchemaModel(schema, NS1);
-    }
+	private static XSModel model;
 
-    @Test
-    public void addIntersectsPredicate() throws SAXException, IOException {
-        Document reqEntity = WFSMessage.createRequestEntity("GetFeature-Minimal", "2.0.2");
-        WFSMessage.appendSimpleQuery(reqEntity, new QName(NS1, "SimpleFeature"));
-        Element gmlGeom = docBuilder.parse(getClass().getResourceAsStream("Polygon-01.xml")).getDocumentElement();
-        Element valueRef = WFSMessage.createValueReference(model.getElementDeclaration("lineProperty", NS1));
-        IntersectsTests iut = new IntersectsTests();
-        iut.addSpatialPredicate(reqEntity, "Intersects", gmlGeom, valueRef);
-        Node predicate = reqEntity.getElementsByTagNameNS(Namespaces.FES, "Intersects").item(0);
-        assertNotNull(predicate);
-        assertEquals("Unexpected number of operands", 2, predicate.getChildNodes().getLength());
-    }
+	@BeforeClass
+	public static void initParser() throws ParserConfigurationException {
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		dbf.setNamespaceAware(true);
+		dbf.setValidating(false);
+		dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+		docBuilder = dbf.newDocumentBuilder();
+	}
+
+	@BeforeClass
+	public static void buildSchemaModel() throws SAXException {
+		URL entityCatalog = VerifyAppSchemaUtils.class.getResource("/schema-catalog.xml");
+		XmlSchemaCompiler xsdCompiler = new XmlSchemaCompiler(entityCatalog);
+		InputStream xis = VerifyAppSchemaUtils.class.getResourceAsStream("/xsd/simple.xsd");
+		Schema schema = xsdCompiler.compileXmlSchema(new StreamSource(xis));
+		model = XSModelBuilder.buildXMLSchemaModel(schema, NS1);
+	}
+
+	@Test
+	public void addIntersectsPredicate() throws SAXException, IOException {
+		Document reqEntity = WFSMessage.createRequestEntity("GetFeature-Minimal", "2.0.2");
+		WFSMessage.appendSimpleQuery(reqEntity, new QName(NS1, "SimpleFeature"));
+		Element gmlGeom = docBuilder.parse(getClass().getResourceAsStream("Polygon-01.xml")).getDocumentElement();
+		Element valueRef = WFSMessage.createValueReference(model.getElementDeclaration("lineProperty", NS1));
+		IntersectsTests iut = new IntersectsTests();
+		iut.addSpatialPredicate(reqEntity, "Intersects", gmlGeom, valueRef);
+		Node predicate = reqEntity.getElementsByTagNameNS(Namespaces.FES, "Intersects").item(0);
+		assertNotNull(predicate);
+		assertEquals("Unexpected number of operands", 2, predicate.getChildNodes().getLength());
+	}
+
 }

@@ -21,32 +21,34 @@ import org.w3c.dom.ls.LSResourceResolver;
  */
 public class VerifyBasicGetFeatureTests {
 
-    private static ITestContext testContext;
-    private static ISuite suite;
+	private static ITestContext testContext;
 
-    public VerifyBasicGetFeatureTests() {
-    }
+	private static ISuite suite;
 
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-        testContext = mock(ITestContext.class);
-        suite = mock(ISuite.class);
-        when(testContext.getSuite()).thenReturn(suite);
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-        dbf.newDocumentBuilder();
-    }
+	public VerifyBasicGetFeatureTests() {
+	}
 
-    @Test
-    public void buildAndResetValidator() {
-        BasicGetFeatureTests iut = new BasicGetFeatureTests();
-        iut.buildValidator();
-        Validator validator = iut.hintsValidator;
-        LSResourceResolver resolver = validator.getResourceResolver();
-        assertNotNull("Resolver is null.", resolver);
-        iut.resetValidator();
-        LSInput resource = resolver.resolveResource(Namespaces.XSD.toString(),
-                Namespaces.WFS, null, WFS2.SCHEMA_URI, null);
-        assertNotNull("WFS2 schema resource is null.", resource);
-    }
+	@BeforeClass
+	public static void setUpClass() throws Exception {
+		testContext = mock(ITestContext.class);
+		suite = mock(ISuite.class);
+		when(testContext.getSuite()).thenReturn(suite);
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		dbf.setNamespaceAware(true);
+		dbf.newDocumentBuilder();
+	}
+
+	@Test
+	public void buildAndResetValidator() {
+		BasicGetFeatureTests iut = new BasicGetFeatureTests();
+		iut.buildValidator();
+		Validator validator = iut.hintsValidator;
+		LSResourceResolver resolver = validator.getResourceResolver();
+		assertNotNull("Resolver is null.", resolver);
+		iut.resetValidator();
+		LSInput resource = resolver.resolveResource(Namespaces.XSD.toString(), Namespaces.WFS, null, WFS2.SCHEMA_URI,
+				null);
+		assertNotNull("WFS2 schema resource is null.", resource);
+	}
+
 }

@@ -15,68 +15,69 @@ import org.testng.SkipException;
  */
 public abstract class AbstractTemporalTest extends QueryFilterFixture {
 
-    private static final Logger LOGR = Logger.getLogger( AbstractTemporalTest.class.getPackage().getName() );
+	private static final Logger LOGR = Logger.getLogger(AbstractTemporalTest.class.getPackage().getName());
 
-    public TemporalProperty findTemporalProperty( QName featureType ) {
-        List<XSElementDeclaration> temporalProperties = findTemporalProperties( featureType );
-        if ( temporalProperties.isEmpty() ) {
-            throw new SkipException( "Feature type has no temporal properties: " + featureType );
-        }
-
-        TemporalProperty temporalExtent = null;
-        
-        try {
-        	temporalExtent = findTemporalExtent( featureType, temporalProperties );
-		} catch (Exception e) {
-            if(e instanceof SkipException) {
-            	throw e;
-            }
+	public TemporalProperty findTemporalProperty(QName featureType) {
+		List<XSElementDeclaration> temporalProperties = findTemporalProperties(featureType);
+		if (temporalProperties.isEmpty()) {
+			throw new SkipException("Feature type has no temporal properties: " + featureType);
 		}
-        
-        if ( temporalExtent == null )
-            throw new SkipException(
-                                     "Feature type + "
-                                                             + featureType
-                                                             + " has at least one temporal properties but an extent could not be calculated (e.g. all properties are nill). " );
-        return temporalExtent;
-    }
 
-    private TemporalProperty findTemporalExtent( QName featureType, List<XSElementDeclaration> temporalProperties ) {
-        for ( XSElementDeclaration temporalProp : temporalProperties ) {
-            try {
-                Period temporalExtent = this.dataSampler.getTemporalExtentOfProperty(getModel(), featureType,
-                                                                                      temporalProp);
-                if ( temporalExtent != null )
-                    return new TemporalProperty( temporalProp, temporalExtent );
-            } catch ( Exception e ) {
-                LOGR.warning( "Could not calculate the extent of the temporal property " + temporalProp
-                              + " of the feature type " + featureType );
-                if(e instanceof SkipException) {
-                	throw e;
-                }
-            }
-        }
-        return null;
-    }
+		TemporalProperty temporalExtent = null;
 
-    class TemporalProperty {
+		try {
+			temporalExtent = findTemporalExtent(featureType, temporalProperties);
+		}
+		catch (Exception e) {
+			if (e instanceof SkipException) {
+				throw e;
+			}
+		}
 
-        private XSElementDeclaration property;
+		if (temporalExtent == null)
+			throw new SkipException("Feature type + " + featureType
+					+ " has at least one temporal properties but an extent could not be calculated (e.g. all properties are nill). ");
+		return temporalExtent;
+	}
 
-        private Period extent;
+	private TemporalProperty findTemporalExtent(QName featureType, List<XSElementDeclaration> temporalProperties) {
+		for (XSElementDeclaration temporalProp : temporalProperties) {
+			try {
+				Period temporalExtent = this.dataSampler.getTemporalExtentOfProperty(getModel(), featureType,
+						temporalProp);
+				if (temporalExtent != null)
+					return new TemporalProperty(temporalProp, temporalExtent);
+			}
+			catch (Exception e) {
+				LOGR.warning("Could not calculate the extent of the temporal property " + temporalProp
+						+ " of the feature type " + featureType);
+				if (e instanceof SkipException) {
+					throw e;
+				}
+			}
+		}
+		return null;
+	}
 
-        public TemporalProperty( XSElementDeclaration property, Period extent ) {
-            this.property = property;
-            this.extent = extent;
-        }
+	class TemporalProperty {
 
-        public XSElementDeclaration getProperty() {
-            return property;
-        }
+		private XSElementDeclaration property;
 
-        public Period getExtent() {
-            return extent;
-        }
-    }
+		private Period extent;
+
+		public TemporalProperty(XSElementDeclaration property, Period extent) {
+			this.property = property;
+			this.extent = extent;
+		}
+
+		public XSElementDeclaration getProperty() {
+			return property;
+		}
+
+		public Period getExtent() {
+			return extent;
+		}
+
+	}
 
 }

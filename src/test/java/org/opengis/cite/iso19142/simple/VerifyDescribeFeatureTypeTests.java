@@ -26,50 +26,53 @@ import org.xml.sax.SAXException;
  */
 public class VerifyDescribeFeatureTypeTests {
 
-    private static ITestContext testContext;
-    private static ISuite suite;
-    private static DocumentBuilder docBuilder;
+	private static ITestContext testContext;
 
-    public VerifyDescribeFeatureTypeTests() {
-    }
+	private static ISuite suite;
 
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-        testContext = mock(ITestContext.class);
-        suite = mock(ISuite.class);
-        when(testContext.getSuite()).thenReturn(suite);
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-        docBuilder = dbf.newDocumentBuilder();
-    }
+	private static DocumentBuilder docBuilder;
 
-    @Before
-    public void setUp() {
-    }
+	public VerifyDescribeFeatureTypeTests() {
+	}
 
-    @After
-    public void tearDown() {
-    }
+	@BeforeClass
+	public static void setUpClass() throws Exception {
+		testContext = mock(ITestContext.class);
+		suite = mock(ISuite.class);
+		when(testContext.getSuite()).thenReturn(suite);
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		dbf.setNamespaceAware(true);
+		docBuilder = dbf.newDocumentBuilder();
+	}
 
-    @Test
-    public void addOneFeatureType() throws SAXException, IOException {
-        Document doc = docBuilder.parse(this.getClass().getResourceAsStream("/DescribeFeatureType-Empty.xml"));
-        DescribeFeatureTypeTests iut = new DescribeFeatureTypeTests();
-        iut.addFeatureType(doc, new QName("http://example.org", "Unknown1.Type"));
-        Element typeName = (Element) doc.getElementsByTagNameNS(Namespaces.WFS, WFS2.TYPENAME_ELEM).item(0);
-        String[] qName = typeName.getTextContent().split(":");
-        assertEquals("Qualified name should be 'prefix:localPart'.", 2, qName.length);
-        assertEquals("Unexpected type name.", "Unknown1.Type", qName[1]);
-    }
+	@Before
+	public void setUp() {
+	}
 
-    @Test
-    public void decodeAppSchema() throws SAXException, IOException {
-        Document doc = docBuilder.parse(this.getClass().getResourceAsStream("/DescribeFeatureTypeResponse-Base64.xml"));
-        DescribeFeatureTypeTests iut = new DescribeFeatureTypeTests();
-        iut.buildRequestEntity();
-        Document schema = iut.decodeSchema(doc);
-        assertNotNull("Failed to parse decoded schema.", schema);
-        assertEquals("Unexpected namespace name", "http://www.w3.org/2001/XMLSchema",
-                schema.getDocumentElement().getNamespaceURI());
-    }
+	@After
+	public void tearDown() {
+	}
+
+	@Test
+	public void addOneFeatureType() throws SAXException, IOException {
+		Document doc = docBuilder.parse(this.getClass().getResourceAsStream("/DescribeFeatureType-Empty.xml"));
+		DescribeFeatureTypeTests iut = new DescribeFeatureTypeTests();
+		iut.addFeatureType(doc, new QName("http://example.org", "Unknown1.Type"));
+		Element typeName = (Element) doc.getElementsByTagNameNS(Namespaces.WFS, WFS2.TYPENAME_ELEM).item(0);
+		String[] qName = typeName.getTextContent().split(":");
+		assertEquals("Qualified name should be 'prefix:localPart'.", 2, qName.length);
+		assertEquals("Unexpected type name.", "Unknown1.Type", qName[1]);
+	}
+
+	@Test
+	public void decodeAppSchema() throws SAXException, IOException {
+		Document doc = docBuilder.parse(this.getClass().getResourceAsStream("/DescribeFeatureTypeResponse-Base64.xml"));
+		DescribeFeatureTypeTests iut = new DescribeFeatureTypeTests();
+		iut.buildRequestEntity();
+		Document schema = iut.decodeSchema(doc);
+		assertNotNull("Failed to parse decoded schema.", schema);
+		assertEquals("Unexpected namespace name", "http://www.w3.org/2001/XMLSchema",
+				schema.getDocumentElement().getNamespaceURI());
+	}
+
 }
