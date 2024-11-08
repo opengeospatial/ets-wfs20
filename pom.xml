@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.opengis.cite</groupId>
     <artifactId>ets-common</artifactId>
-    <version>10-SNAPSHOT</version>
+    <version>13</version>
   </parent>
   <artifactId>ets-wfs20</artifactId>
   <version>1.42-SNAPSHOT</version>
@@ -65,13 +65,7 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>ets-gml32</artifactId>
-      <version>1.33-SNAPSHOT</version>
-      <exclusions>
-        <exclusion>
-          <artifactId>teamengine-spi</artifactId>
-          <groupId>org.opengis.cite.teamengine</groupId>
-        </exclusion>
-      </exclusions>
+      <version>1.33</version>
     </dependency>
     <dependency>
       <artifactId>teamengine-spi</artifactId>
@@ -88,12 +82,6 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>schema-utils</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>xml-apis</groupId>
-          <artifactId>xml-apis</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -113,8 +101,8 @@
       <artifactId>jersey-server</artifactId>
     </dependency>
     <dependency>
-      <groupId>javax.ws.rs</groupId>
-      <artifactId>jsr311-api</artifactId>
+      <groupId>jakarta.ws.rs</groupId>
+      <artifactId>jakarta.ws.rs-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.hamcrest</groupId>
