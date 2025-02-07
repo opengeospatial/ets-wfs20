@@ -276,7 +276,7 @@ dt {
       <li style="list-style:square">Integrated development environment (IDE): The main Java class is <code>
 	  org.opengis.cite.iso19142.TestNGController</code>.</li>
       <li style="list-style:square">REST API: Submit a request that includes the necessary 
-      arguments to the test run controller (/rest/suites/${ets-code}/${project.version}/run).</li>
+      arguments to the test run controller (/rest/suites/${maven.site.properties['ets-code']}/${project.version}/run).</li>
       <li style="list-style:square">TEAM Engine: Run the CTL script located in the <code>/src/main/ctl/</code> 
 	  directory.</li>
     </ul>
