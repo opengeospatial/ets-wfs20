@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.opengis.cite</groupId>
     <artifactId>ets-common</artifactId>
-    <version>13</version>
+    <version>14</version>
   </parent>
   <artifactId>ets-wfs20</artifactId>
   <version>1.44-SNAPSHOT</version>
