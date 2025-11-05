@@ -352,7 +352,7 @@ public class WFSClient {
 		Response response = null;
 		switch (binding) {
 			case GET:
-				String queryString = WFSMessage.transformEntityToKVP(entity);
+				String queryString = WFSMessage.transformEntityToKVP(entity, wfsVersion);
 				URI requestURI = UriBuilder.fromUri(target.getUri()).replaceQuery(queryString).build();
 				LOGR.log(Level.FINE, String.format("Request URI: %s", requestURI));
 				target = client.target(requestURI);

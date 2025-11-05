@@ -149,7 +149,7 @@ public class BaseFixture {
 			String request = "";
 			Object[] params = result.getParameters();
 			if (WFSMessage.containsGetProtocolBinding(params)) {
-				request = WFSMessage.transformEntityToKVP(new DOMSource(this.reqEntity));
+				request = WFSMessage.transformEntityToKVP(new DOMSource(this.reqEntity), wfsVersion);
 			}
 			else {
 				// https://github.com/opengeospatial/ets-wfs20/issues/233

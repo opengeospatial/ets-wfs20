@@ -22,6 +22,7 @@ import org.opengis.cite.iso19142.WFS2;
 import org.opengis.cite.iso19142.util.ServiceMetadataUtils;
 import org.opengis.cite.iso19142.util.TestSuiteLogger;
 import org.opengis.cite.iso19142.util.ValidationUtils;
+import org.opengis.cite.iso19142.util.WFSMessage;
 import org.opengis.cite.iso19142.util.XMLUtils;
 import org.opengis.cite.validation.SchematronValidator;
 import org.testng.Assert;
@@ -58,6 +59,7 @@ public class DescribeFeatureTypeTests extends BaseFixture {
 		try {
 			this.docBuilder = factory.newDocumentBuilder();
 			this.reqEntity = docBuilder.parse(getClass().getResourceAsStream("DescribeFeatureType.xml"));
+			WFSMessage.updateVersion(reqEntity, this.wfsVersion);
 		}
 		catch (Exception e) {
 			TestSuiteLogger.log(Level.WARNING, "Failed to parse request entity from classpath", e);
