@@ -125,7 +125,8 @@ public class SuiteFixtureListener implements ISuiteListener {
 		}
 		LOGR.log(Level.CONFIG, "DescribeFeatureType request endpoint: {0}", endpoint);
 		StringBuilder reqURI = new StringBuilder(endpoint.toString());
-		reqURI.append("?service=WFS&version=2.0.0&request=DescribeFeatureType");
+		String wfsVersion = (String) suite.getAttribute(SuiteAttribute.WFS_VERSION.getName());
+		reqURI.append("?service=WFS&version=" + wfsVersion + "&request=DescribeFeatureType");
 		Map<String, String> params = suite.getXmlSuite().getParameters();
 		params.put(org.opengis.cite.iso19136.TestRunArg.XSD.toString(), reqURI.toString());
 		LOGR.log(Level.CONFIG, "Set suite parameter {0}: {1}",

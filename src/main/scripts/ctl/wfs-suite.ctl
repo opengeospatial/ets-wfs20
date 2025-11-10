@@ -35,7 +35,7 @@
               <li style="list-style:square">[<a target="_blank" href="http://docs.opengeospatial.org/is/09-025r2/09-025r2.html">
               OGC 09-025r2</a>] OpenGIS Web Feature Service 2.0 Interface Standard - With Corrigendum, Version 2.0.2</li>
               <li style="list-style:square">[<a target="_blank" href="http://docs.opengeospatial.org/is/09-026r2/09-026r2.html">
-              OGC 09-026r2</a>] OGC Filter Encoding 2.0 Standard - With Corrigendum, Version 2.0.2</li>
+              OGC 09-026r2</a>] OGC Filter Encoding 2.0 Standard - With Corrigendum, Version 2.0.3</li>
               <li style="list-style:square">[<a target="_blank" href="http://portal.opengeospatial.org/files/?artifact_id=20509">
               OGC 07-036</a>] OpenGIS Geography Markup Language (GML) Encoding Standard, Version 3.2.1</li>
             </ul>

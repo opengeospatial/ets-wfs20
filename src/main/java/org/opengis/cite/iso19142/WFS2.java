@@ -23,6 +23,8 @@ public class WFS2 {
 
 	public static final String V2_0_0 = "2.0.0";
 
+	public static final String V2_0_2 = "2.0.2";
+
 	public static final String GET_CAPABILITIES = "GetCapabilities";
 
 	public static final String DESCRIBE_FEATURE_TYPE = "DescribeFeatureType";

@@ -53,7 +53,7 @@ public class VerifyWFSMessage {
 	@Test
 	public void transformGetCapabilitiesToKVP() {
 		InputStream inStream = getClass().getResourceAsStream("/GetCapabilities-AcceptSections.xml");
-		String kvp = WFSMessage.transformEntityToKVP(new StreamSource(inStream));
+		String kvp = WFSMessage.transformEntityToKVP(new StreamSource(inStream), "2.0.0");
 		assertTrue("Expected result to contain 'acceptversions=2.0.0,1.1.0'",
 				kvp.contains("acceptversions=2.0.0,1.1.0"));
 		assertTrue("Expected result to contain 'sections=ServiceIdentification'",
@@ -63,7 +63,7 @@ public class VerifyWFSMessage {
 	@Test
 	public void transformGetFeatureBBOXToKVP() {
 		InputStream inStream = getClass().getResourceAsStream("/GetFeature/GetFeature-BBOX.xml");
-		String kvp = WFSMessage.transformEntityToKVP(new StreamSource(inStream));
+		String kvp = WFSMessage.transformEntityToKVP(new StreamSource(inStream), "2.0.0");
 		// expect <fes:BBOX> to be percent-encoded
 		assertTrue("Expected result to contain '%3Cfes%3ABBOX%3E'", kvp.contains("%3Cfes%3ABBOX%3E"));
 	}
@@ -71,7 +71,7 @@ public class VerifyWFSMessage {
 	@Test
 	public void transformStoredQueryToKVP() {
 		InputStream inStream = getClass().getResourceAsStream("/GetFeature/GetFeatureById.xml");
-		String kvp = WFSMessage.transformEntityToKVP(new StreamSource(inStream));
+		String kvp = WFSMessage.transformEntityToKVP(new StreamSource(inStream), "2.0.0");
 		assertTrue("Expected result to contain 'storedquery_id=urn:ogc:def:query:OGC-WFS::GetFeatureById'",
 				kvp.contains("storedquery_id=urn:ogc:def:query:OGC-WFS::GetFeatureById"));
 		assertTrue("Expected result to contain 'id=id-1'", kvp.contains("id=id-1"));
@@ -81,7 +81,7 @@ public class VerifyWFSMessage {
 	@Test
 	public void transformGetFeatureQuery2TypesToKVP() {
 		InputStream inStream = getClass().getResourceAsStream("/GetFeature/GetFeature-Query2Types.xml");
-		String kvp = WFSMessage.transformEntityToKVP(new StreamSource(inStream));
+		String kvp = WFSMessage.transformEntityToKVP(new StreamSource(inStream), "2.0.0");
 		assertTrue("Expected result to contain 'typenames=tns:PrimitiveGeoFeature,tns:AggregateGeoFeature'",
 				kvp.contains("typenames=tns:PrimitiveGeoFeature,tns:AggregateGeoFeature"));
 		assertTrue("Expected result to contain 'xmlns(tns,http://cite.opengeospatial.org/gmlsf)'",
@@ -91,7 +91,7 @@ public class VerifyWFSMessage {
 	@Test
 	public void transformDescribeFeatureTypeToKVP() {
 		InputStream inStream = getClass().getResourceAsStream("/DescribeFeatureType.xml");
-		String kvp = WFSMessage.transformEntityToKVP(new StreamSource(inStream));
+		String kvp = WFSMessage.transformEntityToKVP(new StreamSource(inStream), "2.0.0");
 		assertTrue("Expected result to contain 'version=2.0.0'", kvp.contains("version=2.0.0"));
 		assertTrue("Expected result to contain 'typename=tns:ComplexGeoFeature,tns:AggregateGeoFeature'",
 				kvp.contains("typename=tns:ComplexGeoFeature,tns:AggregateGeoFeature"));
@@ -102,7 +102,7 @@ public class VerifyWFSMessage {
 	@Test
 	public void transformDescribeStoredQueriesToKVP() {
 		InputStream inStream = getClass().getResourceAsStream("/DescribeStoredQueries.xml");
-		String kvp = WFSMessage.transformEntityToKVP(new StreamSource(inStream));
+		String kvp = WFSMessage.transformEntityToKVP(new StreamSource(inStream), "2.0.0");
 		assertTrue("Expected result to contain 'request=DescribeStoredQueries'",
 				kvp.contains("request=DescribeStoredQueries"));
 		assertTrue(

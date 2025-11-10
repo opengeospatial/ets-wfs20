@@ -64,7 +64,7 @@ public class WFSMessage {
 	 * @param xmlSource A Source representing the XML request entity.
 	 * @return A String containing the resulting query component.
 	 */
-	public static String transformEntityToKVP(Source xmlSource) {
+	public static String transformEntityToKVP(Source xmlSource, String wfsVersion) {
 		Source xsltSource = new StreamSource(WFSMessage.class.getResourceAsStream("xml2kvp.xsl"));
 		TransformerFactory factory = TransformerFactory.newInstance();
 		StringWriter writer = new StringWriter();
