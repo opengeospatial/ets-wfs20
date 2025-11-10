@@ -126,6 +126,9 @@ dt {
     <code>GetFeatureById</code> stored query. This identifier is required to test a "Simple WFS" 
     implementation but is ignored if the WFS under test implements the "Basic WFS" conformance class.</p>
 
+    <p>XML schemas that the service provides are tested for validity using the ets-gml32 test suite. 
+    All schemalocations and schema imports need to be accessible for the validity test. HTTP redirects cannot be followed.</p>
+
     <h2>Test coverage</h2>
     <p>Some optional conformance classes are not covered by the test suite. The following 
     capabilities are not tested:</p>
